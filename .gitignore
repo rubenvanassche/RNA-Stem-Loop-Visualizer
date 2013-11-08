@@ -22,3 +22,6 @@ install_manifest.txt
 # Binary & build directory
 bin/
 build/
+
+# VIm backup files
+*.swp
