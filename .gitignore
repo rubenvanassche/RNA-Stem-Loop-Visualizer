@@ -22,3 +22,7 @@ install_manifest.txt
 # Binary & build directory
 bin/
 build/
+
+# Eclipse project
+.project
+.cproject
