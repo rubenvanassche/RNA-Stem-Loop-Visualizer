@@ -19,3 +19,17 @@
 # Last modified:  9 November 2013
 # By: Stijn Wouters
 
+# Lists all sourcefiles (no testfiles and no main)
+set(SRC example.cpp)
+
+# Lists all testfiles, DO NOT remove Tests.cpp
+set(TESTSRC Tests.cpp test_example.cpp)
+
+# Target to build all the tests
+add_executable(Tests ${TESTSRC} ${SRC})
+
+# Target to build the main program
+add_executable(RNAslv RNAslv.cpp ${SRC})
+
+# Install all executables into the bin directory.
+install(TARGETS Tests RNAslv DESTINATION ${PROJECT_SOURCE_DIR}/bin)
