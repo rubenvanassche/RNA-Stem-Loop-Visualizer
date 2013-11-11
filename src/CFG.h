@@ -32,57 +32,58 @@
  */
 class SymbolString{
 public:
-	 /**
-	 * @brief Constructor
-	 *
-	 * @param string A string containing variables and symbols
-	 */
-	SymbolString(std::string string);
+     /**
+     * @brief Constructor
+     *
+     * @param string A string containing variables and symbols
+     */
+    SymbolString(const std::string& string);
 
-	 /**
-	 * @brief Get the string
-	 *
-	 * @param string A string containing variables and symbols
-	 *
-	 * @return A string representing the symbolString
-	 */
-	std::string get();
+     /**
+     * @brief Get the string
+     *
+     * @param string A string containing variables and symbols
+     *
+     * @return A string representing the symbolString
+     */
+    std::string get() const;
 
-	 /**
-	 * @brief Get a symbol in the string at a certain point
-	 *
-	 * @param index The index of the symbol you want
-	 *
-	 * @return The symbol you wanted
-	 */
-	char get(int index);
+     /**
+     * @brief Get a symbol in the string at a certain point
+     *
+     * @param index The index of the symbol you want
+     *
+     * @return The symbol you wanted
+     */
+    char get(const int& index) const;
 
-	 /**
-	 * @brief Remove a symbol in the string at a certain point
-	 *
-	 * @param index The index of the symbol you want removed
-	 *
-	 * @return A bool telling if the operation was successfull
-	 */
-	bool remove(int index);
+     /**
+     * @brief Remove a symbol in the string at a certain point
+     *
+     * @param index The index of the symbol you want removed
+     *
+     * @return A bool telling if the operation was successfull
+     */
+    bool remove(const int& index);
 
-	 /**
-	 * @brief Append two symbolStrings
-	 *
-	 * @param second The second symbolString
-	 *
-	 * @return This symbolString object
-	 */
-	symbolString operator+(symbolString second);
+     /**
+     * @brief Append two symbolStrings
+     *
+     * @param second The second symbolString
+     *
+     * @return This symbolString object
+     */
+    SymbolString& operator+(const SymbolString second);
 
-	 /**
-	 * @brief Get the length of the symbolString
-	 *
-	 * @return An integer
-	 */
-	int size();
+     /**
+     * @brief Get the length of the symbolString
+     *
+     * @return An integer
+     */
+    int size() const;
+
 private:
-	std::string symbols;
+    std::string fSymbols;
 };
 
 /**
@@ -90,22 +91,29 @@ private:
  */
 class CFG {
 public:
-	 /**
-	 * @brief Constructor
-	 *
-	 * @param CFGTerminals A vector containing the terminals of the CFG
-	 * @param CFGVariables A vector containing the variables of the CFG
-	 * @param CFGTransitions A multimap that maps a symbol to an symbolString
-	 * @param CFGStartsymbol The startsymbol for the CFG
-	 */
-	CFG(std::vector<char> CFGTerminals, std::vector<char> CFGVariables,std::multimap<char, symbolString> CFGTransitions, char CFGStartsymbol);
-	virtual ~CFG();
-private:
-	std::multimap<char, symbolString> transitions;
-	std::vector<char> terminals;
-	std::vector<char> variables;
+     /**
+     * @brief Constructor
+     *
+     * @param CFGTerminals A vector containing the terminals of the CFG
+     * @param CFGVariables A vector containing the variables of the CFG
+     * @param CFGTransitions A multimap that maps a symbol to an symbolString
+     * @param CFGStartsymbol The startsymbol for the CFG
+     */
+    CFG(
+        const std::vector<char>& CFGTerminals, 
+        const std::vector<char>& CFGVariables,
+        const std::multimap<char, symbolString>& CFGTransitions, 
+        const char& CFGStartsymbol
+        );
 
-	char startSymbol;
+    virtual ~CFG();
+
+private:
+    std::multimap<char, symbolString> fTransitions;
+    std::vector<char> fTerminals;
+    std::vector<char> fVariables;
+
+    char fStartSymbol;
 };
 
 #endif /* CFG_H_ */

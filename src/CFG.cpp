@@ -22,11 +22,9 @@
 #include "CFG.h"
 
 CFG::CFG() {
-	// TODO Auto-generated constructor stub
-
+    // TODO Auto-generated constructor stub
 }
 
 CFG::~CFG() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
-
