@@ -16,14 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 8 November 2013
+ * Last modified: 11 November 2013
  * By: Ruben Van Assche
  */
 
 #ifndef CFG_H_
 #define CFG_H_
 
-#include <vector>
+#include <set>
 #include <map>
 #include <string>
 
@@ -94,25 +94,31 @@ public:
      /**
      * @brief Constructor
      *
-     * @param CFGTerminals A vector containing the terminals of the CFG
-     * @param CFGVariables A vector containing the variables of the CFG
-     * @param CFGTransitions A multimap that maps a symbol to an symbolString
+     * @param CFGTerminals A set containing the terminals of the CFG
+     * @param CFGVariables A set containing the variables of the CFG
+     * @param CFGProductions A multimap that maps a symbol to an symbolString
      * @param CFGStartsymbol The startsymbol for the CFG
      */
     CFG(
-        const std::vector<char>& CFGTerminals, 
-        const std::vector<char>& CFGVariables,
-        const std::multimap<char, symbolString>& CFGTransitions, 
+        const std::set<char>& CFGTerminals, 
+        const std::set<char>& CFGVariables,
+        const std::multimap<char, symbolString>& CFGProductions, 
         const char& CFGStartsymbol
         );
 
     virtual ~CFG();
 
-private:
-    std::multimap<char, symbolString> fTransitions;
-    std::vector<char> fTerminals;
-    std::vector<char> fVariables;
+/* for converting CFG's to CNF, I need access to the following data members.
+ * Of course, you could write getters and setters, but that's pointless here
+ * since you'll probably never use that getter and setters again.
+ */
+protected:
+    std::multimap<char, symbolString> fProductions;
+    std::set<char> fTerminals;
+    std::set<char> fVariables;
 
+// ...but this one will be kept private.
+private:
     char fStartSymbol;
 };
 
