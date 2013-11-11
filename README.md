@@ -4,7 +4,7 @@ RNA Stem Loop Visualizer
 Software for finding and visualizing RNA Stem Loops from a RNA sequence.
 
 ## Introduction
-RNA (**R**ibo**N**ucleine **Acid**) is actually a chain of nucleotides,
+RNA (**R**ibo **N**ucleine **Acid**) is actually a chain of nucleotides,
 abbreviated as G, A, U and C and where G is a complement of C and U of A and
 vice versa. The RNA will form a stem loop if there are two parts in the RNA
 sequence consisting of complements of each other (the stem) while there are
