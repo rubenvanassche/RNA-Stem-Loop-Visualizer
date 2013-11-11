@@ -102,14 +102,14 @@ public:
     CFG(
         const std::vector<char>& CFGTerminals, 
         const std::vector<char>& CFGVariables,
-        const std::multimap<char, symbolString>& CFGTransitions, 
+        const std::multimap<char, SymbolString>& CFGTransitions, 
         const char& CFGStartsymbol
         );
 
     virtual ~CFG();
 
 private:
-    std::multimap<char, symbolString> fTransitions;
+    std::multimap<char, SymbolString> fTransitions;
     std::vector<char> fTerminals;
     std::vector<char> fVariables;
 
