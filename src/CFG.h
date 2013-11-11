@@ -102,7 +102,7 @@ public:
     CFG(
         const std::set<char>& CFGTerminals, 
         const std::set<char>& CFGVariables,
-        const std::multimap<char, symbolString>& CFGProductions, 
+        const std::multimap<char, SymbolString>& CFGProductions, 
         const char& CFGStartsymbol
         );
 
