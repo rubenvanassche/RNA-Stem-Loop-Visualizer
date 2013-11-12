@@ -73,6 +73,15 @@ public:
      * Destructor.
      */
     ~CNF();
+
+    /**
+     * Check whether the terminal string is in the language of this CNF by
+     * using the CYK algorithm.
+     *
+     * Throws std::domain_error exception if the string passed is not a
+     * terminalstring.
+     */
+    bool CYK(const std::string& terminalstring) const;
 };
 
 #endif // H_CNF_H

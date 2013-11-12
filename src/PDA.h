@@ -26,6 +26,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <set>
 
 /**
  * @brief Class representing a state from a PDA
@@ -108,14 +109,14 @@ public:
      /**
      * @brief Constructor
      *
-     * @param alphabetPDA A vector containing characters representing the alphabet of the PDA
-     * @param alphabetStack A vector containing characters representing the alphabet of the stack
+     * @param alphabetPDA A set containing characters representing the alphabet of the PDA
+     * @param alphabetStack A set containing characters representing the alphabet of the stack
      * @param stackStartSymbol The start symbol for the stack
      * @param PDAending The type of PDA(STACK: PDA is final with empty stack, STATE: PDA is final when it reaches an empty state)
      */
     PDA(
-        const std::vector<char>& alphabetPDA, 
-        const std::vector<char>& alphabetStack, 
+        const std::set<char>& alphabetPDA, 
+        const std::set<char>& alphabetStack, 
         const char& stackStartSymbol, 
         const PDAFinal& PDAending
         );
@@ -137,10 +138,7 @@ public:
      *
      * @return A bool telling if the state is added or not
      */
-    bool addState(
-            const PDAState& state, 
-            const bool& isFinal
-            );
+    bool addState(const PDAState& state, const bool& isFinal);
 
      /**
      * @brief Add a new state to the PDA
@@ -178,9 +176,9 @@ public:
     virtual ~PDA();
 
 private:
-    std::vector<PDATransition> fTransitions;
-    std::vector<PDAState> fStates;
-    std::vector<PDAState*> fFinalStates;
+    std::set<PDATransition> fTransitions;
+    std::set<PDAState> fStates;
+    std::set<PDAState*> fFinalStates;
 
     PDAState* fStartState = nullptr;
 
@@ -188,8 +186,8 @@ private:
 
     PDAFinal fPDAtype;
 
-    std::vector<char> fStackAlphabet;
-    std::vector<char> fAlphabet;
+    std::set<char> fStackAlphabet;
+    std::set<char> fAlphabet;
 
     std::stack<char> fStack;
 };
