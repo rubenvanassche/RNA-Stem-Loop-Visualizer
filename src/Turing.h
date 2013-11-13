@@ -25,6 +25,13 @@
 
 #include <set>
 #include <string>
+#include <exception>
+#include <stdexcept>
+#include <iostream>
+#include <utility>
+#include <deque>
+#include <queue>
+#include <tuple>
 
 enum Direction {L, R};
 
@@ -41,11 +48,42 @@ public:
      */
     TuringState(const std::string& name);
 
+    /**
+     * @brief Checks if name of state is given name
+     *
+     * @param name Name to check
+     *
+     * @return True if name is given name
+     */
+
+    bool isCalled(const std::string& name) const;
+
+
+    /**
+     * @brief overload for boolean < (set support)
+     */
+
+    bool operator<(const TuringState&) const;
+
+    /**
+     * @brief overload for boolean > (set support)
+     */
+
+    bool operator>(const TuringState&) const;
+
+    /**
+     * @brief output overload
+     */
+
+    friend std::ostream& operator<<(std::ostream& output, const TuringState& TS);
+
     virtual ~TuringState();
 
 private:
+
     std::string fName;
 };
+
 
 
 /**
@@ -63,24 +101,151 @@ public:
      * @param dir Direction in which to move head
      */
     TuringTransition(
-        TuringState* from,
-        TuringState* to,
+        const TuringState* from,
+        const TuringState* to,
         const char& read,
         const char& write,
         Direction dir
     );
 
+    /**
+     * @brief Checks if transition is for given state and tape symbol
+     *
+     * @param state State from which transition should start
+     * @param symbol Symbol that should be under head on tape
+     *
+     * @return True if matching transition
+     */
+
+    bool match(const TuringState* state, char symbol);
+
+    /**
+     * @brief Gets next state, symbol to write and direction
+     *
+     * @return Tuple of next state, symbol to write and direction to move in
+     */
+
+    std::tuple<const TuringState*, char, Direction> getTransition() const;
+
+    /**
+     * @brief overload for boolean <, needed to insert TuringTransitions into a set
+     */
+
+    bool operator<(const TuringTransition&) const;
+
+    /**
+     * @brief all of the given arguments are the transition's
+     *
+     * @param from From pointer to check
+     * @param to To pointer to check
+     * @param read Read symbol to check
+     * @param write Write symbol to check
+     * @param dir Direction to check
+     *
+     *
+     * @return True if the same
+     */
+
+    bool isThisTransition(const TuringState* from,
+            const TuringState* to,
+            const char& read,
+            const char& write,
+            Direction dir) const;
+
 
     virtual ~TuringTransition();
 
 private:
-    TuringState *fFrom = nullptr;
-    TuringState *fTo = nullptr;
+    const TuringState *fFrom = nullptr;
+    const TuringState *fTo = nullptr;
     char fRead;
     char fWrite;
     Direction fDirection;
 };
 
+/**
+ * @brief Class representing the tape for a Turing Machine
+ */
+
+class Tape {
+public:
+
+    /**
+     * @brief Constructor
+     *
+     * @param input String to write to tape
+     * @param blank Blank symbol
+     */
+
+    Tape(std::string& input, char blank);
+
+    /*
+     * @brief fetches the symbol at a given position
+     *
+     * @return the symbol
+     */
+    char getSymbolAtHead() const;
+
+    /**
+     * @brief Replaces symbol at given position by given symbol
+     *
+     * @param symbol The symbol to be written to tape
+     */
+    void replaceSymbolAtHead(char symbol);
+
+    /**
+     * @brief Move head one stop
+     *
+     * @param dir Left or right
+     */
+
+    void moveHead(Direction dir);
+
+private:
+    std::deque<char> fTape;
+    char fBlank;
+    int fHead;
+
+};
+
+/**
+ * @brief Class representing Turing Machine Instantaneous Description
+ */
+
+class TMID {
+public:
+
+    /**
+     * @brief Constructor
+     *
+     * @param input The input string
+     * @param state The start state
+     * @param blank The blank symbol for the tape
+     */
+
+    TMID(std::string& input, const TuringState* startState, char blank);
+
+    /**
+     * @brief Get the symbol at the current head position and the current state of the ID
+     *
+     * @return Pair of the symbol and the state
+     */
+    std::pair<const TuringState*, char> getStateAndSymbol() const;
+
+    /**
+     * @brief Process the ID according to one transition for one step
+     *
+     * @param to Pointer to next state
+     * @param write Symbol to be written to tape
+     * @param dir Direction to move head in
+     */
+    void step(const TuringState* to, char write, Direction dir);
+
+private:
+    Tape fTape;
+    const TuringState* fState;
+
+};
 
 /**
  * @brief Class representing a Turing Machine
@@ -105,26 +270,36 @@ public:
      /**
      * @brief Add a new state to the Turing Machine
      *
-     * @param state A TuringState object representing an Turing Machine state
+     * @param state The name of the state to be added
      * @param isEnding A bool describing if the state is a final state
      * @param isStarting A bool describing if the state is the start state
      *
      * @return A bool telling if the state is added or not
      */
     bool addState(
-            const TuringState& state,
-            const bool& isFinal,
-            const bool& isStarting
+            const std::string& state,
+            const bool isStarting,
+            const bool isFinal
             );
 
      /**
      * @brief Add a new transition to the Turing Machine
      *
-     * @param transition A TuringTransition object representing an Turing Machine transition
+     * @param from The name of the state where the transition starts
+     * @param to The name of the state where the transition leads to
+     * @param read The symbol read from the tape
+     * @param write The symbol to write to the tape
+     * @param dir The direction to move tape head in
      *
      * @return A bool telling if the transition is added or not
      */
-    bool addTransition(const TuringTransition& transition);
+    bool addTransition(const std::string& from,
+            const std::string& to,
+            const char& read,
+            const char& write,
+            Direction dir);
+
+
 
     /**
      * @brief Process an input string through the Turing Machine
@@ -133,20 +308,20 @@ public:
      *
      * @return A bool telling if the Turing Machine accepted
      */
-    bool process(std::string input);
+    bool process(std::string& input);
 
     virtual ~TuringMachine();
 
 private:
-    std::set<TuringState> fStates;
+    const TuringState* getStatePtr(std::string& name) const;
+
+
+    std::set<TuringState*> fStates;
     std::set<char> fAlphabet;
     std::set<char> fTapeAlphabet;
     std::set<TuringTransition> fTransitions;
-    TuringTransition* fStartState;
+    const TuringState* fStartState = nullptr;
     char fBlank;
-    std::set<TuringState*> fAccepting;
-
+    std::set<const TuringState*> fAccepting;
 };
-
-
 #endif /*TURING_H*/
