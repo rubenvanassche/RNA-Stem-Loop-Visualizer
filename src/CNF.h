@@ -26,26 +26,27 @@
 #include "CFG.h"
 
 /**
- * The class CNF (Chomsky Normal Form), this is actually a CFG (Context Free
- * Grammar) but with productions of the form
- *     - A --> BC (with A, B and C variables) or
- *     - A --> a (with A a variable and a a terminal)
- *
- * Since this is a CFG, CNF will be inherited from CFG so you can also perform
- * the same actions as declared in the CFG interface.
+ * @brief The class CNF (Chomsky Normal Form), this is actually a CFG (Context
+ * Free Grammar) but with production rules of the form:
+ * - A --> BC (with A, B and C variables) or
+ * - A --> a (with A a variable and a a terminal)
  */
 class CNF : public CFG {
 public:
     /**
-     * Constructor, initialize all datamembers. You'll have to pass a set
-     * of terminal symbols, a set of variables, a multimap where each
-     * character from the set of variables is (multi)mapped to a symbolstring
-     * presenting production rules and a startsymbol (from the set of
-     * variables.
-     * Additionally, this constructor will reconstruct the productionrules and
-     * the set of variables and terminals so that it is actually a CNF.
+     * @brief Constructor, initialize all datamembers. This will reconstruct
+     * the CFG so that the production rules satisfies to the conditions imposed
+     * by the CNF.
      *
-     * Throws the same exception as the CFG constructor.
+     * @param terminals The set of terminal symbols.
+     * @param variables The set of non-terminal symbols.
+     * @param productions The set of production rules (which is actually a
+     * std::map where each non-terminal symbol maps to a string consisting of
+     * terminals and variables.
+     * @param start The start symbol.
+     *
+     * @post
+     * - The production rules satisfies the condition imposed by the CNF.
      */
     CNF(
         const std::set<char>& terminals,
@@ -55,31 +56,50 @@ public:
         );
 
     /**
-     * Convert the CFG to a CNF by calling the constructor immediatelly.
+     * @brief Convert the CFG to a CNF by calling the constructor immediatelly.
+     *
+     * @param cfg The CFG to be converted to CNF.
+     *
+     * @post
+     * - The production rules satisfies the condition imposed by the CNF.
      */
     CNF(const CFG& cfg);
 
     /**
-     * Copy constructor.
+     * @brief Copy constructor.
+     *
+     * @param cnf The CNF to be copied.
      */
     CNF(const CNF& cnf);
 
     /**
-     * Copy assignment operator overloading.
+     * @brief Copy assignment operator overloading.
+     *
+     * @param cnf The CNF to be assigned to.
      */
     CNF& operator=(const CNF& cnf);
 
     /**
-     * Destructor.
+     * @brief Destructor.
      */
     ~CNF();
 
     /**
-     * Check whether the terminal string is in the language of this CNF by
-     * using the CYK algorithm.
+     * @brief Check whether the terminalstring is in the language of this CNF
+     * by using the CYK algorithm.
      *
-     * Throws std::domain_error exception if the string passed is not a
-     * terminalstring.
+     * @param terminalstring The string to be checked whether this is in the
+     * language of the CFG.
+     *
+     * @return True if the terminalstring is in the language of this CFG, false
+     * if not.
+     *
+     * @pre
+     * - The string passed consists only of terminal symbols in the set of
+     *   terminals of this CFG.
+     *
+     * @throw std::domain_error if the string passed is not a valid
+     * terminalstring (that is, not consisting of terminal symbols).
      */
     bool CYK(const std::string& terminalstring) const;
 };

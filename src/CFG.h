@@ -113,8 +113,20 @@ public:
  * since you'll probably never use that getter and setters again.
  */
 protected:
-    std::multimap<char, symbolString> fProductions;
+    /**
+     * @brief The set of production rules where each terminal symbol is 
+     * (multi)mapped to a SymbolString
+     */
+    std::multimap<char, SymbolString> fProductions;
+
+    /**
+     * @brief The set of terminal symbols.
+     */
     std::set<char> fTerminals;
+
+    /**
+     * @brief The set of non-terminal symbols.
+     */
     std::set<char> fVariables;
 
 // ...but this one will be kept private.
