@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 11 November 2013
- * By: Ruben Van Assche
+ * Last modified: 15 November 2013
+ * By: Stijn Wouters
  */
 
 #ifndef CFG_H_
@@ -30,61 +30,7 @@
 /**
  * @brief Class representing a sequence of terminals and variables
  */
-class SymbolString{
-public:
-     /**
-     * @brief Constructor
-     *
-     * @param string A string containing variables and symbols
-     */
-    SymbolString(const std::string& string);
-
-     /**
-     * @brief Get the string
-     *
-     * @param string A string containing variables and symbols
-     *
-     * @return A string representing the symbolString
-     */
-    std::string get() const;
-
-     /**
-     * @brief Get a symbol in the string at a certain point
-     *
-     * @param index The index of the symbol you want
-     *
-     * @return The symbol you wanted
-     */
-    char get(const int& index) const;
-
-     /**
-     * @brief Remove a symbol in the string at a certain point
-     *
-     * @param index The index of the symbol you want removed
-     *
-     * @return A bool telling if the operation was successfull
-     */
-    bool remove(const int& index);
-
-     /**
-     * @brief Append two symbolStrings
-     *
-     * @param second The second symbolString
-     *
-     * @return This symbolString object
-     */
-    SymbolString& operator+(const SymbolString second);
-
-     /**
-     * @brief Get the length of the symbolString
-     *
-     * @return An integer
-     */
-    int size() const;
-
-private:
-    std::string fSymbols;
-};
+typedef std::string SymbolString;
 
 /**
  * @brief Class representing a CFG
@@ -100,25 +46,37 @@ public:
      * @param CFGStartsymbol The startsymbol for the CFG
      */
     CFG(
-        const std::set<char>& CFGTerminals, 
-        const std::set<char>& CFGVariables,
-        const std::multimap<char, SymbolString>& CFGProductions, 
-        const char& CFGStartsymbol
+        const std::set<char>& terminals, 
+        const std::set<char>& variables,
+        const std::multimap<char, SymbolString>& productions, 
+        const char& startsymbol
         );
 
+    /**
+     * @brief Copy constructor.
+     *
+     * @param cfg The CFG you want to copy.
+     */
+    CFG(const CFG& cfg);
+
+    /**
+     * @brief Copy assignment operator.
+     *
+     * @param cfg The CFG you want to assign to it.
+     */
+    CFG& operator=(const CFG& cfg);
+
+    /**
+     * @brief Destructor.
+     */
     virtual ~CFG();
 
-/* for converting CFG's to CNF, I need access to the following data members.
+/* 
+ * for converting CFG's to CNF, I need access to the following data members.
  * Of course, you could write getters and setters, but that's pointless here
  * since you'll probably never use that getter and setters again.
  */
 protected:
-    /**
-     * @brief The set of production rules where each terminal symbol is 
-     * (multi)mapped to a SymbolString
-     */
-    std::multimap<char, SymbolString> fProductions;
-
     /**
      * @brief The set of terminal symbols.
      */
@@ -129,8 +87,15 @@ protected:
      */
     std::set<char> fVariables;
 
-// ...but this one will be kept private.
-private:
+    /**
+     * @brief The set of production rules where each terminal symbol is 
+     * (multi)mapped to a SymbolString
+     */
+    std::multimap<char, SymbolString> fProductions;
+
+    /**
+     * @brief The start symbol
+     */
     char fStartSymbol;
 };
 
