@@ -27,16 +27,12 @@ CNF::CNF(
     const std::multimap<char, SymbolString>& productions,
     const char& start
     ) : CFG(terminals, variables, productions, start) {
-    // TODO eleminating epsilon productions
-    // TODO eleminating unit productions
-    // TODO eleminating useless symbols
+    // TODO cleanup grammar
     // TODO convert to Chomsky Normal Form
 }
 
 CNF::CNF(const CFG& cfg) : CFG(cfg) {
-    // TODO eleminating epsilon productions
-    // TODO eleminating unit productions
-    // TODO eleminating useless symbols
+    // TODO cleanup grammar
     // TODO convert to Chomsky Normal Form
 }
 
@@ -51,4 +47,9 @@ CNF& CNF::operator=(const CNF& cnf) {
 
 CNF::~CNF() {
     // nothing else to destroy
+}
+
+bool CNF::CYK(const std::string& terminalstring) const{
+    // TODO implement
+    return true;
 }

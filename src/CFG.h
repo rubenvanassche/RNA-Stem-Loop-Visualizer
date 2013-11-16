@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 15 November 2013
+ * Last modified: 16 November 2013
  * By: Stijn Wouters
  */
 
@@ -70,6 +70,33 @@ public:
      * @brief Destructor.
      */
     virtual ~CFG();
+
+    /**
+     * @brief Eleminate epsilon productions. That is, eleminate productions
+     * of the form A -> ε
+     *
+     * @post The production rules doesn't contain any epsilon productions.
+     */
+    void eleminateEpsilonProductions();
+
+    /**
+     * @brief Eleminate unit productions. That is, eleminate productions of
+     * the form A -> B. But doing so that it does not affect the language of
+     * this CFG.
+     *
+     * @post The production rules doesn't contain any unit productions.
+     * @post The CFG still accepts the same language.
+     */
+    void eleminateUnitProductions();
+
+    /**
+     * @brief Eleminate useless symbols. But doing so that is does not affect
+     * the language of this CFG.
+     *
+     * @post The production rules doesn't contain any unit productions.
+     * @post The CFG still accepts the same language.
+     */
+    void eleminateUselessSymbols();
 
 /* 
  * for converting CFG's to CNF, I need access to the following data members.
