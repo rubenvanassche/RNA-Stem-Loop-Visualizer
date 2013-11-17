@@ -182,7 +182,8 @@ std::set<char> CFG::nullable() const {
                     } // end if-else
                 } // end for
 
-
+                //  if all symbols in the body were nullable, then the head
+                // is also nullable
                 if (isNullable) 
                     nullable.insert(it->first);
             } // end for
@@ -247,38 +248,63 @@ void CFG::eleminateEpsilonProductions() {
     return;
 }
 
-/*
-void CFG::eleminateUnitProductions() {
-    bool modified = true;
+std::set< std::pair<char, char> > CFG::units() const {
+    std::set< std::pair<char, char> > units;
 
-    // keep going untile the production rules aren't modified
-    while (modified) {
-        modified = false;
+    // first the base case
+    for (char v : fVariables) {
+        units.insert( std::pair<char, char>(v, v) );
+    } // end for
 
-        for (char c : fVariables) {
-            for (auto it = fProductions.equal_range(c).first; 
-                it != fProductions.equal_range(c).second; ++it) {
-                // first check whether this is an unit production
-                if ((*it).second.size() == 1 
-                        && fVariables.find(it->second[0]) != fVariables.end()) {
-                    // it is, then replace this production rule
-                    fProductions.erase(it);
-                    for (auto i = fProductions.equal_range(it->second[0]).first;
-                            i != fProductions.equal_range(it->second[0]).second;
-                            ++i) {
-                        std::pair<char, SymbolString> args(c, i->second);
-                        fProductions.insert(args);
-                    } // end for
-                    modified = true;
-                } else {
-                    continue;
-                } // end if-else
-            } // end for
+    // now, recursion
+    for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
+        auto range = fProductions.equal_range(it->first);
+
+        for (auto it1 = range.first; it1 != range.second; ++it1) {
+            // if the body is of length 1 and it's a variable, then we have
+            // an unit pair
+            if ((it1->second).size() == 1 
+                    && fVariables.find((it1->second).at(0)) != fVariables.end())
+                units.insert( std::pair<char, char>(it1->first, (it1->second).at(0)) );
         } // end for
-    } // end while
+    } // end for
+
+    return units;
+}
+
+void CFG::eleminateUnitProductions() {
+    // first, get all unit pairs
+    std::set< std::pair<char, char> > units = this->units();
+
+    // check whether there are no circular unit pairs
+    // TODO
+
+    // the new productions
+    std::multimap<char, SymbolString> newProductions;
+
+    for (std::pair<char, char> u : units) {
+        // get all the bodies from the second variable in the unit pair
+        std::set<SymbolString> bodies = this->productions(u.second);
+
+        // those bodies are also the bodies of the rules from the first
+        // variable in the unit pair
+        for (SymbolString b : bodies) {
+            // ignore if the body is of length 1 and is a variable
+            if (b.size() == 1 && fVariables.find(b.at(0)) != fVariables.end())
+                continue;
+
+            // add the new rule
+            std::pair<char, SymbolString> rule(u.first, b);
+
+            newProductions.insert(rule);
+        } // end for
+    } // end for
+
+    fProductions = newProductions;
     return;
 }
 
+/*
 void CFG::eleminateUselessSymbols() {
     // first, find all reachable symbols
     std::set<char> reachable = {fStartSymbol};  // base case

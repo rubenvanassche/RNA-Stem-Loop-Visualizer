@@ -156,3 +156,82 @@ TEST_CASE("Eleminating epsilon productions", "[CFG]") {
     CHECK(c.productions('B') == b_productions_e);
     CHECK(c.productions('S') == s_productions_e);
 }
+
+TEST_CASE("Unit pairs", "[CFG]") {
+    const std::set<char> terminals = {'a', 'b'};
+    const std::set<char> variables = {'S', 'A', 'B'};
+    const char start = 'S';
+
+    SECTION("Only base case") {
+        const std::multimap<char, SymbolString> productions = {
+                                                            {'S', "AB"},
+                                                            {'A', "a"},
+                                                            {'B', "b"}
+                                                            };
+
+        const CFG c(terminals, variables, productions, start);
+
+        std::set< std::pair<char, char> > units = { 
+                                                {'S', 'S'}, 
+                                                {'A', 'A'},
+                                                {'B', 'B'}
+                                                };
+        CHECK(c.units() == units);
+    }
+
+
+    SECTION("With recursion") {
+        const std::multimap<char, SymbolString> productions = {
+                                                            {'S', "AB"},
+                                                            {'S', "B"},
+                                                            {'S', "A"},
+                                                            {'A', "a"},
+                                                            {'B', "b"}
+                                                            };
+
+        const CFG c(terminals, variables, productions, start);
+
+        std::set< std::pair<char, char> > units = { 
+                                                {'S', 'S'}, 
+                                                {'S', 'A'}, 
+                                                {'S', 'B'}, 
+                                                {'A', 'A'},
+                                                {'B', 'B'},
+                                                };
+        CHECK(c.units() == units);
+    }
+}
+
+TEST_CASE("Eleminating unit productions", "[CFG]") {
+    const std::set<char> terminals = {'a', 'b'};
+    const std::set<char> variables = {'S', 'A', 'B'};
+    const char start = 'S';
+
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'S', "AB"},
+                                                        {'S', "B"},
+                                                        {'S', "A"},
+                                                        {'A', "a"},
+                                                        {'A', "AA"},
+                                                        {'B', "b"},
+                                                        {'B', "BB"}
+                                                        };
+
+    CFG c(terminals, variables, productions, start);
+
+    std::set<SymbolString> s_productions = {"AB", "A", "B"};
+    std::set<SymbolString> a_productions = {"a", "AA"};
+    std::set<SymbolString> b_productions = {"b", "BB"};
+
+    REQUIRE(c.productions('S') == s_productions);
+    REQUIRE(c.productions('A') == a_productions);
+    REQUIRE(c.productions('B') == b_productions);
+ 
+    c.eleminateUnitProductions();
+
+    std::set<SymbolString> s_productions_u = {"AB", "a", "AA", "b", "BB"};
+
+    CHECK(c.productions('S') == s_productions_u);
+    CHECK(c.productions('A') == a_productions);
+    CHECK(c.productions('B') == b_productions);
+}

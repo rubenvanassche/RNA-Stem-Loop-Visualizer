@@ -112,14 +112,27 @@ public:
     void eleminateEpsilonProductions();
 
     /**
+     * @brief Get all the unit pairs of this CFG.
+     *
+     * @return The set of all unit pairs.
+     */
+    std::set< std::pair<char, char> > units() const;
+
+    /**
      * @brief Eleminate unit productions. That is, eleminate productions of
      * the form A -> B. But doing so that it does not affect the language of
      * this CFG.
      *
+     * @note The algorithm only works if there is no cycle of unit productions.
+     * That is, unit pairs of the form A -> B, B -> C and C -> A. If that's the
+     * case, an exception will be thrown.
+     *
+     * @throw std::logic_error This CFG has a cycle of unit pairs. TODO
+     *
      * @post The production rules doesn't contain any unit productions.
      * @post The CFG still accepts the same language.
      */
-    //void eleminateUnitProductions();
+    void eleminateUnitProductions();
 
     /**
      * @brief Eleminate useless symbols. But doing so that is does not affect
