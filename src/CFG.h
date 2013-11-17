@@ -135,13 +135,34 @@ public:
     void eleminateUnitProductions();
 
     /**
+     * @brief Get all the generating symbols.
+     *
+     * @return The set of generating symbols.
+     */
+    std::set<char> generating() const;
+
+    /**
+     * @brief Get all the reachable symbols.
+     *
+     * @return The set of all reachable symbols.
+     */
+    std::set<char> reachable() const;
+
+    /**
      * @brief Eleminate useless symbols. But doing so that is does not affect
      * the language of this CFG.
      *
      * @post The production rules doesn't contain any unit productions.
      * @post The CFG still accepts the same language.
      */
-    //void eleminateUselessSymbols();
+    void eleminateUselessSymbols();
+
+    /**
+     * @brief Clean up CFG, that is, eleminate epsilon productions, useless
+     * symbols and unit productions IN SAFE ORDER. This comes in handy for 
+     * converting to CNF (Chomsky Normal Form).
+     */
+    void cleanUp();
 
 /* 
  * for converting CFG's to CNF, I need access to the following data members.

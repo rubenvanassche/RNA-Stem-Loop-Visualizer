@@ -222,10 +222,18 @@ TEST_CASE("Eleminating unit productions", "[CFG]") {
     std::set<SymbolString> s_productions = {"AB", "A", "B"};
     std::set<SymbolString> a_productions = {"a", "AA"};
     std::set<SymbolString> b_productions = {"b", "BB"};
+    std::set< std::pair<char, char> > units = { 
+                                            {'S', 'S'}, 
+                                            {'S', 'A'}, 
+                                            {'S', 'B'}, 
+                                            {'A', 'A'},
+                                            {'B', 'B'},
+                                            };
 
     REQUIRE(c.productions('S') == s_productions);
     REQUIRE(c.productions('A') == a_productions);
     REQUIRE(c.productions('B') == b_productions);
+    REQUIRE(c.units() == units);
  
     c.eleminateUnitProductions();
 
@@ -234,4 +242,87 @@ TEST_CASE("Eleminating unit productions", "[CFG]") {
     CHECK(c.productions('S') == s_productions_u);
     CHECK(c.productions('A') == a_productions);
     CHECK(c.productions('B') == b_productions);
+}
+
+TEST_CASE("Generating symbols", "[CFG]") {
+    const std::set<char> terminals = {'a', 'b'};
+    const std::set<char> variables = {'S', 'A', 'B'};
+    const char start = 'S';
+
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'S', "AB"},
+                                                        {'S', "a"},
+                                                        {'A', "b"}
+                                                        };
+
+    const CFG c(terminals, variables, productions, start);
+
+    std::set<char> generating = {'S', 'A', 'b', 'a'};
+
+    CHECK(c.generating() == generating);
+}
+
+TEST_CASE("Reachable symbols", "[CFG]") {
+    const std::set<char> terminals = {'a', 'b'};
+    const std::set<char> variables = {'S', 'A', 'B'};
+    const char start = 'S';
+
+    SECTION("Some symbols are reachable") {
+        const std::multimap<char, SymbolString> productions = {
+                                                            {'S', "a"},
+                                                            {'A', "b"}
+                                                            };
+
+        const CFG c(terminals, variables, productions, start);
+
+        std::set<char> reachable = {'S', 'a'};
+
+        CHECK(c.reachable() == reachable);
+    }
+
+    SECTION("All symbols are reachable") {
+        const std::multimap<char, SymbolString> productions = {
+                                                            {'S', "AB"},
+                                                            {'S', "a"},
+                                                            {'A', "b"}
+                                                            };
+
+        const CFG c(terminals, variables, productions, start);
+
+        std::set<char> reachable = {'S', 'A', 'b', 'B', 'a'};
+
+        CHECK(c.reachable() == reachable);
+    }
+}
+
+TEST_CASE("Eleminating useless symbols", "[CFG]") {
+    const std::set<char> terminals = {'a', 'b'};
+    const std::set<char> variables = {'S', 'A', 'B'};
+    const char start = 'S';
+
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'S', "AB"},
+                                                        {'S', "a"},
+                                                        {'A', "b"}
+                                                        };
+
+    CFG c(terminals, variables, productions, start);
+
+    std::set<SymbolString> s_bodies = {"AB", "a"};
+    std::set<SymbolString> a_bodies = {"b"};
+    std::set<char> generating = {'S', 'A', 'b', 'a'};
+    std::set<char> reachable = {'S', 'A', 'b', 'B', 'a'};
+
+    REQUIRE(c.productions('S') == s_bodies);
+    REQUIRE(c.productions('A') == a_bodies);
+    REQUIRE(c.productions('B').empty());
+    REQUIRE(c.generating() == generating);
+    REQUIRE(c.reachable() == reachable);
+
+    c.eleminateUselessSymbols();
+    std::set<SymbolString> s_bodies_u = {"a"};
+
+    CHECK(c.productions('S') == s_bodies_u);
+    CHECK(c.productions('A').empty());
+    CHECK(c.productions('B').empty());
 }

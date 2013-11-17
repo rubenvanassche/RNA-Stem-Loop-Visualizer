@@ -24,8 +24,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include <iostream>
-
 /**
  * @brief Recursive implementation to get all the subsets of a given set.
  *
@@ -304,85 +302,150 @@ void CFG::eleminateUnitProductions() {
     return;
 }
 
-/*
-void CFG::eleminateUselessSymbols() {
-    // first, find all reachable symbols
-    std::set<char> reachable = {fStartSymbol};  // base case
+std::set<char> CFG::generating() const {
+    // base case
+    std::set<char> generating = fTerminals;
 
+    // recursive part: all variables having a production whose body consists
+    // only of generating symbols are also generating
     bool newSymbols = true;
 
-    // keep going untill no new symbols were found
-    while (newSymbols) {
-        unsigned int size_before = reachable.size();
-
-        for (char c : reachable) {
-            for (auto it = fProductions.equal_range(c).first;
-                    it != fProductions.equal_range(c).second; ++it) {
-                // the symbols in the body are surely reachable
-                for (char s : it->second) {
-                    reachable.insert(s);
-                } // end for
-            } // end for
-        } // end for
-
-        unsigned int size_after = reachable.size();
-
-        // if new symbols were found, then keep going
-        newSymbols = (size_before == size_after) ? false : true;
-    } // end while
-
-    // then, find all generating symbols
-    std::set<char> generating;
-    generating.insert(fTerminals.begin(), fTerminals.end());    // base case
-
-    newSymbols = true;
+    // keep going until no new nullable symbols were found
     while (newSymbols) {
         unsigned int size_before = generating.size();
 
-        for (char c : fVariables) {
-            for (auto it = fProductions.equal_range(c).first;
-                    it != fProductions.equal_range(c).second; ++it) {
-                // check if all symbols in the body are generating
-                bool gen = true;
-                for (char s : it->second) {
+        for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
+            // if the key is already generating, skip them
+            if (generating.find(it->first) != generating.end())
+                continue;
+
+            auto range = fProductions.equal_range(it->first);
+
+            for (auto it1 = range.first; it1 != range.second; ++it1) {
+                // iterate over each symbol in the body and check whether they
+                // are generating
+                bool isGenerating = true;
+
+                for (char s : it1->second) {
                     if (generating.find(s) == generating.end()) {
-                        gen = false;
+                        isGenerating = false;
                         break;
                     } else {
                         continue;
                     } // end if-else
                 } // end for
 
-                if (gen)
+                //  if all symbols in the body were generating, then the head
+                // is also generating
+                if (isGenerating) 
                     generating.insert(it->first);
             } // end for
         } // end for
 
         unsigned int size_after = generating.size();
 
-        // if new symbols were found, then keep going
+        // check whether new symbols were found
         newSymbols = (size_before == size_after) ? false : true;
-    } // end while
+    } // end for
 
-    // Now, all useful symbols will be both generating and reachable
-    std::set<char> useful;
+    return generating;
+}
 
-    std::set_intersection(
-                    reachable.begin(), reachable.end(),
-                    generating.begin(), generating.end(),
-                    std::inserter(useful, useful.begin()));
+std::set<char> CFG::reachable() const {
+    // base case: the start symbol is surely reachable
+    std::set<char> reachable = {fStartSymbol};
 
-    for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
-        if (useful.find(it->first) == useful.end())
-            fProductions.erase(it);
+    // recursive part: 
+    bool newSymbols = true;
+
+    while (newSymbols) {
+        unsigned int size_before = reachable.size();
+
+        for (char s : reachable) {
+            // ignore if it's a terminal
+            if (fTerminals.find(s) != fTerminals.end())
+                continue;
+
+            // get all the bodies with this symbol as head
+            std::set<SymbolString> bodies = this->productions(s);
+
+            // all symbols of the bodies are also reachable
+            for (SymbolString b : bodies) {
+                for (char c : b ) {
+                    reachable.insert(c);
+                } // end for
+            } // end for
+        } // end for
+
+        unsigned int size_after = reachable.size();
+
+        // check whether new symbols were found
+        newSymbols = (size_before == size_after) ? false : true;
+    } // end for
+
+    return reachable;
+}
+
+void CFG::eleminateUselessSymbols() {
+    // first, eleminate all symbols that are not generating
+    std::set<char> generating = this->generating();
+
+    // the new set of production rules
+    std::multimap<char, SymbolString> newProductions;
+
+    for (char v : generating) {
+        // ignore if v is a terminal
+        if (fTerminals.find(v) != fTerminals.end())
             continue;
 
-        for (char c : it->second) {
-            if (useful.find(c) == useful.end())
-                fProductions.erase(it);
-                break;
+        // get the bodies
+        std::set<SymbolString> bodies = this->productions(v);
+
+        // only add rules whose body does not contain any non-generating symbols
+        for (SymbolString b : bodies) {
+            // first check whether the body does not contain any non-generating
+            // symbols, if so, skip it
+            bool isGenerating = true;
+            for (char c : b) {
+                if (generating.find(c) == generating.end()) {
+                    isGenerating = false;
+                    break;
+                } else {
+                    continue;
+                } // end if-else
+            } // end for
+
+            // add them if it's ok
+            if (isGenerating) {
+                std::pair<char, SymbolString> rule(v, b);
+                newProductions.insert(rule);
+            } else {
+                continue;
+            } // end if-else
         } // end for
     } // end for
+
+    fProductions = newProductions;
+    // now we have a set of production rules only containing generating
+    // symbols, our next step is to eleminate non-reachable symbols
+
+    std::set<char> reachable = this->reachable();
+
+    for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
+        // if the key is not reachable, then remove the rules
+        if (reachable.find(it->first) == reachable.end()) {
+            fProductions.erase(it->first);
+        }
+    } // end for
+
     return;
 }
-*/
+
+void CFG::cleanUp() {
+    // this one is easy now, just clean up in this order
+    this->eleminateEpsilonProductions();
+    this->eleminateUnitProductions();
+    this->eleminateUselessSymbols();
+    // that's it
+    return;
+}
