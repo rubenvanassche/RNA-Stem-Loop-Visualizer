@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 16 November 2013
+ * Last modified: 17 November 2013
  * By: Stijn Wouters
  */
 
@@ -44,6 +44,16 @@ public:
      * @param CFGVariables A set containing the variables of the CFG
      * @param CFGProductions A multimap that maps a symbol to an symbolString
      * @param CFGStartsymbol The startsymbol for the CFG
+     *
+     * @pre
+     * - The set of variables and the set of terminales are disjoints.
+     * - The production rule is valid: The head consist of exactly one symbol
+     *   that is in the set of the variables and the body must be empty or
+     *   consisting of symbols that is either in the set of variables or in
+     *   the set of terminals.
+     * - The starting symbol must be a member of the set of variables.
+     *
+     * @throw std::invalid_argument One of the preconditions were not met.
      */
     CFG(
         const std::set<char>& terminals, 
@@ -72,6 +82,28 @@ public:
     virtual ~CFG();
 
     /**
+     * @brief Get the set of symbolstrings.
+     *
+     * @param v The variable representing the head of the production rules.
+     *
+     * @return The set of symbolstrings representing the body of the
+     * production rules.
+     *
+     * @pre
+     * - The variable must be in the set of the variables.
+     *
+     * @throw std::invalid_argument The precondition were not satisfied.
+     */
+    std::set<SymbolString> productions(const char& v) const;
+
+    /**
+     * @brief Get all the nullable variables.
+     *
+     * @return The set of all nullable variables.
+     */
+    std::set<char> nullable() const;
+
+    /**
      * @brief Eleminate epsilon productions. That is, eleminate productions
      * of the form A -> ε
      *
@@ -87,7 +119,7 @@ public:
      * @post The production rules doesn't contain any unit productions.
      * @post The CFG still accepts the same language.
      */
-    void eleminateUnitProductions();
+    //void eleminateUnitProductions();
 
     /**
      * @brief Eleminate useless symbols. But doing so that is does not affect
@@ -96,7 +128,7 @@ public:
      * @post The production rules doesn't contain any unit productions.
      * @post The CFG still accepts the same language.
      */
-    void eleminateUselessSymbols();
+    //void eleminateUselessSymbols();
 
 /* 
  * for converting CFG's to CNF, I need access to the following data members.

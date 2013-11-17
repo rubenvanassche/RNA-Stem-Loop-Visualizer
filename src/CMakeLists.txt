@@ -23,7 +23,7 @@
 set(SRC CFG.cpp CNF.cpp)
 
 # Lists all testfiles, DO NOT remove Tests.cpp
-set(TESTSRC Tests.cpp)
+set(TESTSRC Tests.cpp test_CFG.cpp)
 
 # Target to build all the tests
 add_executable(Tests ${TESTSRC} ${SRC})
