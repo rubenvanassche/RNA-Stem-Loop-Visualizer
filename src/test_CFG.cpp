@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 17 November 2013
+ * Last modified: 18 November 2013
  * By: Stijn Wouters
  */
 #include "Catch.h"
@@ -25,304 +25,403 @@
 #include <map>
 #include <stdexcept>
 
-TEST_CASE("Production rules", "[CFG]") {
+TEST_CASE("Constructing CFG's", "[CFG]") {
+    const std::set<char> empty_set;
+    const std::set<char> a = {'a'};
+    const std::set<char> a_b = {'a', 'b'};
+    const std::set<char> A = {'A'};
+    const std::set<char> A_B = {'A', 'B'};
+
+    const std::multimap<char, SymbolString> empty_map;
+    const std::multimap<char, SymbolString> valid_map = { {'A', "a"} };
+    const std::multimap<char, SymbolString> invalid_map = { {'a', "A"} };
+
+    // first, valid construction
+    try {
+        const CFG c0(a, A, empty_map, 'A');
+        const CFG c1(a, A_B, empty_map, 'A');
+        const CFG c2(a_b, A, empty_map, 'A');
+        const CFG c3(a_b, A_B, empty_map, 'A');
+        const CFG c4(a_b, A_B, empty_map, 'B');
+        const CFG c5(a, A, valid_map, 'A');
+        const CFG c6(a, A_B, valid_map, 'A');
+        const CFG c7(a_b, A, valid_map, 'A');
+        const CFG c8(a_b, A_B, valid_map, 'A');
+        const CFG c9(a_b, A_B, valid_map, 'B');
+    } catch (const std::invalid_argument& e) {
+        FAIL("Got exception: " << e.what());
+    } // end try-catch
+
+    // invalid set of variables/terminals (not disjoint)
+    try {
+        const CFG c(A, A, empty_map, 'A');
+        FAIL("Could construct const CFG c(A, A, empty_map, 'A');");
+    } catch (const std::invalid_argument& e) {
+        // expected to be here
+    } // end try-catch
+
+    try {
+        const CFG c(A_B, A, empty_map, 'A');
+        FAIL("Could construct const CFG c(A_B, A, empty_map, 'A');");
+    } catch (const std::invalid_argument& e) {
+        // expected to be here
+    } // end try-catch
+
+    try {
+        const CFG c(A, A_B, empty_map, 'A');
+        FAIL("Could construct const CFG c(A, A_B, empty_map, 'A');");
+    } catch (const std::invalid_argument& e) {
+        // expected to be here
+    } // end try-catch
+
+    // invalid production rule
+    try {
+        const CFG c(a_b, A_B, invalid_map, 'A');
+        FAIL("Could construct const CFG c(a_b, A_B, invalid_map, 'A');");
+    } catch (const std::invalid_argument& e) {
+        // expected to be here
+    } // end try-catch
+}
+
+TEST_CASE("Bodies of the production rules", "[CFG]") {
     const std::set<char> terminals = {'a', 'b'};
-    const std::set<char> variables = {'S', 'A', 'B', 'C'};
-    const char start = 'S';
+    const std::set<char> variables = {'A', 'B'};
 
+    const std::multimap<char, SymbolString> empty_map;
     const std::multimap<char, SymbolString> productions = {
-                                                        {'S', "AB"},
-                                                        {'A', ""},
-                                                        {'A', "a"},
-                                                        {'A', "AA"},
-                                                        {'B', "b"},
-                                                        {'B', "BB"}
-                                                        };
+                                                {'A', ""},
+                                                {'A', "aa"},
+                                                {'A', "aA"},
+                                                {'A', "ab"},
+                                                {'A', "aB"},
+                                                {'A', "Aa"},
+                                                {'A', "AA"},
+                                                {'A', "Ab"},
+                                                {'A', "AB"}
+                                                };
 
-    const CFG c(terminals, variables, productions, start);
+    const std::set<SymbolString> A_bodies = { 
+                                                "aa", "aA", "ab", 
+                                                "aB", "Aa", "AA",
+                                                "Ab", "AB", ""
+                                                };
 
-    std::set<SymbolString> s_productions = {"AB"};
-    std::set<SymbolString> a_productions = {"a", "AA", ""};
-    std::set<SymbolString> b_productions = {"b", "BB"};
+    try {
+        const CFG c0(terminals, variables, empty_map, 'A');
+        CHECK(c0.bodies('A').empty());
+        CHECK(c0.bodies('B').empty());
+        CHECK_THROWS_AS(c0.bodies('a'), std::invalid_argument);
+        CHECK_THROWS_AS(c0.bodies('b'), std::invalid_argument);
+        CHECK_THROWS_AS(c0.bodies('C'), std::invalid_argument);
 
-    CHECK(c.productions('S') == s_productions);
-    CHECK(c.productions('A') == a_productions);
-    CHECK(c.productions('B') == b_productions);
-    CHECK(c.productions('C').empty());
-
-    CHECK_THROWS_AS(c.productions('D'), std::invalid_argument);
+        const CFG c1(terminals, variables, productions, 'A');
+        CHECK(c1.bodies('A') == A_bodies);
+        CHECK(c1.bodies('B').empty());
+        CHECK_THROWS_AS(c1.bodies('a'), std::invalid_argument);
+        CHECK_THROWS_AS(c1.bodies('b'), std::invalid_argument);
+        CHECK_THROWS_AS(c1.bodies('C'), std::invalid_argument);
+    } catch (const std::invalid_argument& e) {
+        FAIL("Could not construct CFG's: " << e.what());
+    } // end try-catch
 }
 
 TEST_CASE("Nullable symbols", "[CFG]") {
     const std::set<char> terminals = {'a', 'b'};
-    const std::set<char> variables = {'S', 'A', 'B'};
-    const char start = 'S';
+    const std::set<char> variables = {'A', 'B'};
 
-    SECTION("no nullable symbols") {
-        const std::multimap<char, SymbolString> productions = {
-                                                            {'S', "AB"},
-                                                            {'A', "a"},
-                                                            {'A', "A"},
-                                                            {'B', "b"},
-                                                            {'B', "B"}
-                                                            };
-
-        const CFG c(terminals, variables, productions, start);
-
-        CHECK(c.nullable().empty());
-    }
-
-    SECTION("only base case") {
-        const std::multimap<char, SymbolString> productions = {
-                                                            {'S', ""},
-                                                            {'A', "a"},
-                                                            {'A', "A"},
-                                                            {'B', "b"},
-                                                            {'B', "B"}
-                                                            };
-
-        const CFG c(terminals, variables, productions, start);
-
-        std::set<char> s = {'S'};
-        CHECK(c.nullable() == s);
-    }
-
-    SECTION("induction") {
-        const std::multimap<char, SymbolString> productions = {
-                                                            {'S', "A"},
-                                                            {'A', "a"},
-                                                            {'A', "A"},
-                                                            {'A', ""},
-                                                            {'B', "b"},
-                                                            {'B', "B"}
-                                                            };
-
-        const CFG c(terminals, variables, productions, start);
-
-        std::set<char> s_a = {'S', 'A'};
-        CHECK(c.nullable() == s_a);
-    }
-
-    SECTION("all") {
-        const std::multimap<char, SymbolString> productions = {
-                                                            {'S', "AB"},
-                                                            {'A', "a"},
-                                                            {'A', "AA"},
-                                                            {'A', ""},
-                                                            {'B', "b"},
-                                                            {'B', "BB"},
-                                                            {'B', ""}
-                                                            };
-
-        const CFG c(terminals, variables, productions, start);
-
-        CHECK(c.nullable() == variables);
-    }
-}
-
-TEST_CASE("Eleminating epsilon productions", "[CFG]") {
-    const std::set<char> terminals = {'a', 'b', 'c'};
-    const std::set<char> variables = {'S', 'A', 'B'};
-    const char start = 'S';
-
-    const std::multimap<char, SymbolString> productions = {
-                                                        {'S', "AB"},
+    const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> A_nullable = {
                                                         {'A', ""},
-                                                        {'A', "a"},
-                                                        {'A', "AA"},
-                                                        {'B', ""},
-                                                        {'B', "c"},
-                                                        {'B', "BbB"}
+                                                        {'B', "b"}
+                                                        };
+    const std::multimap<char, SymbolString> all_nullable = { 
+                                                        {'A', "AB"}, 
+                                                        {'A', ""}, 
+                                                        {'B', ""}
                                                         };
 
-    CFG c(terminals, variables, productions, start);
+    try {
+        const CFG c0(terminals, variables, empty, 'A');
+        CHECK(c0.nullable().empty());
 
-    std::set<SymbolString> s_productions = {"AB"};
-    std::set<SymbolString> a_productions = {"a", "AA", ""};
-    std::set<SymbolString> b_productions = {"", "c", "BbB"};
+        std::set<char> A = {'A'};
+        const CFG c1(terminals, variables, A_nullable, 'A');
+        CHECK(c1.nullable() == A);
 
-    REQUIRE(c.nullable() == variables);
-    REQUIRE(c.productions('S') == s_productions);
-    REQUIRE(c.productions('A') == a_productions);
-    REQUIRE(c.productions('B') == b_productions);
- 
-    c.eleminateEpsilonProductions();
+        const CFG c2(terminals, variables, all_nullable, 'A');
+        CHECK(c2.nullable() == variables);
+    } catch (const std::invalid_argument& e) {
+        FAIL("Could not construct CFG's:" << e.what());
+    } // end try-catch
+}
 
-    std::set<SymbolString> a_productions_e = {"a", "A", "AA"};
-    std::set<SymbolString> b_productions_e = {"b", "Bb", "bB", "BbB", "c"};
-    std::set<SymbolString> s_productions_e = {"A", "B", "AB"};
+TEST_CASE("Eleminate epsilon productions", "[CFG]") {
+    const std::set<char> terminals = {'a', 'b'};
+    const std::set<char> variables = {'A', 'B'};
 
-    CHECK(c.productions('A') == a_productions_e);
-    CHECK(c.productions('B') == b_productions_e);
-    CHECK(c.productions('S') == s_productions_e);
+    const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> A_nullable = {
+                                                        {'A', ""},
+                                                        {'B', "b"}
+                                                        };
+    const std::multimap<char, SymbolString> all_nullable = { 
+                                                        {'A', "AB"}, 
+                                                        {'A', "AaB"}, 
+                                                        {'A', ""}, 
+                                                        {'B', ""}
+                                                        };
+
+    try {
+        CFG c0(terminals, variables, empty, 'A');
+        REQUIRE(c0.nullable().empty());
+        c0.eleminateEpsilonProductions();
+        CHECK(c0.nullable().empty());
+
+        std::set<char> A = {'A'};
+        std::set<SymbolString> A_bodies_nullable1 = {""};
+        std::set<SymbolString> B_bodies_nullable1 = {"b"};
+        CFG c1(terminals, variables, A_nullable, 'A');
+        REQUIRE(c1.nullable() == A);
+        REQUIRE(c1.bodies('A') == A_bodies_nullable1);
+        REQUIRE(c1.bodies('B') == B_bodies_nullable1);
+        c1.eleminateEpsilonProductions();
+        CHECK(c1.nullable().empty());
+        CHECK(c1.bodies('A').empty());
+        CHECK(c1.bodies('B') == B_bodies_nullable1);
+
+        std::set<SymbolString> A_bodies_nullable2 = {"", "AB", "AaB"};
+        std::set<SymbolString> A_bodies_not_nullable2 = {"A", "B", "AB", "a", "Aa", "aB", "AaB"};
+        std::set<SymbolString> B_bodies_nullable2 = {""};
+        CFG c2(terminals, variables, all_nullable, 'A');
+        REQUIRE(c2.nullable() == variables);
+        REQUIRE(c2.bodies('A') == A_bodies_nullable2);
+        REQUIRE(c2.bodies('B') == B_bodies_nullable2);
+        c2.eleminateEpsilonProductions();
+        CHECK(c2.nullable().empty());
+        CHECK(c2.bodies('A') == A_bodies_not_nullable2);
+        CHECK(c2.bodies('B').empty());
+    } catch (const std::invalid_argument& e) {
+        FAIL("Could not construct CFG's: " << e.what());
+    } // end try-catch
 }
 
 TEST_CASE("Unit pairs", "[CFG]") {
     const std::set<char> terminals = {'a', 'b'};
-    const std::set<char> variables = {'S', 'A', 'B'};
-    const char start = 'S';
+    const std::set<char> variables = {'A', 'B', 'C'};
 
-    SECTION("Only base case") {
-        const std::multimap<char, SymbolString> productions = {
-                                                            {'S', "AB"},
-                                                            {'A', "a"},
-                                                            {'B', "b"}
-                                                            };
+    const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'A', "AB"},
+                                                        {'B', "A"},
+                                                        {'B', "a"}
+                                                        };
 
-        const CFG c(terminals, variables, productions, start);
+    try {
+        std::set<std::pair<char, char>> empty_units = { 
+                                                    {'A', 'A'}, 
+                                                    {'B', 'B'},
+                                                    {'C', 'C'}
+                                                    };
+        const CFG c0(terminals, variables, empty, 'A');
+        CHECK(c0.units() == empty_units);
 
-        std::set< std::pair<char, char> > units = { 
-                                                {'S', 'S'}, 
-                                                {'A', 'A'},
-                                                {'B', 'B'}
-                                                };
-        CHECK(c.units() == units);
-    }
-
-
-    SECTION("With recursion") {
-        const std::multimap<char, SymbolString> productions = {
-                                                            {'S', "AB"},
-                                                            {'S', "B"},
-                                                            {'S', "A"},
-                                                            {'A', "a"},
-                                                            {'B', "b"}
-                                                            };
-
-        const CFG c(terminals, variables, productions, start);
-
-        std::set< std::pair<char, char> > units = { 
-                                                {'S', 'S'}, 
-                                                {'S', 'A'}, 
-                                                {'S', 'B'}, 
-                                                {'A', 'A'},
-                                                {'B', 'B'},
-                                                };
-        CHECK(c.units() == units);
-    }
+        std::set<std::pair<char, char>> productions_units = { 
+                                                        {'A', 'A'}, 
+                                                        {'B', 'B'},
+                                                        {'B', 'A'},
+                                                        {'C', 'C'}
+                                                        };
+        const CFG c1(terminals, variables, productions, 'A');
+        CHECK(c1.units() == productions_units);
+    } catch (const std::invalid_argument& e) {
+        FAIL("Could not construct CFG's: " << e.what());
+    } // end try-catch
 }
 
 TEST_CASE("Eleminating unit productions", "[CFG]") {
     const std::set<char> terminals = {'a', 'b'};
-    const std::set<char> variables = {'S', 'A', 'B'};
-    const char start = 'S';
+    const std::set<char> variables = {'A', 'B', 'C'};
 
+    const std::multimap<char, SymbolString> empty;
     const std::multimap<char, SymbolString> productions = {
-                                                        {'S', "AB"},
-                                                        {'S', "B"},
-                                                        {'S', "A"},
-                                                        {'A', "a"},
-                                                        {'A', "AA"},
-                                                        {'B', "b"},
-                                                        {'B', "BB"}
+                                                        {'A', "AB"},
+                                                        {'B', "A"},
+                                                        {'B', "a"}
                                                         };
 
-    CFG c(terminals, variables, productions, start);
+    try {
+        std::set<std::pair<char, char>> empty_units = { 
+                                                    {'A', 'A'}, 
+                                                    {'B', 'B'},
+                                                    {'C', 'C'}
+                                                    };
+        CFG c0(terminals, variables, empty, 'A');
+        REQUIRE(c0.units() == empty_units);
+        REQUIRE(c0.bodies('A').empty());
+        REQUIRE(c0.bodies('B').empty());
+        REQUIRE(c0.bodies('C').empty());
+        c0.eleminateUnitProductions();
+        CHECK(c0.units() == empty_units);
+        CHECK(c0.bodies('A').empty());
+        CHECK(c0.bodies('B').empty());
+        CHECK(c0.bodies('C').empty());
 
-    std::set<SymbolString> s_productions = {"AB", "A", "B"};
-    std::set<SymbolString> a_productions = {"a", "AA"};
-    std::set<SymbolString> b_productions = {"b", "BB"};
-    std::set< std::pair<char, char> > units = { 
-                                            {'S', 'S'}, 
-                                            {'S', 'A'}, 
-                                            {'S', 'B'}, 
-                                            {'A', 'A'},
-                                            {'B', 'B'},
-                                            };
+        std::set<std::pair<char, char>> productions_units = { 
+                                                        {'A', 'A'}, 
+                                                        {'B', 'B'},
+                                                        {'B', 'A'},
+                                                        {'C', 'C'}
+                                                        };
+        std::set<SymbolString> A_bodies = {"AB"};
+        std::set<SymbolString> B_bodies = {"A", "a"};
+        std::set<SymbolString> B_bodies_no_units = {"AB", "a"};
+        CFG c1(terminals, variables, productions, 'A');
+        REQUIRE(c1.units() == productions_units);
+        REQUIRE(c1.bodies('A') == A_bodies);
+        REQUIRE(c1.bodies('B') == B_bodies);
+        REQUIRE(c1.bodies('C').empty());
+        c1.eleminateUnitProductions();
+        CHECK(c1.units() == empty_units);
+        CHECK(c1.bodies('A') == A_bodies);
+        CHECK(c1.bodies('B') == B_bodies_no_units);
+        CHECK(c1.bodies('C').empty());
+    } catch (const std::invalid_argument& e) {
+        FAIL("Could not construct CFG's: " << e.what());
+    } // end try-catch
 
-    REQUIRE(c.productions('S') == s_productions);
-    REQUIRE(c.productions('A') == a_productions);
-    REQUIRE(c.productions('B') == b_productions);
-    REQUIRE(c.units() == units);
- 
-    c.eleminateUnitProductions();
-
-    std::set<SymbolString> s_productions_u = {"AB", "a", "AA", "b", "BB"};
-
-    CHECK(c.productions('S') == s_productions_u);
-    CHECK(c.productions('A') == a_productions);
-    CHECK(c.productions('B') == b_productions);
 }
 
-TEST_CASE("Generating symbols", "[CFG]") {
+TEST_CASE("Generating symbols of CFG", "[CFG]") {
     const std::set<char> terminals = {'a', 'b'};
-    const std::set<char> variables = {'S', 'A', 'B'};
-    const char start = 'S';
+    const std::set<char> variables = {'A', 'B'};
 
+    const std::multimap<char, SymbolString> empty;
     const std::multimap<char, SymbolString> productions = {
-                                                        {'S', "AB"},
-                                                        {'S', "a"},
-                                                        {'A', "b"}
+                                                        {'A', "AB"},
+                                                        {'B', "A"},
+                                                        {'B', "a"}
                                                         };
 
-    const CFG c(terminals, variables, productions, start);
+    try {
+        const CFG c0(terminals, variables, empty, 'A');
+        CHECK(c0.generating() == terminals);
 
-    std::set<char> generating = {'S', 'A', 'b', 'a'};
-
-    CHECK(c.generating() == generating);
+        std::set<char> generating_productions = {'a', 'b', 'B'};
+        const CFG c1(terminals, variables, productions, 'A');
+        CHECK(c1.generating() == generating_productions);
+    } catch (const std::invalid_argument& e) {
+        FAIL("Could not construct CFG's: " << e.what());
+    } // end try-catch
 }
 
 TEST_CASE("Reachable symbols", "[CFG]") {
     const std::set<char> terminals = {'a', 'b'};
-    const std::set<char> variables = {'S', 'A', 'B'};
-    const char start = 'S';
+    const std::set<char> variables = {'A', 'B', 'C'};
 
-    SECTION("Some symbols are reachable") {
-        const std::multimap<char, SymbolString> productions = {
-                                                            {'S', "a"},
-                                                            {'A', "b"}
-                                                            };
+    const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'A', "AB"},
+                                                        {'B', "A"},
+                                                        {'B', "a"},
+                                                        {'C', "abC"}
+                                                        };
 
-        const CFG c(terminals, variables, productions, start);
+    try {
+        std::set<char> A = {'A'};
+        const CFG c0(terminals, variables, empty, 'A');
+        CHECK(c0.reachable() == A);
 
-        std::set<char> reachable = {'S', 'a'};
-
-        CHECK(c.reachable() == reachable);
-    }
-
-    SECTION("All symbols are reachable") {
-        const std::multimap<char, SymbolString> productions = {
-                                                            {'S', "AB"},
-                                                            {'S', "a"},
-                                                            {'A', "b"}
-                                                            };
-
-        const CFG c(terminals, variables, productions, start);
-
-        std::set<char> reachable = {'S', 'A', 'b', 'B', 'a'};
-
-        CHECK(c.reachable() == reachable);
-    }
+        std::set<char> reachable_symbols = {'A', 'a', 'B'};
+        const CFG c1(terminals, variables, productions, 'A');
+        CHECK(c1.reachable() == reachable_symbols);
+    } catch (const std::invalid_argument& e) {
+        FAIL("Could not construct CFG's: " << e.what());
+    } // end try-catch
 }
 
 TEST_CASE("Eleminating useless symbols", "[CFG]") {
     const std::set<char> terminals = {'a', 'b'};
-    const std::set<char> variables = {'S', 'A', 'B'};
-    const char start = 'S';
+    const std::set<char> variables = {'A', 'B', 'S'};
 
+    const std::multimap<char, SymbolString> empty;
     const std::multimap<char, SymbolString> productions = {
                                                         {'S', "AB"},
                                                         {'S', "a"},
                                                         {'A', "b"}
                                                         };
 
-    CFG c(terminals, variables, productions, start);
+    try {
+        std::set<char> S = {'S'};
+        CFG c0(terminals, variables, empty, 'S');
+        REQUIRE(c0.reachable() == S);
+        REQUIRE(c0.generating() == terminals);
+        REQUIRE(c0.bodies('A').empty());
+        REQUIRE(c0.bodies('B').empty());
+        REQUIRE(c0.bodies('S').empty());
+        c0.eleminateUselessSymbols();
+        CHECK(c0.reachable() == S);
+        CHECK(c0.generating() == terminals);
+        CHECK(c0.bodies('A').empty());
+        CHECK(c0.bodies('B').empty());
+        CHECK(c0.bodies('S').empty());
 
-    std::set<SymbolString> s_bodies = {"AB", "a"};
-    std::set<SymbolString> a_bodies = {"b"};
-    std::set<char> generating = {'S', 'A', 'b', 'a'};
-    std::set<char> reachable = {'S', 'A', 'b', 'B', 'a'};
+        std::set<char> reachable_symbols = {'S', 'A', 'B', 'a', 'b'};
+        std::set<char> generating_symbols = {'A', 'S', 'a', 'b'};
+        std::set<SymbolString> S_bodies = {"AB", "a"};
+        std::set<SymbolString> A_bodies = {"b"};
+        std::set<char> reachable_symbols_no_useless = {'S', 'a'};
+        std::set<char> generating_symbols_no_useless = {'S', 'a', 'b'};
+        std::set<SymbolString> S_bodies_no_useless = {"a"};
+        CFG c1(terminals, variables, productions, 'S');
+        REQUIRE(c1.reachable() == reachable_symbols);
+        REQUIRE(c1.generating() == generating_symbols);
+        REQUIRE(c1.bodies('A') == A_bodies);
+        REQUIRE(c1.bodies('B').empty());
+        REQUIRE(c1.bodies('S') == S_bodies);
+        c1.eleminateUselessSymbols();
+        CHECK(c1.reachable() == reachable_symbols_no_useless);
+        CHECK(c1.generating() == generating_symbols_no_useless);
+        REQUIRE(c1.bodies('A').empty());
+        REQUIRE(c1.bodies('B').empty());
+        REQUIRE(c1.bodies('S') == S_bodies_no_useless);
+    } catch (const std::invalid_argument& e) {
+        FAIL("Could not construct CFG's: " << e.what());
+    } // end try-catch
+}
 
-    REQUIRE(c.productions('S') == s_bodies);
-    REQUIRE(c.productions('A') == a_bodies);
-    REQUIRE(c.productions('B').empty());
-    REQUIRE(c.generating() == generating);
-    REQUIRE(c.reachable() == reachable);
+TEST_CASE("Clean up CFG", "[CFG]") {
+    const std::set<char> terminals = {'a', 'b'};
+    const std::set<char> variables = {'A', 'B', 'C', 'S'};
 
-    c.eleminateUselessSymbols();
-    std::set<SymbolString> s_bodies_u = {"a"};
+    const std::multimap<char, SymbolString> empty;
 
-    CHECK(c.productions('S') == s_bodies_u);
-    CHECK(c.productions('A').empty());
-    CHECK(c.productions('B').empty());
+    try {
+        std::set<char> S = {'S'};
+        std::set<std::pair<char, char>> empty_units = { 
+                                                    {'A', 'A'}, 
+                                                    {'B', 'B'},
+                                                    {'C', 'C'}, 
+                                                    {'S', 'S'}
+                                                    };
+        CFG c0(terminals, variables, empty, 'S');
+        REQUIRE(c0.nullable().empty());
+        REQUIRE(c0.units() == empty_units);
+        REQUIRE(c0.reachable() == S);
+        REQUIRE(c0.generating() == terminals);
+        REQUIRE(c0.bodies('A').empty());
+        REQUIRE(c0.bodies('B').empty());
+        REQUIRE(c0.bodies('S').empty());
+        c0.cleanUp();
+        CHECK(c0.nullable().empty());
+        CHECK(c0.units() == empty_units);
+        CHECK(c0.reachable() == S);
+        CHECK(c0.generating() == terminals);
+        CHECK(c0.bodies('A').empty());
+        CHECK(c0.bodies('B').empty());
+        CHECK(c0.bodies('S').empty());
+
+        // TODO real clean up
+    } catch (const std::invalid_argument& e) {
+        FAIL("Could not construct CFG's: " << e.what());
+    } // end try-catch
 }
