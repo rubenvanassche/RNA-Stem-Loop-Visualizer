@@ -24,8 +24,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include <iostream>
-
 /**
  * @brief Recursive implementation to get all the subsets of a given set.
  *
@@ -178,14 +176,14 @@ std::set<char> CFG::nullable() const {
             if (nullable.find(it->first) != nullable.end())
                 continue;
 
-            auto range = fProductions.equal_range(it->first);
-
-            for (auto it1 = range.first; it1 != range.second; ++it1) {
+            // note that this never throws an exception, since productions
+            // consists of head that is only in the set of the variables.
+            for (SymbolString body : this->bodies(it->first)) {
                 // iterate over each symbol in the body and check whether they
                 // all are nullable
                 bool isNullable = true;
 
-                for (char s : it1->second) {
+                for (char s : body) {
                     if (nullable.find(s) == nullable.end()) {
                         isNullable = false;
                         break;
@@ -269,6 +267,8 @@ std::set< std::pair<char, char> > CFG::units() const {
 
     // now, inductive part
     for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
+        // note that this never throws an exception, since productions
+        // consists of head that is only in the set of the variables.
         for (SymbolString body : this->bodies(it->first)) {
             // if the body is of length 1 and it's a variable, then we have
             // an unit pair
@@ -293,9 +293,12 @@ void CFG::eleminateUnitProductions() {
     for (std::pair<char, char> u : units) {
         // the bodies from the second variable are also the bodies of first
         // variable in the unit pairs
+        // note that this never throws an exception, since unit pairs consists
+        // of variables only
         for (SymbolString body : this->bodies(u.second)) {
             // ignore if the body is of length 1 and is a variable (we
-            // actually want to remove the unit pairs
+            // actually want to remove the unit productions and not creating
+            // another new one)
             if (body.size() == 1 && fVariables.find(body.at(0)) != fVariables.end())
                 continue;
 
@@ -326,6 +329,8 @@ std::set<char> CFG::generating() const {
             if (generating.find(it->first) != generating.end())
                 continue;
 
+            // note that this never throws an exception, since productions
+            // consists of head that is only in the set of the variables.
             for (SymbolString body : this->bodies(it->first)) {
                 // iterate over each symbol in the body and check whether they
                 // are generating
@@ -369,17 +374,18 @@ std::set<char> CFG::reachable() const {
         unsigned int size_before = reachable.size();
 
         for (char s : reachable) {
-            // ignore if it's a terminal, because they will never be in
-            // the head of the production
-            if (fTerminals.find(s) != fTerminals.end())
-                continue;
-
-            // all symbols of the bodies are also reachable
-            for (SymbolString body : this->bodies(s)) {
-                for (char c : body) {
-                    reachable.insert(c);
+            try {
+                // all symbols of the bodies are also reachable
+                for (SymbolString body : this->bodies(s)) {
+                    for (char c : body) {
+                        reachable.insert(c);
+                    } // end for
                 } // end for
-            } // end for
+            } catch (const std::invalid_argument& e) {
+                // you only reach here if the symbol s was a terminal (and
+                // thus cannot have a body in the production rules
+                continue;
+            } // end try-catch
         } // end for
 
         unsigned int size_after = reachable.size();
@@ -399,30 +405,31 @@ void CFG::eleminateUselessSymbols() {
     std::multimap<char, SymbolString> newProductions;
 
     // first, eleminate all symbols that are not generating
-    for (char v : generating) {
-        // ignore if v is a terminal because rules have only a variable in the
-        // head
-        if (fTerminals.find(v) != fTerminals.end())
-            continue;
+    for (char s : generating) {
+        try {
+            // only add rules whose body does not contain any non-generating symbols
+            for (SymbolString body : this->bodies(s)) {
+                // first check whether the body does not contain any non-generating
+                // symbols, if so, skip it
+                bool isGenerating = true;
+                for (char c : body) {
+                    if (generating.find(c) == generating.end()) {
+                        isGenerating = false;
+                        break;
+                    } else {
+                        continue;
+                    } // end if-else
+                } // end for
 
-        // only add rules whose body does not contain any non-generating symbols
-        for (SymbolString body : this->bodies(v)) {
-            // first check whether the body does not contain any non-generating
-            // symbols, if so, skip it
-            bool isGenerating = true;
-            for (char c : body) {
-                if (generating.find(c) == generating.end()) {
-                    isGenerating = false;
-                    break;
-                } else {
-                    continue;
-                } // end if-else
+                // add them if the body consists of generating symbols
+                if (isGenerating)
+                    newProductions.insert(std::pair<char, SymbolString>(s, body));
             } // end for
-
-            // add them if the body consists of generating symbols
-            if (isGenerating)
-                newProductions.insert( std::pair<char, SymbolString>(v, body) );
-        } // end for
+        } catch (const std::invalid_argument& e) {
+            // you only reach here if the symbol s was a terminal (and
+            // thus cannot have a body in the production rules
+            continue;
+        } // end try-catch
     } // end for
 
     fProductions = newProductions;
