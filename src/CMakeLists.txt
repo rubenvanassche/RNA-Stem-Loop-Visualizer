@@ -16,14 +16,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Last modified:  9 November 2013
+# Last modified: 15 November 2013
 # By: Stijn Wouters
 
 # Lists all sourcefiles (no testfiles and no main)
-set(SRC example.cpp)
+set(SRC CFG.cpp CNF.cpp)
 
 # Lists all testfiles, DO NOT remove Tests.cpp
-set(TESTSRC Tests.cpp test_example.cpp)
+set(TESTSRC Tests.cpp test_CFG.cpp)
 
 # Target to build all the tests
 add_executable(Tests ${TESTSRC} ${SRC})

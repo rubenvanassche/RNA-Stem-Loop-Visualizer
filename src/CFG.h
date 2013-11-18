@@ -1,96 +1,195 @@
 /*
  * CFG.h
  *
- *  Created on: 8 nov. 2013
- *      Author: Ruben
+ * Copyright (C) 2013 Ruben Van Assche
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Last modified: 17 November 2013
+ * By: Stijn Wouters
  */
 
 #ifndef CFG_H_
 #define CFG_H_
 
-#include <vector>
+#include <set>
 #include <map>
 #include <string>
 
 /**
  * @brief Class representing a sequence of terminals and variables
  */
-class symbolString{
-public:
-	 /**
-	 * @brief Constructor
-	 *
-	 * @param string A string containing variables and symbols
-	 */
-	symbolString(std::string string);
-
-	 /**
-	 * @brief Get the string
-	 *
-	 * @param string A string containing variables and symbols
-	 *
-	 * @return A string representing the symbolString
-	 */
-	std::string get();
-
-	 /**
-	 * @brief Get a symbol in the string at a certain point
-	 *
-	 * @param index The index of the symbol you want
-	 *
-	 * @return The symbol you wanted
-	 */
-	char get(int index);
-
-	 /**
-	 * @brief Remove a symbol in the string at a certain point
-	 *
-	 * @param index The index of the symbol you want removed
-	 *
-	 * @return A bool telling if the operation was successfull
-	 */
-	bool remove(int index);
-
-	 /**
-	 * @brief Append two symbolStrings
-	 *
-	 * @param second The second symbolString
-	 *
-	 * @return This symbolString object
-	 */
-	symbolString operator+(symbolString second);
-
-	 /**
-	 * @brief Get the length of the symbolString
-	 *
-	 * @return An integer
-	 */
-	int size();
-private:
-	std::string symbols;
-};
+typedef std::string SymbolString;
 
 /**
  * @brief Class representing a CFG
  */
 class CFG {
 public:
-	 /**
-	 * @brief Constructor
-	 *
-	 * @param CFGTerminals A vector containing the terminals of the CFG
-	 * @param CFGVariables A vector containing the variables of the CFG
-	 * @param CFGTransitions A multimap that maps a symbol to an symbolString
-	 * @param CFGStartsymbol The startsymbol for the CFG
-	 */
-	CFG(std::vector<char> CFGTerminals, std::vector<char> CFGVariables,std::multimap<char, symbolString> CFGTransitions, char CFGStartsymbol);
-	virtual ~CFG();
-private:
-	std::multimap<char, symbolString> transitions;
-	std::vector<char> terminals;
-	std::vector<char> variables;
+     /**
+     * @brief Constructor
+     *
+     * @param CFGTerminals A set containing the terminals of the CFG
+     * @param CFGVariables A set containing the variables of the CFG
+     * @param CFGProductions A multimap that maps a symbol to an symbolString
+     * @param CFGStartsymbol The startsymbol for the CFG
+     *
+     * @pre
+     * - The set of variables and the set of terminales are disjoints.
+     * - The production rule is valid: The head consist of exactly one symbol
+     *   that is in the set of the variables and the body must be empty or
+     *   consisting of symbols that is either in the set of variables or in
+     *   the set of terminals.
+     * - The starting symbol must be a member of the set of variables.
+     *
+     * @throw std::invalid_argument One of the preconditions were not met.
+     */
+    CFG(
+        const std::set<char>& terminals, 
+        const std::set<char>& variables,
+        const std::multimap<char, SymbolString>& productions, 
+        const char& startsymbol
+        );
 
-	char startSymbol;
+    /**
+     * @brief Copy constructor.
+     *
+     * @param cfg The CFG you want to copy.
+     */
+    CFG(const CFG& cfg);
+
+    /**
+     * @brief Copy assignment operator.
+     *
+     * @param cfg The CFG you want to assign to it.
+     */
+    CFG& operator=(const CFG& cfg);
+
+    /**
+     * @brief Destructor.
+     */
+    virtual ~CFG();
+
+    /**
+     * @brief Get the set of symbolstrings.
+     *
+     * @param v The variable representing the head of the production rules.
+     *
+     * @return The set of symbolstrings representing the body of the
+     * production rules.
+     *
+     * @pre
+     * - The variable must be in the set of the variables.
+     *
+     * @throw std::invalid_argument The precondition were not satisfied.
+     */
+    std::set<SymbolString> productions(const char& v) const;
+
+    /**
+     * @brief Get all the nullable variables.
+     *
+     * @return The set of all nullable variables.
+     */
+    std::set<char> nullable() const;
+
+    /**
+     * @brief Eleminate epsilon productions. That is, eleminate productions
+     * of the form A -> ε
+     *
+     * @post The production rules doesn't contain any epsilon productions.
+     */
+    void eleminateEpsilonProductions();
+
+    /**
+     * @brief Get all the unit pairs of this CFG.
+     *
+     * @return The set of all unit pairs.
+     */
+    std::set< std::pair<char, char> > units() const;
+
+    /**
+     * @brief Eleminate unit productions. That is, eleminate productions of
+     * the form A -> B. But doing so that it does not affect the language of
+     * this CFG.
+     *
+     * @note The algorithm only works if there is no cycle of unit productions.
+     * That is, unit pairs of the form A -> B, B -> C and C -> A. If that's the
+     * case, an exception will be thrown.
+     *
+     * @throw std::logic_error This CFG has a cycle of unit pairs. TODO
+     *
+     * @post The production rules doesn't contain any unit productions.
+     * @post The CFG still accepts the same language.
+     */
+    void eleminateUnitProductions();
+
+    /**
+     * @brief Get all the generating symbols.
+     *
+     * @return The set of generating symbols.
+     */
+    std::set<char> generating() const;
+
+    /**
+     * @brief Get all the reachable symbols.
+     *
+     * @return The set of all reachable symbols.
+     */
+    std::set<char> reachable() const;
+
+    /**
+     * @brief Eleminate useless symbols. But doing so that is does not affect
+     * the language of this CFG.
+     *
+     * @post The production rules doesn't contain any unit productions.
+     * @post The CFG still accepts the same language.
+     */
+    void eleminateUselessSymbols();
+
+    /**
+     * @brief Clean up CFG, that is, eleminate epsilon productions, useless
+     * symbols and unit productions IN SAFE ORDER. This comes in handy for 
+     * converting to CNF (Chomsky Normal Form).
+     */
+    void cleanUp();
+
+/* 
+ * for converting CFG's to CNF, I need access to the following data members.
+ * Of course, you could write getters and setters, but that's pointless here
+ * since you'll probably never use that getter and setters again.
+ */
+protected:
+    /**
+     * @brief The set of terminal symbols.
+     */
+    std::set<char> fTerminals;
+
+    /**
+     * @brief The set of non-terminal symbols.
+     */
+    std::set<char> fVariables;
+
+    /**
+     * @brief The set of production rules where each terminal symbol is 
+     * (multi)mapped to a SymbolString
+     */
+    std::multimap<char, SymbolString> fProductions;
+
+    /**
+     * @brief The start symbol
+     */
+    char fStartSymbol;
 };
 
 #endif /* CFG_H_ */
