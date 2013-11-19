@@ -167,6 +167,11 @@ public:
      * @brief Clean up CFG, that is, eleminate epsilon productions, useless
      * symbols and unit productions IN SAFE ORDER. This comes in handy for 
      * converting to CNF (Chomsky Normal Form).
+     *
+     * @post The production rules doesn't contain any nullable symbols.
+     * @post The production rules doesn't contain any useless symbols.
+     * @post The CFG has only unit pairs of the form (A, A) for each A is a
+     * variable.
      */
     void cleanUp();
 

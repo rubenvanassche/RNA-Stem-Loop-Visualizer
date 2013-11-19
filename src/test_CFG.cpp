@@ -394,6 +394,16 @@ TEST_CASE("Clean up CFG", "[CFG]") {
     const std::set<char> variables = {'A', 'B', 'C', 'S'};
 
     const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'S', "A"},
+                                                        {'S', "B"},
+                                                        {'A', "aAa"},
+                                                        {'A', ""},
+                                                        {'B', "bBb"},
+                                                        {'B', ""},
+                                                        {'C', "aCa"},
+                                                        {'C', "bCb"}
+                                                        };
 
     try {
         std::set<char> S = {'S'};
@@ -410,6 +420,7 @@ TEST_CASE("Clean up CFG", "[CFG]") {
         REQUIRE(c0.generating() == terminals);
         REQUIRE(c0.bodies('A').empty());
         REQUIRE(c0.bodies('B').empty());
+        REQUIRE(c0.bodies('C').empty());
         REQUIRE(c0.bodies('S').empty());
         c0.cleanUp();
         CHECK(c0.nullable().empty());
@@ -418,9 +429,46 @@ TEST_CASE("Clean up CFG", "[CFG]") {
         CHECK(c0.generating() == terminals);
         CHECK(c0.bodies('A').empty());
         CHECK(c0.bodies('B').empty());
+        CHECK(c0.bodies('C').empty());
         CHECK(c0.bodies('S').empty());
 
         // TODO real clean up
+        std::set<char> nullable = {'S', 'A', 'B'};
+        std::set< std::pair<char, char> > units = {
+                                                {'A', 'A'},
+                                                {'C', 'C'},
+                                                {'B', 'B'},
+                                                {'S', 'S'},
+                                                {'S', 'A'},
+                                                {'S', 'B'}
+                                                };
+        std::set<char> reachable = {'S', 'A', 'B', 'a', 'b'};
+        std::set<char> generating = {'a', 'b', 'A', 'B', 'S'};
+        std::set<SymbolString> S_productions = {"A", "B"};
+        std::set<SymbolString> A_productions = {"", "aAa"};
+        std::set<SymbolString> B_productions = {"", "bBb"};
+        std::set<SymbolString> C_productions = {"aCa", "bCb"};
+        std::set<SymbolString> S_productions_cleanup = {"aa", "aAa", "bb", "bBb"};
+        std::set<SymbolString> A_productions_cleanup = {"aa", "aAa"};
+        std::set<SymbolString> B_productions_cleanup = {"bb", "bBb"};
+        CFG c1(terminals, variables, productions, 'S');
+        REQUIRE(c1.nullable() == nullable);
+        REQUIRE(c1.units() == units);
+        REQUIRE(c1.reachable() == reachable);
+        REQUIRE(c1.generating() == generating);
+        REQUIRE(c1.bodies('A') == A_productions);
+        REQUIRE(c1.bodies('B') == B_productions);
+        REQUIRE(c1.bodies('C') == C_productions);
+        REQUIRE(c1.bodies('S') == S_productions);
+        c1.cleanUp();
+        CHECK(c1.nullable().empty());
+        CHECK(c1.units() == empty_units);
+        CHECK(c1.reachable() == reachable);
+        CHECK(c1.generating() == generating);
+        CHECK(c1.bodies('A') == A_productions_cleanup);
+        CHECK(c1.bodies('B') == B_productions_cleanup);
+        CHECK(c1.bodies('C').empty());
+        CHECK(c1.bodies('S') == S_productions_cleanup);
     } catch (const std::invalid_argument& e) {
         FAIL("Could not construct CFG's: " << e.what());
     } // end try-catch
