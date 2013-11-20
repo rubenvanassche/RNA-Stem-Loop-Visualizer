@@ -74,9 +74,31 @@ public:
      *
      * @return The right side of the used production rule.
      */
-    SymbolString process(const char& topStack, const SymbolString& remainingInput);
+    SymbolString process(const char& topStack, const SymbolString& remainingInput) const;
+
+    /**
+     * @brief Destructor
+     */
+    virtual ~LLTable();
 
 private:
+    /**
+     * @brief Generates the parse table.
+     *
+     * @param CFGTerminals A set containing the terminals of the CFG
+     * @param CFGVariables A set containing the variables of the CFG
+     * @param CFGProductions A multimap that maps a symbol to an symbolString
+     * @param dimension The dimension of the table, thus the size of the lookahead (k)
+     *
+     * @return A bool telling if the Parser accepted
+     */
+    static std::map<SymbolString, SymbolString> generateTable(
+        const std::set<char>& CFGTerminals,            
+        const std::set<char>& CFGVariables,
+        const std::multimap<char, SymbolString>& CFGProductions, 
+        unsigned int dimension
+        );
+
     const unsigned int dimension;
 
     /**
@@ -134,7 +156,7 @@ public:
      *
      * @return A bool telling if the Parser accepted
      */
-    bool process(std::string& input);
+    bool process(std::string& input) const;
 
     /**
      * @brief Destructor
