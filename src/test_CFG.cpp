@@ -432,7 +432,6 @@ TEST_CASE("Clean up CFG", "[CFG]") {
         CHECK(c0.bodies('C').empty());
         CHECK(c0.bodies('S').empty());
 
-        // TODO real clean up
         std::set<char> nullable = {'S', 'A', 'B'};
         std::set< std::pair<char, char> > units = {
                                                 {'A', 'A'},
