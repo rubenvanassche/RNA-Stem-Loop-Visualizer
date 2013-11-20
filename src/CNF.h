@@ -26,6 +26,7 @@
 #include "CFG.h"
 #include <set>
 #include <map>
+#include <vector>
 
 /**
  * @brief The class CNF (Chomsky Normal Form), this is actually a CFG (Context
@@ -81,6 +82,23 @@ public:
     ~CNF();
 
 private:
+    /*
+     * The raison that I use an apart production map is that the amount of
+     * variables may be very big, even bigger than the provided chars (assuming
+     * you don't want the special ASCII characters such as ~, @, #, ...
+     * representing a variable). Besides, you can still keep using the methods
+     * in the CFG's interface, because converting CFG's to CNF's will not
+     * create any unwanted side effects (except that the CFG will be cleaned
+     * up, which is necessary before converting to CNF's).
+     */
+
+    // All variables and terminals will be mapped to an integer, I'll call
+    // this Chomsky Numbers (however, that doesn't make any sense at all).
+    std::map<char, int> fChomskyNumbers;
+
+    // The set of production rules where the head (a Chomsky Number will be
+    // projected to an array of integers.
+    std::multimap<int, std::vector<int> > fChomskyProductions;
 };
 
 #endif // H_CNF_H
