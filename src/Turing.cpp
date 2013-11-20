@@ -79,17 +79,17 @@ std::ostream& operator<<(std::ostream& output, const TuringState& TS) {
 
 TuringState::~TuringState() {}
 
-TuringTransition::TuringTransition(const TuringState* from, const TuringState* to, const std::vector<char>& read, const std::vector<char>& write, Direction dir) :
+TuringTransition::TuringTransition(StatePtr from, StatePtr to, const std::vector<char>& read, const std::vector<char>& write, Direction dir) :
     fFrom(from), fTo(to), fRead(read), fWrite(write), fDirection(dir) {}
 
 
-bool TuringTransition::match(const TuringState* state, std::vector<char> symbol) {
+bool TuringTransition::match(StatePtr state, std::vector<char> symbol) {
     if (fFrom == state && std::equal(symbol.begin(), symbol.end(), fRead.begin()))
         return true;
     return false;
 }
 
-std::tuple<const TuringState*, std::vector<char>, Direction> TuringTransition::getTransition() const {
+std::tuple<StatePtr, std::vector<char>, Direction> TuringTransition::getTransition() const {
     return std::make_tuple(fTo, fWrite, fDirection);
 }
 
@@ -131,7 +131,7 @@ bool TuringTransition::operator<(const TuringTransition& that) const {
 
 }
 
-bool TuringTransition::isThisTransition(const TuringState* from, const TuringState* to, const std::vector<char>& read, const std::vector<char>& write, Direction dir) const{
+bool TuringTransition::isThisTransition(StatePtr from, StatePtr to, const std::vector<char>& read, const std::vector<char>& write, Direction dir) const{
     if (fFrom == from && fTo == to && std::equal(fRead.begin(), fRead.end(), read.begin()) && std::equal(fWrite.begin(), fWrite.end(), write.begin()) && fDirection == dir)
         return true;
     return false;
@@ -205,17 +205,17 @@ std::ostream& operator<<(std::ostream& output, const Tape& T) {
     return output;
 }
 
-TMID::TMID(std::string& input, const TuringState* startState, char blank, int trackCount) : fTape(input, blank, trackCount), fState(startState), fTrackCount(trackCount) {}
+TMID::TMID(std::string& input, StatePtr startState, char blank, int trackCount) : fTape(input, blank, trackCount), fState(startState), fTrackCount(trackCount) {}
 
 
-std::pair<const TuringState*, std::vector<char>> TMID::getStateAndSymbol() const {
-    std::pair<const TuringState*, std::vector<char>> answer;
+std::pair<StatePtr, std::vector<char>> TMID::getStateAndSymbol() const {
+    std::pair<StatePtr, std::vector<char>> answer;
     answer.first = fState;
     answer.second = fTape.getSymbolAtHead();
     return answer;
 }
 
-void TMID::step(const TuringState* to, std::vector<char> write, Direction dir) {
+void TMID::step(StatePtr to, std::vector<char> write, Direction dir) {
     fState = to;
     fTape.replaceSymbolAtHead(write);
     fTape.moveHead(dir);
@@ -228,6 +228,7 @@ std::ostream& operator<<(std::ostream& output, const TMID& ID) {
 }
 
 
+TuringMachine::TuringMachine() {}
 
 TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::set<std::vector<char>>& alphabetTape, const char& tapeBlank) :
     fAlphabet(alphabetTuring), fTapeAlphabet(alphabetTape), fTrackCount((*alphabetTape.begin()).size()) {
@@ -304,8 +305,8 @@ TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::se
 }
 
 /*TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::set<char>& alphabetTape, const char& tapeBlank,
-                             const std::set<TuringState*>& states, const std::set<TuringTransition>& transitions,
-                             const TuringState* startState, const std::set<const TuringState*>& acceptingStates) :
+                             const std::set<StatePtr>& states, const std::set<TuringTransition>& transitions,
+                             StatePtr startState, const std::set<StatePtr>& acceptingStates) :
     fAlphabet(alphabetTuring), fTapeAlphabet(alphabetTape), fStates(states), fTransitions(transitions),
     fStartState(startState),  fAccepting(acceptingStates) {
     try {                                                          //Check if blank symbol in tape alphabet before adding
@@ -328,12 +329,13 @@ TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::se
 
 bool TuringMachine::addState(const std::string& name, const bool isStarting, const bool isFinal, const std::vector<char>& storage) {
     try {
-        for (auto i : fStates)     //Check if state of that name already a state
+        for (auto i : fStates) {    //Check if state of that name already a state
             if (i->isCalled(name))
                 if (!fStateStorageSize)
                     throw std::runtime_error("Name is not unique!");
                 else if (i->hasThisStorage(storage))
                     throw std::runtime_error("Name + storage is not unique!");
+        }
         if (isStarting && fStartState != nullptr)
             throw std::runtime_error("Trying to create second start state!");
         if (fStateStorageSize != -1 && fStateStorageSize != storage.size())
@@ -343,27 +345,29 @@ bool TuringMachine::addState(const std::string& name, const bool isStarting, con
         std::cout << "Error adding state: " << e.what() << std::endl;
         return 0;
     }
-    std::pair<std::set<TuringState*>::iterator, bool> pos;   //Holds address of state in set and success boolean
-    if (!storage.size())
-        pos = fStates.insert(new TuringState(name));
-    else
-        pos = fStates.insert(new TuringState(name, storage));
+    if (!storage.size()) {
+        StatePtr newState (new TuringState(name));
+        fStates.push_back(newState);
+    }
+    else {
+        StatePtr newState (new TuringState(name, storage));
+        fStates.push_back(newState);
+    }
     if (fStateStorageSize == -1)
         fStateStorageSize = storage.size();
     if (isStarting)
-        fStartState = *pos.first;
+        fStartState = (fStates.back());
     if (isFinal) {
-        const TuringState* statePtr = *pos.first;
-        fAccepting.insert(statePtr);
+        fAccepting.insert(fStates.back());
     }
-    return pos.second;
+    return true;
 }
 
 bool TuringMachine::addTransition(const std::string& from, const std::string& to, const std::vector<char>& read, const std::vector<char>& write, Direction dir,
                                   const std::vector<char>& fromStorage, const std::vector<char>& toStorage) {
     bool storage = fromStorage.size();
-    const TuringState* fromPtr = nullptr;
-    const TuringState* toPtr = nullptr;
+    StatePtr fromPtr = nullptr;
+    StatePtr toPtr = nullptr;
     try {
         if (read.size() != write.size())
             throw std::runtime_error("Read and write do not have same number of characters!");
@@ -371,15 +375,13 @@ bool TuringMachine::addTransition(const std::string& from, const std::string& to
             throw std::runtime_error("Read and write character count does not match track count!");
         if (fromStorage.size() != toStorage.size())
             throw std::runtime_error("Storages do not have same size!");
-        std::set<TuringState*>::iterator it = fStates.begin();   //look for the names of the necessary states, get pointer to the state if found
-        while(it != fStates.end()) {
-            if ((*it)->isCalled(from) && (*it)->hasThisStorage(fromStorage))
-                fromPtr = *it;
-            if ((*it)->isCalled(to) && (*it)->hasThisStorage(toStorage))
-                toPtr = *it;
+        for (auto i : fStates) {
+            if (i->isCalled(from) && i->hasThisStorage(fromStorage))
+                fromPtr = i;
+            if (i->isCalled(to) && i->hasThisStorage(toStorage))
+                toPtr = i;
             if (fromPtr && toPtr)
                 break;
-            it++;
         }
         if (!fromPtr)
             throw std::runtime_error("From state not in set of states!");
@@ -409,9 +411,8 @@ bool TuringMachine::addTransition(const std::string& from, const std::string& to
     }
     if (fTrackCount == -1)
         fTrackCount = write.size();
-    std::pair<std::set<TuringTransition>::iterator, bool> pos;
-    pos = fTransitions.insert(TuringTransition(fromPtr, toPtr, read, write, dir));
-    return pos.second;
+    fTransitions.push_back(TuringTransition(fromPtr, toPtr, read, write, dir));
+    return true;
 }
 
 bool TuringMachine::addTransition(const std::string& from, const std::string& to, const char& read, const char& write, Direction dir,
@@ -423,18 +424,52 @@ bool TuringMachine::addTransition(const std::string& from, const std::string& to
     addTransition(from, to, readVec, writeVec, dir, fromStorage, toStorage);
 }
 
-const TuringState* TuringMachine::getStatePtr(std::string& name) const{
-    std::set<TuringState*>::iterator it = fStates.begin();
-    while (it != fStates.end()) {
-        if ((*it)->isCalled(name))
-            return *it;
-        it++;
+bool TuringMachine::addStartState(std::string name, std::vector<char> storage) {
+    if (fStartState != nullptr) {
+        std::cout << "Start state already set!" << std::endl;
+        return 0;
     }
+    for (auto i : fStates) {
+        if (i->isCalled(name)) {
+            if (i->hasThisStorage(storage)) {
+                fStartState =  i;
+                return 1;
+            }
+        }
+    }
+    std::cout << "Start state not found" << std::endl;
+    return 0;
+}
+
+bool TuringMachine::addAcceptingState(std::string name, std::vector<char> storage) {
+    for (auto i : fStates) {
+        if (i->isCalled(name)) {
+            if (i->hasThisStorage(storage)) {
+                fAccepting.insert(i);
+                return 1;
+            }
+        }
+    }
+    std::cout << "Accepting state not found" << std::endl;
+    return 0;
+}
+
+
+StatePtr TuringMachine::getStatePtr(std::string& name) const{
+    for (auto i : fStates)
+        if (i->isCalled(name))
+            return i;
     return nullptr;
 }
 
 bool TuringMachine::process(std::string& input) {
+    for(auto i : fStates)
+        std::cout << *i << std::endl;
+    for (auto i : fTransitions)
+        std::cout << i << std::endl;
     try {
+        if (fStartState == nullptr)
+            throw std::runtime_error("No start state specified!");
         for (auto i : input) {
             if (fAlphabet.find(i) == fAlphabet.end()) {
                 throw std::runtime_error("Character in input but not in input alphabet!");
@@ -445,14 +480,15 @@ bool TuringMachine::process(std::string& input) {
         std::cout << "Error while processing input string: " << e.what() << std::endl;
         return 0;
     }
+
     std::queue<TMID> fIDs;   //Queue ensures all IDs for i-th character in input are processed before moving on to IDs for (i+1)th character
     fIDs.push(TMID(input, fStartState, fBlank, fTrackCount));  //Generate first ID
     while (fIDs.size()) {               //continue processing until no IDs left or accept state reached
         TMID& currentID = fIDs.front();
         for(auto i : fTransitions) {                //Multiple valid transitions possible!
-            std::pair<const TuringState*, std::vector<char>> IDpair = currentID.getStateAndSymbol();    //Current state and read symbol on tape
+            std::pair<StatePtr, std::vector<char>> IDpair = currentID.getStateAndSymbol();    //Current state and read symbol on tape
             if (i.match(IDpair.first, IDpair.second)) {                                    //Transition for current state and symbol found
-                std::tuple<const TuringState*, std::vector<char>, Direction> trans = i.getTransition();    //Fetch next state, symbol to write and direction to move tape head
+                std::tuple<StatePtr, std::vector<char>, Direction> trans = i.getTransition();    //Fetch next state, symbol to write and direction to move tape head
                 if (fAccepting.find(std::get<0>(trans)) != fAccepting.end())              //Next state accepting --> immediately accept input
                     return 1;
                 TMID newID = currentID;                                                   //copy current ID (through default copy constructor, which does the job in this case)
@@ -468,9 +504,372 @@ bool TuringMachine::process(std::string& input) {
 TuringMachine::~TuringMachine() {}
 
 
+TuringMachine generateTM(std::string fileName) {
+    TiXmlDocument doc;
+    if(!doc.LoadFile(fileName.c_str()))
+    {
+        std::cout << doc.ErrorDesc() << std::endl;
+        return TuringMachine();
+    }
+    TiXmlElement* root = doc.FirstChildElement();
+    if(root == NULL)
+    {
+        std::cout << "Failed to load file: No root element."
+             << std::endl;
+        doc.Clear();
+        return TuringMachine();
+    }
+    std::string rootName = root->Value();
+    if (rootName == "TM") {
+        std::set<char> alphabet;
+        std::set<char> tapeAlphabet;
+        bool allFound = false;
+        char blank = 0;
+        for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()) {  //find  alphabets and blank symbol
+            std::string elemName = elem->Value();
+            if (elemName == "InputAlphabet") {
+                for(TiXmlElement* elemOfSigma = elem->FirstChildElement(); elemOfSigma != NULL; elemOfSigma = elemOfSigma->NextSiblingElement()) {
+                    std::string elemOfSigmaName = elemOfSigma->Value();
+                    if (elemOfSigmaName == "symbol") {
+                        TiXmlNode* e = elemOfSigma->FirstChild();
+                        TiXmlText* text = e->ToText();
+                        if(text == NULL)
+                            continue;
+                        std::string t = text->Value();
+                        if (t.size() != 1) {
+                            std::cout << "One input symbol per node please" << std::endl;
+                        }
+                        alphabet.insert(t.front());
+                    }
+                }
+            }
+            if (elemName == "TapeAlphabet") {
+                for(TiXmlElement* elemOfGamma = elem->FirstChildElement(); elemOfGamma != NULL; elemOfGamma = elemOfGamma->NextSiblingElement()) {
+                    std::string elemOfGammaName = elemOfGamma->Value();
+                    if (elemOfGammaName == "symbol") {
+                        TiXmlNode* e = elemOfGamma->FirstChild();
+                        TiXmlText* text = e->ToText();
+                        if(text == NULL)
+                            continue;
+                        std::string t = text->Value();
+                        if (t.size() != 1) {
+                            std::cout << "One input symbol per node please" << std::endl;
+                        }
+                        tapeAlphabet.insert(t.front());
+                    }
+                }
+            }
+            if (elemName == "Blank") {
+                TiXmlNode* e = elem->FirstChild();
+                TiXmlText* text = e->ToText();
+                if(text == NULL)
+                    continue;
+                std::string t = text->Value();
+                if (t.size() != 1) {
+                    std::cout << "One blank symbol please" << std::endl;
+                }
+                blank = t.front();
+            }
+            if (tapeAlphabet.size() && alphabet.size() && blank) { //All arguments necessary to construct TM found
+                allFound = true;
+                break;
+            }
+
+        }
+        if (!allFound) {
+            std::cout << "Alphabet, tape alphabet or blank symbol missing!" << std::endl;
+            return TuringMachine();
+        }
+        TuringMachine TM(alphabet, tapeAlphabet, blank);
+
+        for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()) {  //find  alphabets and blank symbol
+            std::string elemName = elem->Value();
+            if (elemName == "States") {
+                const char* attr = elem->Attribute("storage");
+                bool hasStorage = false;
+                std::vector<std::vector<char>> storages;
+                if (attr) {
+                    std::string statesAttr(attr);
+                    if (statesAttr == "true")
+                        hasStorage = true;
+                }
+                if (hasStorage) {
+                    for(TiXmlElement* elemOfQ = elem->FirstChildElement(); elemOfQ != NULL; elemOfQ = elemOfQ->NextSiblingElement()) {
+                        std::string elemOfQName = elemOfQ->Value();
+                        if (elemOfQName == "storage") {
+                            if (elemOfQ->FirstChild() == NULL) {
+                                storages.push_back(std::vector<char> ());
+                                continue;
+                            }
+                            TiXmlNode* e = elemOfQ->FirstChild();
+                            TiXmlText* text = e->ToText();
+                            if(text == NULL)
+                                continue;
+                            std::string t = text->Value();
+                            std::vector<char> thisStorage;
+                            for (auto i : t)
+                                thisStorage.push_back(i);
+                            storages.push_back(thisStorage);
+                        }
+                    }
+                }
+                for(TiXmlElement* elemOfQ = elem->FirstChildElement(); elemOfQ != NULL; elemOfQ = elemOfQ->NextSiblingElement()) {
+                    bool isStarting = false;
+                    bool isAccepting = false;
+                    std::string elemOfQName = elemOfQ->Value();
+                    if (elemOfQName == "state") {
+                        const char* attr = elemOfQ->Attribute("start");
+                        if (attr) {
+                            std::string stateAttr(attr);
+                            if (stateAttr == "true")
+                                isStarting = true;
+                        }
+                        attr = elemOfQ->Attribute("accept");
+                        if (attr) {
+                            std::string stateAttr(attr);
+                            if (stateAttr == "true")
+                                isAccepting = true;
+                        }
+                        if (elemOfQ->FirstChild() == NULL) {
+                            std::cout << "State without name, was skipped" << std::endl;
+                            continue;
+                        }
+                        TiXmlNode* e = elemOfQ->FirstChild();
+                        TiXmlText* text = e->ToText();
+                        if(text == NULL)
+                            continue;
+                        std::string t = text->Value();
+                        if (!hasStorage)
+                            TM.addState(t, isStarting, isAccepting);
+                        else
+                            for (auto i : storages)
+                                TM.addState(t, isStarting, isAccepting, i);
+
+                    }
+                }
+
+            }
+            if (elemName == "Transitions") {
+                for(TiXmlElement* elemOfDelta = elem->FirstChildElement(); elemOfDelta != NULL; elemOfDelta = elemOfDelta->NextSiblingElement()) {
+
+                    std::string elemOfDeltaName = elemOfDelta->Value();
+                    if (elemOfDeltaName == "transition") {
+                        std::string from = "";
+                        std::string to = "";
+                        std::vector<char> fromStorage;
+                        std::vector<char> toStorage;
+                        std::vector<char> read;
+                        std::vector<char> write;
+                        Direction dir;
+                        for(TiXmlElement* elemOfTransition = elemOfDelta->FirstChildElement(); elemOfTransition != NULL; elemOfTransition = elemOfTransition->NextSiblingElement()) {
+                            std::string elemOfTransitionName = elemOfTransition->Value();
+                            if (elemOfTransitionName == "from") {
+                                if (elemOfTransition->FirstChild() == NULL) {
+                                    continue;
+                                }
+                                TiXmlNode* e = elemOfTransition->FirstChild();
+                                TiXmlText* text = e->ToText();
+                                if(text == NULL)
+                                    continue;
+                                std::string t = text->Value();
+                                from = t;
+
+                            }
+                            if (elemOfTransitionName == "to") {
+                                if (elemOfTransition->FirstChild() == NULL) {
+                                    continue;
+                                }
+                                TiXmlNode* e = elemOfTransition->FirstChild();
+                                TiXmlText* text = e->ToText();
+                                if(text == NULL)
+                                    continue;
+                                std::string t = text->Value();
+                                to = t;
+
+                            }
+                            if (elemOfTransitionName == "fromStorage") {
+                                if (elemOfTransition->FirstChild() == NULL) {
+                                    continue;
+                                }
+                                TiXmlNode* e = elemOfTransition->FirstChild();
+                                TiXmlText* text = e->ToText();
+                                if(text == NULL)
+                                    continue;
+                                std::string t = text->Value();
+                                for (auto i : t)
+                                    fromStorage.push_back(i);
+                            }
+                            if (elemOfTransitionName == "toStorage") {
+                                if (elemOfTransition->FirstChild() == NULL) {
+                                    continue;
+                                }
+                                TiXmlNode* e = elemOfTransition->FirstChild();
+                                TiXmlText* text = e->ToText();
+                                if(text == NULL)
+                                    continue;
+                                std::string t = text->Value();
+                                for (auto i : t)
+                                    toStorage.push_back(i);
+                            }
+                            if (elemOfTransitionName == "read") {
+                                if (elemOfTransition->FirstChild() == NULL) {
+                                    continue;
+                                }
+                                TiXmlNode* e = elemOfTransition->FirstChild();
+                                TiXmlText* text = e->ToText();
+                                if(text == NULL)
+                                    continue;
+                                std::string t = text->Value();
+                                for (auto i : t)
+                                    read.push_back(i);
+                            }
+                            if (elemOfTransitionName == "write") {
+                                if (elemOfTransition->FirstChild() == NULL) {
+                                    continue;
+                                }
+                                TiXmlNode* e = elemOfTransition->FirstChild();
+                                TiXmlText* text = e->ToText();
+                                if(text == NULL)
+                                    continue;
+                                std::string t = text->Value();
+                                for (auto i : t)
+                                    write.push_back(i);
+                            }
+                            if (elemOfTransitionName == "dir") {
+                                if (elemOfTransition->FirstChild() == NULL) {
+                                    continue;
+                                }
+                                TiXmlNode* e = elemOfTransition->FirstChild();
+                                TiXmlText* text = e->ToText();
+                                if(text == NULL)
+                                    continue;
+                                std::string t = text->Value();
+                                if (t == "L")
+                                    dir = L;
+                                else if (t == "R")
+                                    dir = L;
+                                else
+                                    std::cout << "invalid direction" << std::endl;
+                            }
+                        }
+                        if (from.size() && to.size() && read.size() && write.size() && (dir == L || dir == R))
+                            TM.addTransition(from, to, read, write, dir, fromStorage, toStorage);
+                        else
+                            std::cout << "Incomplete transition" << std::endl;
+
+
+
+                    }
+                }
+
+            }
+
+        }
+        for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()) {  //find  alphabets and blank symbol
+            std::string elemName = elem->Value();
+            if (elemName == "StartState") {
+                std::string stateName = "";
+                std::vector<char> storage;
+                for(TiXmlElement* elemOfSS = elem->FirstChildElement(); elemOfSS != NULL; elemOfSS = elemOfSS->NextSiblingElement()) {
+                    std::string elemOfSSName = elemOfSS->Value();
+                    if (elemOfSSName == "name") {
+                        if (elemOfSS->FirstChild() == NULL) {
+                            continue;
+                        }
+                        TiXmlNode* e = elemOfSS->FirstChild();
+                        TiXmlText* text = e->ToText();
+                        if(text == NULL)
+                            continue;
+                        stateName = text->Value();
+                    }
+                    if (elemOfSSName == "storage") {
+                        if (elemOfSS->FirstChild() == NULL) {
+                            continue;
+                        }
+                        TiXmlNode* e = elemOfSS->FirstChild();
+                        TiXmlText* text = e->ToText();
+                        if(text == NULL)
+                            continue;
+                        std::string t = text->Value();
+
+                        for (auto i : t)
+                            storage.push_back(i);
+                    }
+                }
+                if (stateName.size() != 0) {
+                    if (storage.size() == 0)
+                        TM.addStartState(stateName);
+                    else
+                        TM.addStartState(stateName, storage);
+                }
+                else
+                    std::cout << "No name for start state specified" << std::endl;
+
+
+            }
+            if (elemName == "AcceptingStates") {
+                for(TiXmlElement* elemOfAccepting = elem->FirstChildElement(); elemOfAccepting != NULL; elemOfAccepting = elemOfAccepting->NextSiblingElement()) {
+                    std::string elemOfAcceptingName = elemOfAccepting->Value();
+                    if (elemOfAcceptingName == "state") {
+                        std::string stateName = "";
+                        std::vector<char> storage;
+                        for(TiXmlElement* elemOfAccState = elemOfAccepting->FirstChildElement(); elemOfAccState != NULL; elemOfAccState = elemOfAccState->NextSiblingElement()) {
+                            std::string elemOfAccStateName = elemOfAccState->Value();
+                            if (elemOfAccStateName == "name") {
+                                if (elemOfAccState->FirstChild() == NULL) {
+                                    continue;
+                                }
+                                TiXmlNode* e = elemOfAccState->FirstChild();
+                                TiXmlText* text = e->ToText();
+                                if(text == NULL)
+                                    continue;
+                                stateName = text->Value();
+                            }
+                            if (elemOfAccStateName == "storage") {
+                                if (elemOfAccState->FirstChild() == NULL) {
+                                    continue;
+                                }
+                                TiXmlNode* e = elemOfAccState->FirstChild();
+                                TiXmlText* text = e->ToText();
+                                if(text == NULL)
+                                    continue;
+                                std::string t = text->Value();
+
+                                for (auto i : t)
+                                    storage.push_back(i);
+                            }
+                        }
+                        if (stateName.size() != 0) {
+                            if (storage.size() == 0)
+                                TM.addAcceptingState(stateName);
+                            else
+                                TM.addAcceptingState(stateName, storage);
+
+                        }
+                        else
+                        std::cout << "No name for accepting state specified" << std::endl;
+
+
+                    }
+                }
+
+            }
+        }
+
+        for(auto i : alphabet)
+            std::cout << i << std::endl;
+        for(auto i : tapeAlphabet)
+            std::cout << i << std::endl;
+        std::cout << blank << std::endl;
+        return TM;
+    }
+    return TuringMachine();
+}
+
+
 
 int main () {
-    std::set<char> alph;
+    /*std::set<char> alph;
     std::set<char> alphT;
     std::vector<char> storage;
     std::string input;
@@ -481,7 +880,7 @@ int main () {
     alphT.insert('X');
     alphT.insert('Y');
     alphT.insert('B');
-    /*TuringMachine TM(alph, alphT, 'B');;
+    TuringMachine TM(alph, alphT, 'B');;
     TM.addState("Q0", 1, 0);
     TM.addState("Q1", 0, 0);
     TM.addState("Q2", 0, 0);
@@ -521,7 +920,7 @@ int main () {
     input = "0101";
     std::cout << "0101: " << TM.process(input) << std::endl;
     input = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
-    std::cout << "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111: " << TM.process(input) << std::endl;
+    //std::cout << "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111: " << TM.process(input) << std::endl;
     alph.insert('0');
     alph.insert('1');
     alphT.insert('0');
@@ -562,7 +961,7 @@ int main () {
     input2 = "10";
     std::cout << "10: " << TM2.process(input2) << std::endl;
     input2 = "01";
-    std::cout << "01: " << TM2.process(input2) << std::endl;*/
+    std::cout << "01: " << TM2.process(input2) << std::endl;
     alph.insert('c');
     std::set<std::vector<char>> alphTvec;
     std::vector<char> tempVec1;
@@ -744,8 +1143,14 @@ int main () {
     TM3.addTransition("Q8", "Q9", read, write, R, std::vector<char> (1, 'B'), std::vector<char> (1, 'B'));
     input = "010c010";
     std::cout << "010c010: " << TM3.process(input) << std::endl;
-
-
+*/
+    TuringMachine TM4 = generateTM("TM.xml");
+    std::string testinput = "a";
+    std::cout << "Test a: " <<TM4.process(testinput) << std::endl;
+    testinput = "b";
+    std::cout << "Test b: " <<TM4.process(testinput) << std::endl;
+    testinput = "";
+    std::cout << "Test empty: " <<TM4.process(testinput) << std::endl;
 
     return 0;
 }

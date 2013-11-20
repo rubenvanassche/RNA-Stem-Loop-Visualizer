@@ -33,8 +33,12 @@
 #include <deque>
 #include <queue>
 #include <tuple>
+#include <memory>
+#include "TinyXML/tinyxml.h"
 
 enum Direction {L, R};
+class TuringState;
+typedef std::shared_ptr<const TuringState> StatePtr;
 
 
 /**
@@ -121,8 +125,8 @@ public:
      * @param dir Direction in which to move head
      */
     TuringTransition(
-        const TuringState* from,
-        const TuringState* to,
+        StatePtr from,
+        StatePtr to,
         const std::vector<char>& read,
         const std::vector<char>& write,
         Direction dir
@@ -137,7 +141,7 @@ public:
      * @return True if matching transition
      */
 
-    bool match(const TuringState* state, std::vector<char> symbol);
+    bool match(StatePtr state, std::vector<char> symbol);
 
     /**
      * @brief Gets next state, symbol to write and direction
@@ -145,7 +149,7 @@ public:
      * @return Tuple of next state, symbol to write and direction to move in
      */
 
-    std::tuple<const TuringState*, std::vector<char>, Direction> getTransition() const;
+    std::tuple<StatePtr, std::vector<char>, Direction> getTransition() const;
 
     /**
      * @brief overload for boolean <, needed to insert TuringTransitions into a set
@@ -166,8 +170,8 @@ public:
      * @return True if the same
      */
 
-    bool isThisTransition(const TuringState* from,
-            const TuringState* to,
+    bool isThisTransition(StatePtr from,
+            StatePtr to,
             const std::vector<char>& read,
             const std::vector<char>& write,
             Direction dir) const;
@@ -182,8 +186,8 @@ public:
     virtual ~TuringTransition();
 
 private:
-    const TuringState *fFrom = nullptr;
-    const TuringState *fTo = nullptr;
+    StatePtr fFrom = nullptr;
+    StatePtr fTo = nullptr;
     std::vector<char> fRead;
     std::vector<char> fWrite;
     Direction fDirection;
@@ -259,14 +263,14 @@ public:
      * @param trackCount Number of tracks on the tape
      */
 
-    TMID(std::string& input, const TuringState* startState, char blank, int trackCount);
+    TMID(std::string& input, StatePtr startState, char blank, int trackCount);
 
     /**
      * @brief Get the symbol at the current head position and the current state of the ID
      *
      * @return Pair of the symbol and the state
      */
-    std::pair<const TuringState*, std::vector<char>> getStateAndSymbol() const;
+    std::pair<StatePtr, std::vector<char>> getStateAndSymbol() const;
 
     /**
      * @brief Process the ID according to one transition for one step
@@ -275,7 +279,7 @@ public:
      * @param write Symbol to be written to tape
      * @param dir Direction to move head in
      */
-    void step(const TuringState* to, std::vector<char> write, Direction dir);
+    void step(StatePtr to, std::vector<char> write, Direction dir);
 
     /**
      * @brief output overload
@@ -285,7 +289,7 @@ public:
 
 private:
     Tape fTape;
-    const TuringState* fState;
+    StatePtr fState;
     int fTrackCount;
 
 };
@@ -296,6 +300,13 @@ private:
 
 class TuringMachine {
 public:
+
+    /**
+     * @brief Constructor
+     *
+     */
+
+    TuringMachine();
      /**
      * @brief Constructor
      *
@@ -338,10 +349,10 @@ public:
        const std::set<char>& alphabetTuring,
        const std::set<std::vector<char>>& alphabetTape,
        const char& tapeBlank,
-       const std::set<TuringState*>& states,
+       const std::set<StatePtr>& states,
        const std::set<TuringTransition>& transitions,
-       const TuringState* startState,
-       const std::set<const TuringState*>& acceptingStates
+       StatePtr startState,
+       const std::set<StatePtr>& acceptingStates
        );*/
 
 
@@ -403,6 +414,16 @@ public:
            const std::vector<char>& fromStorage = std::vector<char> (),
            const std::vector<char>& toStorage = std::vector<char> ());
 
+   /**
+    * @brief Adds start state pointer after adding the states. Useful for XML with state storage
+    */
+   bool addStartState(std::string name, std::vector<char> storage = std::vector<char> ());
+
+   /**
+    * @brief Adds an accepting state after adding the states. Useful for XML with state storage
+    */
+   bool addAcceptingState(std::string name, std::vector<char> storage = std::vector<char> ());
+
 
     /**
      * @brief Process an input string through the Turing Machine
@@ -416,17 +437,28 @@ public:
     virtual ~TuringMachine();
 
 private:
-    const TuringState* getStatePtr(std::string& name) const;
+    StatePtr getStatePtr(std::string& name) const;
 
 
-    std::set<TuringState*> fStates;
+    std::vector<StatePtr> fStates;
     std::set<char> fAlphabet;
     std::set<std::vector<char>> fTapeAlphabet;
-    std::set<TuringTransition> fTransitions;
-    const TuringState* fStartState = nullptr;
+    std::vector<TuringTransition> fTransitions;
+    StatePtr fStartState = nullptr;
     char fBlank;
-    std::set<const TuringState*> fAccepting;
+    std::set<StatePtr> fAccepting;
     int fStateStorageSize = -1;
     int fTrackCount = -1;
 };
+
+
+/**
+ * @brief Generates a Turing Machine from an XML file
+ *
+ * @param fileName Name of the XML file
+ *
+ * @return TM The generated Turing Machine
+ */
+TuringMachine generateTM(std::string fileName);
+
 #endif /*TURING_H*/
