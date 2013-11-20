@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 18 November 2013
+ * Last modified: 20 November 2013
  * By: Stijn Wouters
  */
 
@@ -175,31 +175,17 @@ public:
      */
     void cleanUp();
 
-/* 
- * for converting CFG's to CNF, I need access to the following data members.
- * Of course, you could write getters and setters, but that's pointless here
- * since you'll probably never use that getter and setters again.
- */
-protected:
-    /**
-     * @brief The set of terminal symbols.
-     */
+private:
+    // the set of terminal symbols
     std::set<char> fTerminals;
 
-    /**
-     * @brief The set of non-terminal symbols.
-     */
+    // the set of variables (non-terminals)
     std::set<char> fVariables;
 
-    /**
-     * @brief The set of production rules where each terminal symbol is 
-     * (multi)mapped to a SymbolString
-     */
+    // the production rules
     std::multimap<char, SymbolString> fProductions;
 
-    /**
-     * @brief The start symbol
-     */
+    // the starting symbol
     char fStartSymbol;
 };
 
