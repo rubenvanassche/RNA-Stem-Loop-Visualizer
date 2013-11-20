@@ -407,10 +407,11 @@ void CFG::eleminateUselessSymbols() {
     // first, eleminate all symbols that are not generating
     for (char s : generating) {
         try {
-            // only add rules whose body does not contain any non-generating symbols
+            // only add rules whose body does not contain any 
+            // non-generating symbols
             for (SymbolString body : this->bodies(s)) {
-                // first check whether the body does not contain any non-generating
-                // symbols, if so, skip it
+                // first check whether the body does not contain
+                // any non-generating symbols, if so, skip it
                 bool isGenerating = true;
                 for (char c : body) {
                     if (generating.find(c) == generating.end()) {
