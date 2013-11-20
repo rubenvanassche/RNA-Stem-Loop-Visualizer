@@ -185,6 +185,7 @@ private:
     // the production rules
     std::multimap<char, SymbolString> fProductions;
 
+protected:
     // the starting symbol
     char fStartSymbol;
 };

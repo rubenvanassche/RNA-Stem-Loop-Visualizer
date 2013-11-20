@@ -32,7 +32,7 @@ CNF::CNF(
     // first thing to do is clean up grammar
     CFG::cleanUp();
 
-    // then maps each terminal and variable to the Chomsky numbers
+    // then maps each terminal and variable to a Chomsky Number
     int i = 0;
     for (char t : terminals) {
         fChomskyNumbers.insert(std::pair<char, int>(t, i++));
@@ -114,15 +114,31 @@ CNF::CNF(
 
 CNF::CNF(const CNF& cnf) : CFG(cnf) {
     this->fChomskyNumbers = cnf.fChomskyNumbers;
-    this->fChomskyProductions = cnf.fChomskyProductions;
 }
 
 CNF& CNF::operator=(const CNF& cnf) {
     this->fChomskyNumbers = cnf.fChomskyNumbers;
-    this->fChomskyProductions = cnf.fChomskyProductions;
     return *this;
 }
 
 CNF::~CNF() {
     // nothing else to destroy
+}
+
+bool CNF::CYK(const std::string& terminalstring) const {
+    // first, check whether the terminalstring is valid while
+    // translating the string into Chomsky Numbers
+    std::vector<int> chomskyTerminal;
+
+    for (char t : terminalstring) {
+        auto it = fChomskyNumbers.find(t);
+
+        if (it == fChomskyNumbers.end())
+            throw std::invalid_argument("Invalid terminal string.");
+
+        chomskyTerminal.push_back(it->second);
+    } // end for
+
+
+    return true;
 }

@@ -81,6 +81,25 @@ public:
      */
     ~CNF();
 
+    /**
+     * @brief Check whether the terminalstring is in the language of this CNF
+     * by using the CYK algorithm.
+     *
+     * @param terminalstring The string to be checked whether this is in the
+     * language of the CFG.
+     *
+     * @return True if the terminalstring is in the language of this CFG,
+     * false if not.
+     *
+     * @pre
+     * - The string passed consists only of terminal symbols in the set of
+     *   terminals of this CFG.
+     *
+     * @throw std::invalid_argument if the string passed is not a valid
+     * terminal string (that is, not consisting of terminal symbols).
+     */
+    bool CYK(const std::string& terminalstring) const;
+
 private:
     /*
      * The raison that I use an apart production map is that the amount of
@@ -93,12 +112,12 @@ private:
      */
 
     // All variables and terminals will be mapped to an integer, I'll call
-    // this Chomsky Numbers (however, that doesn't make any sense at all).
+    // this Chomsky Numbers (well, at least it sounds good.. :-P)
     std::map<char, int> fChomskyNumbers;
 
-    // The set of production rules where the head (a Chomsky Number will be
-    // projected to an array of integers.
-    std::multimap<int, std::vector<int> > fChomskyProductions;
+    // The set of production rules where a Chomsky Number will be mapped to
+    // a vector of ChomskyNumbers.
+    std::multimap<int, std::vector<int>> fChomskyProductions;
 };
 
 #endif // H_CNF_H
