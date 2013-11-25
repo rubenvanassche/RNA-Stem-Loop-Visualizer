@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 17 November 2013
+ * Last modified: 18 November 2013
  * By: Stijn Wouters
  */
 
@@ -28,7 +28,8 @@
 #include <string>
 
 /**
- * @brief Class representing a sequence of terminals and variables
+ * @brief SymbolString is just a std::string consisting of symbols from either
+ * a set of variables or a set of terminals.
  */
 typedef std::string SymbolString;
 
@@ -40,14 +41,16 @@ public:
      /**
      * @brief Constructor
      *
-     * @param CFGTerminals A set containing the terminals of the CFG
-     * @param CFGVariables A set containing the variables of the CFG
-     * @param CFGProductions A multimap that maps a symbol to an symbolString
-     * @param CFGStartsymbol The startsymbol for the CFG
+     * @param terminals  A set containing the terminals of the CFG.
+     * @param variables A set containing the variables of the CFG.
+     * @param productions A multimap that maps any symbol from the set of
+     * variables to a (possibly empty) SymbolString (which contains symbols
+     * from either the set of terminals or either the set of variables.
+     * @param startsymbol The startsymbol for the CFG.
      *
      * @pre
-     * - The set of variables and the set of terminales are disjoints.
-     * - The production rule is valid: The head consist of exactly one symbol
+     * - The set of variables and the set of terminals are disjoints.
+     * - The production rule is valid: the head consist of exactly one symbol
      *   that is in the set of the variables and the body must be empty or
      *   consisting of symbols that is either in the set of variables or in
      *   the set of terminals.
@@ -82,19 +85,21 @@ public:
     virtual ~CFG();
 
     /**
-     * @brief Get the set of symbolstrings.
+     * @brief Get the set of bodies with the passed variable as head. For
+     * example if there are productions of the form A -> "a" and A -> "aA",
+     * then this will returns {"a", "aA"}.
      *
      * @param v The variable representing the head of the production rules.
      *
-     * @return The set of symbolstrings representing the body of the
-     * production rules.
+     * @return The set of SymbolString representing the body of the production
+     * rules whose head is the passed variable.
      *
      * @pre
-     * - The variable must be in the set of the variables.
+     * - The passed variable must be in the set of the variables.
      *
      * @throw std::invalid_argument The precondition were not satisfied.
      */
-    std::set<SymbolString> productions(const char& v) const;
+    std::set<SymbolString> bodies(const char& v) const;
 
     /**
      * @brief Get all the nullable variables.
@@ -105,9 +110,10 @@ public:
 
     /**
      * @brief Eleminate epsilon productions. That is, eleminate productions
-     * of the form A -> ε
+     * of the form A -> ε, but doing so that the CFG still accepts the same
+     * language with epsilon (empty string excluded).
      *
-     * @post The production rules doesn't contain any epsilon productions.
+     * @post The production rules doesn't contain any nullable symbols.
      */
     void eleminateEpsilonProductions();
 
@@ -129,8 +135,8 @@ public:
      *
      * @throw std::logic_error This CFG has a cycle of unit pairs. TODO
      *
-     * @post The production rules doesn't contain any unit productions.
-     * @post The CFG still accepts the same language.
+     * @post The CFG has only unit pairs of the form (A, A) for each A is a
+     * variable.
      */
     void eleminateUnitProductions();
 
@@ -152,7 +158,7 @@ public:
      * @brief Eleminate useless symbols. But doing so that is does not affect
      * the language of this CFG.
      *
-     * @post The production rules doesn't contain any unit productions.
+     * @post The production rules doesn't contain any useless symbols.
      * @post The CFG still accepts the same language.
      */
     void eleminateUselessSymbols();
@@ -161,6 +167,11 @@ public:
      * @brief Clean up CFG, that is, eleminate epsilon productions, useless
      * symbols and unit productions IN SAFE ORDER. This comes in handy for 
      * converting to CNF (Chomsky Normal Form).
+     *
+     * @post The production rules doesn't contain any nullable symbols.
+     * @post The production rules doesn't contain any useless symbols.
+     * @post The CFG has only unit pairs of the form (A, A) for each A is a
+     * variable.
      */
     void cleanUp();
 

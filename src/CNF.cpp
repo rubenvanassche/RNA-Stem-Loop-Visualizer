@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 15 November 2013
+ * Last modified: 18 November 2013
  * By: Stijn Wouters
  */
 #include "CNF.h"
@@ -27,13 +27,19 @@ CNF::CNF(
     const std::multimap<char, SymbolString>& productions,
     const char& start
     ) : CFG(terminals, variables, productions, start) {
-    // TODO cleanup grammar
-    // TODO convert to Chomsky Normal Form
+    // first, clean up the grammar
+    this->cleanUp();
+
+    // then convert it to Chomsky Normal Form
+    // TODO
 }
 
 CNF::CNF(const CFG& cfg) : CFG(cfg) {
-    // TODO cleanup grammar
-    // TODO convert to Chomsky Normal Form
+    // first, clean up the grammar
+    this->cleanUp();
+
+    // then, convert it to Chomsky Normal Form
+    // TODO
 }
 
 CNF::CNF(const CNF& cnf) : CFG(cnf) {
@@ -50,6 +56,6 @@ CNF::~CNF() {
 }
 
 bool CNF::CYK(const std::string& terminalstring) const{
-    // TODO implement
+    // TODO
     return true;
 }
