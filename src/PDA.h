@@ -26,24 +26,60 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <list>
 #include <set>
+#include <utility>
+#include <iostream>
+#include <exception>
+#include <stdexcept>
+#include <algorithm>
 
 /**
  * @brief Class representing a state from a PDA
  */
+
 class PDAState {
 public:
-     /**
-     * @brief Constructor
-     *
-     * @param name The name of the PDAState
-     */
-    PDAState(const std::string& name);
+         /**
+         * @brief Constructor
+         *
+         * @param name The name of the PDAState
+         */
+        PDAState(std::string name);
 
-    virtual ~PDAState();
+        /**
+		 * @brief Constructor
+		 *
+		 * @param name The name of the PDAState
+		 * @param isFinal Bool which tells if this state is final or not
+		 */
+		PDAState(std::string name, bool isFinal);
 
+		 /**
+		 * @brief Check if a state is final
+		 *
+		 * @return A bool telling if it's true or not
+		 */
+		bool isFinal() const;
+
+		 /**
+		 * @brief Get the name of the state
+		 *
+		 * @return A string representing the name
+		 */
+		std::string getName() const;
+
+		/**
+		 * @brief == operator overloading
+		 *
+		 * @return Bool telling if the two states are equal
+		 */
+		bool operator==(const PDAState& other);
+
+        virtual ~PDAState();
 private:
-    std::string fName;
+        std::string fName;
+        bool fFinal;
 };
 
 /**
@@ -87,9 +123,17 @@ public:
 
     virtual ~PDATransition();
 
-private:
-    PDAState *fFrom = nullptr;
-    PDAState *fTo = nullptr;
+    /**
+	 * @brief == operator overloading
+	 *
+	 * @return Bool telling if the two transitions are equal
+	 */
+	bool operator==(const PDATransition& other);
+
+    void stackOperation(std::stack<char>& in);
+
+    PDAState *fFrom;
+    PDAState *fTo;
     char fInputSymbol;
     char fTopStack;
     std::vector<char> fPushStack;
@@ -99,6 +143,35 @@ private:
 enum PDAFinal{
     STACK,
     STATE
+};
+
+/**
+ * @brief Class representing a PDA Instantenious Description
+ */
+class PDAID{
+public:
+    /**
+     * @brief Constructor
+     *
+     * @param input The input string
+     * @param currentState The pointer to state where the ID starts
+     * @param stack The stack at this moment
+     */
+
+	PDAID(const std::string& input, PDAState* currentState, const std::stack<char> stack);
+
+    /**
+     * @brief Process the ID according to one transition for one step
+     *
+     * @param to Pointer to next state
+     * @param inputSymbol Character accompanied with this transition
+     * @param topStack Character that should be at the top of the stack after the transition
+     */
+    void step(const std::string& input, PDAState* currentState, const std::stack<char> stack);
+
+    std::string fInput;
+    PDAState* fState;
+    std::stack<char> fStack;
 };
 
 /**
@@ -133,27 +206,12 @@ public:
      /**
      * @brief Add a new state to the PDA
      *
-     * @param state An PDAState object representing an PDA state
-     * @param isEnding A bool describing if the state is a final state
-     *
-     * @return A bool telling if the state is added or not
-     */
-    bool addState(const PDAState& state, const bool& isFinal);
-
-     /**
-     * @brief Add a new state to the PDA
-     *
      * @param state A PDAState object representing an PDA state
-     * @param isEnding A bool describing if the state is a final state
      * @param isStarting A bool describing if the state is the start state
      *
      * @return A bool telling if the state is added or not
      */
-    bool addState(
-            const PDAState& state, 
-            const bool& isFinal, 
-            const bool& isStarting
-            );
+    bool addState(const PDAState& state, const bool& isStarting);
 
      /**
      * @brief Add a new transition to the PDA
@@ -162,7 +220,7 @@ public:
      *
      * @return A bool telling if the transition is added or not
      */
-    bool addTransition(const PDATransition& transition);
+    bool addTransition(PDATransition transition);
 
     /**
      * @brief Process an input string through the PDA
@@ -176,13 +234,17 @@ public:
     virtual ~PDA();
 
 private:
-    std::set<PDATransition> fTransitions;
-    std::set<PDAState> fStates;
-    std::set<PDAState*> fFinalStates;
+
+    std::vector<PDATransition> getTransitions(char symbol, char stackTopSymbol, PDAState* from);
+
+    std::pair<bool, bool> isFinalDead(const std::string& input, PDAState* to, const std::stack<char> stack);
+
+    std::list<PDATransition> fTransitions;
+    std::list<PDAState> fStates;
 
     PDAState* fStartState = nullptr;
 
-    char fStartSymbol;
+    char fStackStartSymbol;
 
     PDAFinal fPDAtype;
 
