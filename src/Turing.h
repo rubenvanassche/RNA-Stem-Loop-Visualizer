@@ -317,7 +317,7 @@ public:
     TuringMachine(
         const std::set<char>& alphabetTuring,
         const std::set<std::vector<char>>& alphabetTape,
-        const char& tapeBlank
+        char tapeBlank
         );
 
     /**
@@ -330,7 +330,7 @@ public:
    TuringMachine(
        const std::set<char>& alphabetTuring,
        const std::set<char>& alphabetTape,
-       const char& tapeBlank
+       char tapeBlank
        );
 
     /**

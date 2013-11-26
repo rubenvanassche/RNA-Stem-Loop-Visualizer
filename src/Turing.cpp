@@ -170,7 +170,7 @@ Tape::Tape(std::string& input, char blank, int trackCount) : fBlank(blank), fHea
 std::vector<char> Tape::getSymbolAtHead() const {
     if (fHead < fTape.size() && fHead >= 0)   //Not out of tape bounds
         return fTape[fHead];
-    return std::vector<char>(fTrackCount, 'B');     //if out of bounds; must be blank
+    return std::vector<char>(fTrackCount, fBlank);     //if out of bounds; must be blank
 }
 
 void Tape::replaceSymbolAtHead(std::vector<char> symbol) {
@@ -230,7 +230,7 @@ std::ostream& operator<<(std::ostream& output, const TMID& ID) {
 
 TuringMachine::TuringMachine() {}
 
-TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::set<std::vector<char>>& alphabetTape, const char& tapeBlank) :
+TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::set<std::vector<char>>& alphabetTape, char tapeBlank) :
     fAlphabet(alphabetTuring), fTapeAlphabet(alphabetTape), fTrackCount((*alphabetTape.begin()).size()) {
     try {                                                          //Check if blank symbol in tape alphabet before adding
 
@@ -259,13 +259,14 @@ TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::se
     }
     catch (std::runtime_error& e) {
         std::cout << "Error in TuringMachine constructor: " << e.what() << std::endl;
+        throw;
         return;
     }
     fBlank = tapeBlank;
 
 }
 
-TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::set<char>& alphabetTape, const char& tapeBlank) :
+TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::set<char>& alphabetTape, char tapeBlank) :
     fAlphabet(alphabetTuring), fTrackCount(1) {
     std::set<std::vector<char>> alphabetVecTape;
     for(auto i : alphabetTape)
@@ -297,6 +298,7 @@ TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::se
     }
     catch (std::runtime_error& e) {
         std::cout << "Error in TuringMachine constructor: " << e.what() << std::endl;
+        throw;
         return;
     }
     fBlank = tapeBlank;
@@ -868,7 +870,7 @@ TuringMachine generateTM(std::string fileName) {
 
 
 
-int main () {
+/*int main () {
     /*std::set<char> alph;
     std::set<char> alphT;
     std::vector<char> storage;
@@ -1143,7 +1145,7 @@ int main () {
     TM3.addTransition("Q8", "Q9", read, write, R, std::vector<char> (1, 'B'), std::vector<char> (1, 'B'));
     input = "010c010";
     std::cout << "010c010: " << TM3.process(input) << std::endl;
-*/
+
     TuringMachine TM4 = generateTM("TM.xml");
     std::string testinput = "a";
     std::cout << "Test a: " <<TM4.process(testinput) << std::endl;
@@ -1153,4 +1155,4 @@ int main () {
     std::cout << "Test empty: " <<TM4.process(testinput) << std::endl;
 
     return 0;
-}
+}*/
