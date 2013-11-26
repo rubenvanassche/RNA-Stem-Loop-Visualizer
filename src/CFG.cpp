@@ -34,7 +34,7 @@
 std::set< std::set<int> > subset(std::set<int>& s) {
     if (s.empty()) {
         // base case
-        return { {} };
+        return { std::set<int>{} };
     } else {
         // recursion: remove one element from the subset
         int i = *(s.begin());
