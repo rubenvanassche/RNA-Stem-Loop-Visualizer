@@ -32,13 +32,51 @@ CNF::CNF(
     // first thing to do is clean up grammar
     this->cleanUp();
 
-    // check whether this set of productions is already in CNF
-    bool notChomsky = true;
-
     // new variables, keep incrementing until the variable is not already
     // in the set of variables
     char c = 0;
     while (fVariables.find(c) != fVariables.end()) { ++c; }
+
+    // first, elemeninate terminal symbols in bodies (of size > 1)
+    std::map<char, char> terms;
+
+    for (char t : fTerminals) {
+        std::pair<char, SymbolString> rule(c, SymbolString(1, t));
+        fProductions.insert(rule);
+
+        terms.insert(std::pair<char, char>(t, c));
+
+        ++c;
+        while (fVariables.find(c) != fVariables.end()) { ++c; }
+    } // end for
+
+    
+    std::multimap<char, SymbolString> productions_no_terminals;
+
+    for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
+        auto range = fProductions.equal_range(it->first);
+
+        for (auto it1 = range.first; it1 != range.second; ++it1) {
+            if ((it1->second).size() > 1) {
+                SymbolString body;
+                for (char t : it1->second) {
+                    if (fTerminals.find(t) == fTerminals.end()) {
+                        body += t;
+                    } else {
+                        body += terms.find(t)->second;
+                    } // end if-else
+                } // end for
+                productions_no_terminals.insert(std::pair<char, SymbolString>(it->first, body));
+            } else {
+                productions_no_terminals.insert(std::pair<char, SymbolString>(it->first, it1->second));
+            } // end if-else
+        } // end for
+    } // end for
+
+    fProductions = productions_no_terminals;
+
+    // check whether this set of productions is already in CNF
+    bool notChomsky = true;
 
     do {
         notChomsky = false;
@@ -85,6 +123,7 @@ CNF::CNF(
                         newProductions.insert(rule1);
 
                         // don't forget to update the variable!
+                        ++c;
                         while (fVariables.find(c) != fVariables.end()) { ++c; }
                     } // end if-else
                 } // end for
@@ -111,28 +150,23 @@ CNF::~CNF() {
 }
 
 bool CNF::CYK(const std::string& terminalstring) const {
-    /*
-    // first, check whether the terminalstring is valid while
-    // translating the string into Chomsky Numbers
-    std::vector<int> chomskyTerminal;
-
+    // first, check whether the terminalstring is valid
     for (char t : terminalstring) {
-        auto it = fChomskyNumbers.find(t);
+        auto it = fTerminals.find(t);
 
-        if (it == fChomskyNumbers.end())
+        if (it == fTerminals.end())
             throw std::invalid_argument("Invalid terminal string.");
-
-        chomskyTerminal.push_back(it->second);
     } // end for
 
-    std::multimap< std::vector<int>, int> inductiveProductions;
-    std::multimap<int, int> baseProductions;
-    for (auto it = fChomskyProductions.begin(); it != fChomskyProductions.end(); ++it) {
-        auto range = fChomskyProductions.equal_range(it->first);
+    // inverse production rules
+    std::multimap<SymbolString, char> inductiveProductions;
+    std::multimap<char, char> baseProductions;
+    for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
+        auto range = fProductions.equal_range(it->first);
 
         for (auto it1 = range.first; it1 != range.second; ++it1) {
-            if ((it1->second).size() == 2) {
-                std::pair< std::vector<int>, int> args(it1->second, it->first);
+            if ((it1->second).size() > 1) {
+                std::pair<SymbolString, int> args(it1->second, it->first);
                 inductiveProductions.insert(args);
             } else {
                 std::pair<int, int> args((it1->second).at(0), it->first);
@@ -141,10 +175,20 @@ bool CNF::CYK(const std::string& terminalstring) const {
         } // end for
     } // end for
 
-    std::vector<std::vector<std::set<int>>> table;
+    std::vector<std::vector<std::set<char>>> table;
 
-    for (int s = chomskyTerminal.size(); s > 0; --s) {
+    // base case
+    for (char t : terminalstring) {
+        auto range = baseProductions.equal_range(t);
+
+        std::set<char> s;
+        for (auto it = range.first; it != range.second; ++it) {
+            s.insert(it->second);
+        } // end for
+
+        std::vector<std::set<char>> row = {s};
+        table.push_back(row);
     } // end for
-    */
+
     return true;
 }
