@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 20 November 2013
+ * Last modified: 26 November 2013
  * By: Stijn Wouters
  */
 
@@ -99,25 +99,6 @@ public:
      * terminal string (that is, not consisting of terminal symbols).
      */
     bool CYK(const std::string& terminalstring) const;
-
-private:
-    /*
-     * The raison that I use an apart production map is that the amount of
-     * variables may be very big, even bigger than the provided chars (assuming
-     * you don't want the special ASCII characters such as ~, @, #, ...
-     * representing a variable). Besides, you can still keep using the methods
-     * in the CFG's interface, because converting CFG's to CNF's will not
-     * create any unwanted side effects (except that the CFG will be cleaned
-     * up, which is necessary before converting to CNF's).
-     */
-
-    // All variables and terminals will be mapped to an integer, I'll call
-    // this Chomsky Numbers (well, at least it sounds good.. :-P)
-    std::map<char, int> fChomskyNumbers;
-
-    // The set of production rules where a Chomsky Number will be mapped to
-    // a vector of ChomskyNumbers.
-    std::multimap<int, std::vector<int>> fChomskyProductions;
 };
 
 #endif // H_CNF_H

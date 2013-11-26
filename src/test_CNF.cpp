@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 20 November 2013
+ * Last modified: 26 November 2013
  * By: Stijn Wouters
  */
 #include "Catch.h"
@@ -83,7 +83,7 @@ TEST_CASE("Constructing CNF's", "[CNF]") {
     } // end try-catch
 }
 
-TEST_CASE("CNF with CFG methods", "[CNF]") {
+TEST_CASE("CYK", "[CNF]") {
     const std::set<char> terminals = {'a', 'b'};
     const std::set<char> variables = {'A', 'B', 'C', 'S'};
 
@@ -100,46 +100,7 @@ TEST_CASE("CNF with CFG methods", "[CNF]") {
                                                         };
 
     try {
-        std::set<char> S = {'S'};
-        std::set<std::pair<char, char>> empty_units = { 
-                                                    {'A', 'A'}, 
-                                                    {'B', 'B'},
-                                                    {'C', 'C'}, 
-                                                    {'S', 'S'}
-                                                    };
-        CNF c0(terminals, variables, empty, 'S');
-        CHECK(c0.nullable().empty());
-        CHECK(c0.units() == empty_units);
-        CHECK(c0.reachable() == S);
-        CHECK(c0.generating() == terminals);
-        CHECK(c0.bodies('A').empty());
-        CHECK(c0.bodies('B').empty());
-        CHECK(c0.bodies('C').empty());
-        CHECK(c0.bodies('S').empty());
-
-        std::set<char> nullable = {'S', 'A', 'B'};
-        std::set< std::pair<char, char> > units = {
-                                                {'A', 'A'},
-                                                {'C', 'C'},
-                                                {'B', 'B'},
-                                                {'S', 'S'},
-                                                {'S', 'A'},
-                                                {'S', 'B'}
-                                                };
-        std::set<char> reachable = {'S', 'A', 'B', 'a', 'b'};
-        std::set<char> generating = {'a', 'b', 'A', 'B', 'S'};
-        std::set<SymbolString> S_productions_cleanup = {"aa", "aAa", "bb", "bBb"};
-        std::set<SymbolString> A_productions_cleanup = {"aa", "aAa"};
-        std::set<SymbolString> B_productions_cleanup = {"bb", "bBb"};
         CNF c1(terminals, variables, productions, 'S');
-        CHECK(c1.nullable().empty());
-        CHECK(c1.units() == empty_units);
-        CHECK(c1.reachable() == reachable);
-        CHECK(c1.generating() == generating);
-        CHECK(c1.bodies('A') == A_productions_cleanup);
-        CHECK(c1.bodies('B') == B_productions_cleanup);
-        CHECK(c1.bodies('C').empty());
-        CHECK(c1.bodies('S') == S_productions_cleanup);
     } catch (const std::invalid_argument& e) {
         FAIL("Could not construct CNF's: " << e.what());
     } // end try-catch

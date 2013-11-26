@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 20 November 2013
+ * Last modified: 26 November 2013
  * By: Stijn Wouters
  */
 #include "CNF.h"
@@ -30,75 +30,21 @@ CNF::CNF(
     const char& start
     ) : CFG(terminals, variables, productions, start) {
     // first thing to do is clean up grammar
-    CFG::cleanUp();
+    this->cleanUp();
 
-    // then maps each terminal and variable to a Chomsky Number
-    int i = 0;
-    for (char t : terminals) {
-        fChomskyNumbers.insert(std::pair<char, int>(t, i++));
-    } // end for
+    // check whether this set of productions is already in CNF
+    bool notChomsky = true;
 
-    for (char v : variables) {
-        fChomskyNumbers.insert(std::pair<char, int>(v, i++));
-    } // end for
+    // new variables, keep incrementing until the variable is not already
+    // in the set of variables
+    char c = 0;
+    while (fVariables.find(c) != fVariables.end()) { ++c; }
 
-    for (char v : variables) {
-        for (SymbolString body : CFG::bodies(v)) {
-            // translate the body to ints
-            int chomskyHead = fChomskyNumbers.find(v)->second;
-            std::vector<int> chomskyBody;
-
-            for (char s : body) {
-                chomskyBody.push_back(fChomskyNumbers.find(s)->second);
-            } // end for
-
-            std::pair<int, std::vector<int>> rule(chomskyHead, chomskyBody);
-            fChomskyProductions.insert(rule);
-        } // end for
-    } // end for
-
-    // check whether this is already in CNF
-    bool notChomsky = false;
-
-    for (auto it = fChomskyProductions.begin(); it != fChomskyProductions.end(); ++it) {
-        auto range = fChomskyProductions.equal_range(it->first);
-
-        for (auto it1 = range.first; it1 != range.second; ++it1) {
-            if ((it1->second).size() > 2) {
-                notChomsky = true;
-                break;
-            } else {
-                continue;
-            } // end if-else
-        } // end for
-    } // end for
-
-    while (notChomsky) {
+    do {
         notChomsky = false;
 
-        std::multimap<int, std::vector<int> > newProductions;
-
-        for (auto it = fChomskyProductions.begin(); it != fChomskyProductions.end(); ++it) {
-            auto range = fChomskyProductions.equal_range(it->first);
-
-            for (auto it1 = range.first; it1 != range.second; ++it1) {
-                if ((it1->second).size() <= 2) {
-                    std::pair<int, std::vector<int>> rule(it->first, it1->second);
-                    newProductions.insert(rule);
-                } else {
-                    std::vector<int> chomskyBody = {i};
-                    chomskyBody.insert(chomskyBody.begin(), (it1->second).begin()+2, (it1->second).end());
-                    newProductions.insert(std::pair<int, std::vector<int>>(it->first, chomskyBody));
-                    std::vector<int> chomskyBody1((it1->second).begin(), (it1->second).begin()+2);
-                    newProductions.insert(std::pair<int, std::vector<int>>(i++, chomskyBody1));
-                } // end if-else
-            } // end for
-        } // end for
-
-        fChomskyProductions = newProductions;
-
-        for (auto it = fChomskyProductions.begin(); it != fChomskyProductions.end(); ++it) {
-            auto range = fChomskyProductions.equal_range(it->first);
+        for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
+            auto range = fProductions.equal_range(it->first);
 
             for (auto it1 = range.first; it1 != range.second; ++it1) {
                 if ((it1->second).size() > 2) {
@@ -109,15 +55,54 @@ CNF::CNF(
                 } // end if-else
             } // end for
         } // end for
-    } // end while
+
+        // apply reform if this is not in CNF
+        if (notChomsky) {
+            // the new set of production rules
+            std::multimap<char, SymbolString> newProductions;
+
+            for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
+                auto range = fProductions.equal_range(it->first);
+
+                for (auto it1 = range.first; it1 != range.second; ++it1) {
+                    if ((it1->second).size() <= 2) {
+                        // this rule is already in Chomsky Normal Form
+                        std::pair<char, SymbolString> rule(it->first, it1->second);
+                        newProductions.insert(rule);
+                    } else {
+                        // std::string constructor (converts char to string)
+                        SymbolString chomskyBody(1, c);
+                        // append the rest of the original body (ABCDE) --> (VCDE)
+                        chomskyBody.append((it1->second).begin()+2, (it1->second).end());
+                        // add the rule
+                        std::pair<char, SymbolString> rule(it->first, chomskyBody);
+                        newProductions.insert(rule);
+
+                        // also add the other rule V --> AB
+                        SymbolString chomskyBody1((it1->second).begin(), (it1->second).begin()+2);
+                        // add the rule
+                        std::pair<char, SymbolString> rule1(c, chomskyBody1);
+                        newProductions.insert(rule1);
+
+                        // don't forget to update the variable!
+                        while (fVariables.find(c) != fVariables.end()) { ++c; }
+                    } // end if-else
+                } // end for
+            } // end for
+
+            fProductions = newProductions;
+        } else {
+            // do nothing
+        } // end if-esle
+    } while (notChomsky);
 }
 
 CNF::CNF(const CNF& cnf) : CFG(cnf) {
-    this->fChomskyNumbers = cnf.fChomskyNumbers;
+    // nothing to construct
 }
 
 CNF& CNF::operator=(const CNF& cnf) {
-    this->fChomskyNumbers = cnf.fChomskyNumbers;
+    // nothing to copy
     return *this;
 }
 
@@ -126,6 +111,7 @@ CNF::~CNF() {
 }
 
 bool CNF::CYK(const std::string& terminalstring) const {
+    /*
     // first, check whether the terminalstring is valid while
     // translating the string into Chomsky Numbers
     std::vector<int> chomskyTerminal;
@@ -139,6 +125,26 @@ bool CNF::CYK(const std::string& terminalstring) const {
         chomskyTerminal.push_back(it->second);
     } // end for
 
+    std::multimap< std::vector<int>, int> inductiveProductions;
+    std::multimap<int, int> baseProductions;
+    for (auto it = fChomskyProductions.begin(); it != fChomskyProductions.end(); ++it) {
+        auto range = fChomskyProductions.equal_range(it->first);
 
+        for (auto it1 = range.first; it1 != range.second; ++it1) {
+            if ((it1->second).size() == 2) {
+                std::pair< std::vector<int>, int> args(it1->second, it->first);
+                inductiveProductions.insert(args);
+            } else {
+                std::pair<int, int> args((it1->second).at(0), it->first);
+                baseProductions.insert(args);
+            } // end if-else
+        } // end for
+    } // end for
+
+    std::vector<std::vector<std::set<int>>> table;
+
+    for (int s = chomskyTerminal.size(); s > 0; --s) {
+    } // end for
+    */
     return true;
 }

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 20 November 2013
+ * Last modified: 26 November 2013
  * By: Stijn Wouters
  */
 
@@ -175,7 +175,7 @@ public:
      */
     void cleanUp();
 
-private:
+protected:
     // the set of terminal symbols
     std::set<char> fTerminals;
 
@@ -185,7 +185,6 @@ private:
     // the production rules
     std::multimap<char, SymbolString> fProductions;
 
-protected:
     // the starting symbol
     char fStartSymbol;
 };
