@@ -28,6 +28,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    SET (CMAKE_CXX_COMPILER "/usr/bin/clang++")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
+
 # define DATADIR for tests that need input files
 add_definitions(-DDATADIR="${CMAKE_SOURCE_DIR}/data/")
 
@@ -35,6 +36,7 @@ add_definitions(-DDATADIR="${CMAKE_SOURCE_DIR}/data/")
 set(SRC 
     src/CFG.cpp 
     src/CNF.cpp 
+    src/PDA.cpp 
     src/Turing.cpp 
     src/TinyXML/tinyxml.cpp 
     src/TinyXML/tinyxmlparser.cpp 
@@ -45,8 +47,9 @@ set(SRC
 set(TESTSRC 
     src/Tests.cpp 
     src/test_CFG.cpp 
-    src/test_CNF.cpp 
-    src/test_Turing.cpp)
+    src/test_Turing.cpp
+    src/test_PDA.cpp)
+
 
 # Set flags
 set(CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -std=c++11")
