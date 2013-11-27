@@ -26,21 +26,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    SET (CMAKE_CXX_COMPILER "/usr/bin/clang++")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-<<<<<<< HEAD
-# Some OS X changes
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-   # Mac OS X specific code
-   SET(OperatingSystem "Mac OS X")
-   #SET (CMAKE_CXX_COMPILER "/usr/local/bin/gcc-4.8")
-   SET(GCC_COVERAGE_LINK_FLAGS    "-std=c++11 -stdlib=libc++")
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-# set some default flags (can be overriden through the CLI
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -ggdb")
-=======
 # define DATADIR for tests that need input files
 add_definitions(-DDATADIR="\\"${CMAKE_SOURCE_DIR}/data/\\"")
->>>>>>> master
 
 # Lists all sourcefiles (no testfiles and no main)
 set(SRC 
