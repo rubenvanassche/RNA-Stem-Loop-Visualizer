@@ -48,40 +48,59 @@ std::string PDAState::getName() const{
 	return this->fName;
 }
 
+std::ostream& operator<<(std::ostream& out, PDAState state){
+	out << "State " << state.getName();
+	if(state.isFinal() == true){
+		out << " (final)";
+	}
+	out << std::endl;
+	return out;
+}
 
-PDATransition::PDATransition(PDAState* from, PDAState* to, const char& input, const char& stackTop, const char& stackPush) {
+PDAState::~PDAState(){
+
+}
+
+PDATransition::PDATransition(PDAState* from, PDAState* to, const char& input, const char& stackTop, const PDAStackOperation& stackOperation) {
+	this->fFrom = from;
+	this->fTo = to;
+	this->fInputSymbol = input;
+	this->fTopStack = stackTop;
+	this->fStackOperation = stackOperation;
+}
+
+PDATransition::PDATransition(PDAState* from, PDAState* to, const char& input, const char& stackTop, const PDAStackOperation& stackOperation, const char& stackPush) {
 	this->fFrom = from;
 	this->fTo = to;
 	this->fInputSymbol = input;
 	this->fTopStack = stackTop;
 	this->fPushStack.push_back(stackPush);
+	this->fStackOperation = stackOperation;
 }
 
-PDATransition::PDATransition(PDAState* from, PDAState* to, const char& input, const char& stackTop, const std::vector<char>& stackPush){
+PDATransition::PDATransition(PDAState* from, PDAState* to, const char& input, const char& stackTop, const PDAStackOperation& stackOperation, const std::vector<char>& stackPush){
 	this->fFrom = from;
 	this->fTo = to;
 	this->fInputSymbol = input;
 	this->fTopStack = stackTop;
 	this->fPushStack.insert(this->fPushStack.end(), stackPush.begin(), stackPush.end());
+	this->fStackOperation = stackOperation;
 }
 
 void PDATransition::stackOperation(std::stack<char>& in){
-	if(this->fPushStack.size() == 0){
-		// nothing should happen
-		return;
-	}else{
-		if(this->fPushStack.size() == 1 and this->fPushStack.at(0) == 0){
-			// Epsilon so pop value from stack
-			in.pop();
-		}else if(this->fPushStack.size() == 1 and this->fPushStack.at(0) == this->fTopStack){
-			// a/a nothing to do the stack stays the same
-			return;
-		}else{
-			// just push everything on the stack
-			for(auto pushStackIt = this->fPushStack.begin(); pushStackIt != this->fPushStack.end();pushStackIt++){
-				in.push(*pushStackIt);
-			}
+	if(this->fStackOperation == PUSH){
+		for(auto pushStackIt = this->fPushStack.begin(); pushStackIt != this->fPushStack.end();pushStackIt++){
+			in.push(*pushStackIt);
 		}
+	}else if(this->fStackOperation == POP){
+		if(in.size() == 0){
+			throw std::runtime_error("Try to pop something from an empty stack");
+			return;
+		}
+
+		in.pop();
+	}else if(this->fStackOperation == STAY){
+		// do nothing
 	}
 }
 
@@ -91,6 +110,30 @@ bool PDATransition::operator==(const PDATransition& other){
 	}else{
 		return false;
 	}
+}
+
+std::ostream& operator<<(std::ostream& out, PDATransition transition){
+	out << "Transition " << transition.fFrom->getName() << " -> " << transition.fTo->getName() << " (" << transition.fInputSymbol << ")" << std::endl;
+	if(transition.fPushStack.size() == 0){
+		// nothing should happen
+		out << "when top stack is: " << transition.fTopStack << " nothing happens" << std::endl;
+	}else{
+		if(transition.fPushStack.size() == 1 and transition.fPushStack.at(0) == 0){
+			// Epsilon so pop value from stack
+			out << "When top stack is: " << transition.fTopStack << " this value will be popped" << std::endl;
+		}else if(transition.fPushStack.size() == 1 and transition.fPushStack.at(0) == transition.fTopStack){
+			// a/a nothing to do the stack stays the same
+			out << "when top stack is: " << transition.fTopStack << " it stays the same" << std::endl;
+		}else{
+			// just push everything on the stack
+			out << "when top stack is: " << transition.fTopStack << " push: ";
+			for(auto pushStackIt = transition.fPushStack.begin(); pushStackIt != transition.fPushStack.end();pushStackIt++){
+				out << *pushStackIt << ",";
+			}
+			out << std::endl;
+		}
+	}
+	return out;
 }
 
 PDATransition::~PDATransition() {
@@ -109,11 +152,20 @@ void PDAID::step(const std::string& input, PDAState* to, const std::stack<char> 
 	this->fStack = stack;
 }
 
+std::ostream& operator<<(std::ostream& out, PDAID id){
+	out << "PDA ID(" << id.fInput << ", " << id.fState->getName() << ", ";
+	for(int i = 0; i < id.fStack.size(); i++){
+		out << id.fStack.top();
+		id.fStack.pop();
+	}
+	out << ")";
+	return out;
+}
 
-PDA::PDA(const std::set<char>& alphabetPDA, const std::set<char>& alphabetStack, const char& stackStartSymbol, const PDAFinal& PDAending){
+
+PDA::PDA(const std::set<char>& alphabetPDA, const std::set<char>& alphabetStack, const PDAFinal& PDAending){
 	this->fAlphabet = alphabetPDA;
 	this->fStackAlphabet = alphabetStack;
-	this->fStackStartSymbol = stackStartSymbol;
 	this->fPDAtype = PDAending;
 }
 
@@ -156,52 +208,57 @@ bool PDA::addState(const PDAState& state){
 }
 
 bool PDA::addTransition(PDATransition transition){
-	if(std::find(this->fTransitions.begin(), this->fTransitions.end(), transition) == this->fTransitions.end()){
-		// Transition is not yet in fTransitions list
-
-		// now let's check if the transition is legal
-		if(std::find(this->fAlphabet.begin(), this->fAlphabet.end(), transition.fInputSymbol) == this->fAlphabet.end()){
+	// now let's check if the transition is legal
+	if(std::find(this->fAlphabet.begin(), this->fAlphabet.end(), transition.fInputSymbol) == this->fAlphabet.end()){
+		if(transition.fInputSymbol != 0){
 			throw std::runtime_error("The transition symbol isn't in the alphabet");
 			return false;
 		}
+	}
 
-		for(auto pushStackIt = transition.fPushStack.begin();pushStackIt != transition.fPushStack.end();pushStackIt++){
-			if(std::find(this->fAlphabet.begin(), this->fAlphabet.end(), *pushStackIt) == this->fAlphabet.end()){
+	for(auto pushStackIt = transition.fPushStack.begin();pushStackIt != transition.fPushStack.end();pushStackIt++){
+		if(std::find(this->fStackAlphabet.begin(), this->fStackAlphabet.end(), *pushStackIt) == this->fStackAlphabet.end()){
+			if(*pushStackIt != 0){
 				throw std::runtime_error("The transition symbol from the push on stack vector isn't in the alphabet");
 				return false;
 			}
 		}
+	}
 
-		if(std::find(this->fStackAlphabet.begin(), this->fStackAlphabet.end(), transition.fTopStack) == this->fStackAlphabet.end()){
+	if(std::find(this->fStackAlphabet.begin(), this->fStackAlphabet.end(), transition.fTopStack) == this->fStackAlphabet.end()){
+		if(transition.fTopStack != 0){
 			throw std::runtime_error("The top of the stack symbol isn't in the stack alphabet");
 			return false;
 		}
+	}
 
-		// now lets redirect the pointers to the states in the PDA
-		PDAState* newFrom = nullptr;
-		PDAState* newTo = nullptr;
-		for(auto statesIt = this->fStates.begin();statesIt != this->fStates.end();statesIt++){
-			if(transition.fFrom->getName() == statesIt->getName()){
-				newFrom = &(*statesIt);
-			}
-			if(transition.fTo->getName() == statesIt->getName()){
-				newTo = &(*statesIt);
-			}
+	// now lets redirect the pointers to the states in the PDA
+	PDAState* newFrom = nullptr;
+	PDAState* newTo = nullptr;
+	for(auto statesIt = this->fStates.begin();statesIt != this->fStates.end();statesIt++){
+		if(transition.fFrom->getName() == statesIt->getName()){
+			newFrom = &(*statesIt);
 		}
-
-		if(newFrom == nullptr){
-			throw std::runtime_error("The state from where this transition is coming doesn't exists");
-			return false;
+		if(transition.fTo->getName() == statesIt->getName()){
+			newTo = &(*statesIt);
 		}
+	}
 
-		if(newTo == nullptr){
-			throw std::runtime_error("The state to where this transition is going doesn't exists");
-			return false;
-		}
+	if(newFrom == nullptr){
+		throw std::runtime_error("The state from where this transition is coming doesn't exists");
+		return false;
+	}
 
-		transition.fFrom = newFrom;
-		transition.fTo = newTo;
+	if(newTo == nullptr){
+		throw std::runtime_error("The state to where this transition is going doesn't exists");
+		return false;
+	}
 
+	transition.fFrom = newFrom;
+	transition.fTo = newTo;
+
+	if(std::find(this->fTransitions.begin(), this->fTransitions.end(), transition) == this->fTransitions.end()){
+		// Transition is not yet in fTransitions list
 		this->fTransitions.push_back(transition);
 		return true;
 	}else{
@@ -210,18 +267,27 @@ bool PDA::addTransition(PDATransition transition){
 	}
 }
 
-std::vector<PDATransition> PDA::getTransitions(char symbol, char stackTopSymbol, PDAState* from){
+std::vector<PDATransition> PDA::getTransitions(std::string input, char stackTopSymbol, PDAState* from){
 	std::vector<PDATransition> selectedTransitions;
 
+
 	for(auto transitionIt = fTransitions.begin(); transitionIt != fTransitions.end();transitionIt++){
-		if(transitionIt->fInputSymbol == symbol){
-			// This transition corresponds to the symbol from input we're reading now
-			if(transitionIt->fTopStack == stackTopSymbol){
-				// Top of the PDA stack is equal to what the top of the stack should be in this transition
-				if(transitionIt->fFrom == from){
+		if(input.size() != 0){
+			// only if there are characters, take the first character
+			if(transitionIt->fInputSymbol == input.at(0)){
+				// This transition corresponds to the symbol from input we're reading now
+				if(transitionIt->fTopStack == stackTopSymbol and transitionIt->fFrom == from){
+					// Top of the PDA stack is equal to what the top of the stack should be in this transition
 					// This transition has the same from as given in the parameter list
 					selectedTransitions.push_back(*transitionIt);
 				}
+			}
+		}
+
+		// Now add the epsilon transitions
+		if(transitionIt->fInputSymbol == 0){
+			if(transitionIt->fTopStack == stackTopSymbol and transitionIt->fFrom == from){
+				selectedTransitions.push_back(*transitionIt);
 			}
 		}
 	}
@@ -242,16 +308,10 @@ std::pair<bool, bool> PDA::isFinalDead(const std::string& input, PDAState* to,co
 				isDead = true;
 			}
 		}
-		if(stack.size() == 0){
-			isDead = true;
-		}
 	}else{
 		// PDA is stack ending
 		if(stack.size() == 0){
 			isFinal = true;
-		}
-		if(input.size() == 0){
-			isDead = true;
 		}
 	}
 
@@ -260,67 +320,73 @@ std::pair<bool, bool> PDA::isFinalDead(const std::string& input, PDAState* to,co
 }
 
 bool PDA::process(std::string input){
-	std::list<PDAID> ids;
+	if(this->fStartState == nullptr){
+		throw std::runtime_error("Please define a  start state before processing a string");
+		return false;
+	}
+	std::queue<PDAID> ids;
 
-	input.erase(0);
-	std::vector<PDATransition> selectedTransitions = this->getTransitions(input[0], this->fStack.top(), this->fStartState);
+	// the first thing we do is adding all the ID's we get with the first input symbol from the start state
+	std::vector<PDATransition> selectedTransitions = this->getTransitions(input, 0, this->fStartState);
 	for(auto transitionsIt = selectedTransitions.begin();transitionsIt != selectedTransitions.end();transitionsIt++){
 		// add the initial ID's
+		std::string newInput = input;
+		if(transitionsIt->fInputSymbol != 0){
+			// If the input symbol is not zero we need to remove a character from the input string
+			newInput.erase(0, 1);
+		}
+
 		std::stack<char> tempStack = this->fStack;
 		transitionsIt->stackOperation(tempStack);
-		PDAID newId(input, transitionsIt->fTo, tempStack);
-		ids.push_back(newId);
-	}
 
+		PDAID newId(newInput, transitionsIt->fTo, tempStack);
+		ids.push(newId);
+	}
 	selectedTransitions.clear();
 
-	std::list<PDAID>::iterator idsIt = ids.begin();
-	while(ids.size() != 0){
+	std::cout << "ids size " << ids.size() <<std::endl;
+
+	// That's done now start using these id's to find a succesfull path
+	while(ids.size() > 0){
+		// Now let's check if we are already dead, final or something else
+		std::pair<bool, bool> finalDeath = this->isFinalDead(ids.front().fInput, ids.front().fState, ids.front().fStack);
+		if(finalDeath.second == true){
+			// YES, we're final!
+			return true;
+		}
+		if(finalDeath.first == true){
+			// No! We're death
+			ids.pop();
+			continue;
+		}
+
 		// get the transitions corresponding with the character and the top of the stack
-		char symbol = idsIt->fInput.at(0);
-		char stackTopSymbol = idsIt->fStack.top();
-		selectedTransitions = this->getTransitions(symbol, stackTopSymbol, idsIt->fState);
+		char stackTopSymbol = 0;
+		if(ids.front().fStack.size() != 0){
+			stackTopSymbol = ids.front().fStack.top();
+		}
+
+		selectedTransitions = this->getTransitions(ids.front().fInput, stackTopSymbol, ids.front().fState);
 
 		if(selectedTransitions.size() == 0){
 			// there are no transition possible anymore so remove this ID
-			ids.erase(idsIt);
-		}else if(selectedTransitions.size() == 1){
-			// change the current ID to a new state with the one transition
-			std::string newInput = idsIt->fInput.erase(0);
-			std::stack<char> newStack = idsIt->fStack;
-			PDAState* newTo = selectedTransitions.at(0).fTo;
-
-			// change the stack
-			selectedTransitions.at(0).stackOperation(newStack);
-
-			// check whether we are final or death
-			std::pair<bool, bool> finalDeath = this->isFinalDead(newInput, newTo, newStack);
-
-			if(finalDeath.second == true){
-				// YES, we're final!
-				return true;
-			}
-
-			if(finalDeath.first == true){
-				// NO, we're death!
-				ids.erase(idsIt);
-			}else{
-				// We're not death of final yet so change the ID
-				idsIt->step(newInput, newTo, newStack);
-			}
+			std::cout << "Remove ID:" << ids.front() << std::endl;
+			ids.pop();
 		}else{
 			// there are multiple transitions possible so also multiple ID's
 			// Get the essential data from the current ID
-			const std::string newInput = idsIt->fInput.erase(0);
-			const std::stack<char> tempStack = idsIt->fStack;
+			std::stack<char> tempStack(ids.front().fStack);
 
-			// Remove the current ID
-			ids.erase(idsIt);
+			std::cout << "Change ID:" << ids.front() << std::endl;
 
 			// Now we're gonna add new ID's for each transition
 			for(auto transitionsIt = selectedTransitions.begin();transitionsIt != selectedTransitions.end();transitionsIt++){
-				// change the stack
-				std::stack<char> newStack = tempStack;
+				std::string newInput = ids.front().fInput;
+				if(transitionsIt->fInputSymbol != 0){
+					// If the input symbol is not zero we need to remove a character from the input string
+					newInput.erase(0, 1);
+				}
+				std::stack<char> newStack(tempStack);
 				transitionsIt->stackOperation(newStack);
 
 				PDAID newID(newInput, transitionsIt->fTo, newStack);
@@ -337,14 +403,19 @@ bool PDA::process(std::string input){
 					// NO, we're death, so actually do not add this ID
 				}else{
 					// We're not death of final yet so add the ID
-					ids.push_back(newID);
+					ids.push(newID);
+					std::cout << "   for: " << newID << std::endl;
 				}
 			}
+
+			// Remove the current ID
+			ids.pop();
 		}
+
 		selectedTransitions.clear();
-		idsIt++;
 	}
 
+	// No path ended in a final state or empty stack
 	return false;
 }
 
