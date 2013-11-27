@@ -316,7 +316,7 @@ public:
      */
     TuringMachine(
         const std::set<char>& alphabetTuring,
-        const std::set<std::vector<char>>& alphabetTape,
+        const std::set<char>& alphabetTape,
         char tapeBlank
         );
 
@@ -327,11 +327,11 @@ public:
     * @param alphabetTape A set containing characters representing the alphabet of the tape
     * @param tapeBlank The blank symbol for the stack
     */
-   TuringMachine(
+   /*TuringMachine(
        const std::set<char>& alphabetTuring,
        const std::set<char>& alphabetTape,
        char tapeBlank
-       );
+       );*/
 
     /**
     * @brief Constructor. Note that this constructor supposes the given states (and start/accepting) and transitions are valid; no further checks are made!
@@ -442,7 +442,7 @@ private:
 
     std::vector<StatePtr> fStates;
     std::set<char> fAlphabet;
-    std::set<std::vector<char>> fTapeAlphabet;
+    std::set<char> fTapeAlphabet;
     std::vector<TuringTransition> fTransitions;
     StatePtr fStartState = nullptr;
     char fBlank;

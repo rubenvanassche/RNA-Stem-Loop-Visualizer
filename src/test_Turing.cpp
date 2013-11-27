@@ -19,7 +19,7 @@
  * By: Jakob Struye
  */
 
-#define CATCH_CONFIG_MAIN
+//#define CATCH_CONFIG_MAIN
 #include "Catch.h"
 #include "Turing.h"
 #include <set>
@@ -314,19 +314,213 @@ TEST_CASE("TM Construction", "[TM]") {
     }
     //invalid
     try {
-        TuringMachine TM3(alphabet, alphabetT, 'D');
-        FAIL("Could construct TM TM3(alphabet, alphabetT, 'D')");
+        REQUIRE_THROWS(TuringMachine TM3(alphabet, alphabetT, 'D'));
     }
     catch(...) {
     }
     try {
-        TuringMachine TM4(alphabetT, alphabet, 'B');
-        FAIL("Could construct TM TM4(alphabetT, alphabet, 'B')");
+        REQUIRE_THROWS(TuringMachine TM4(alphabetT, alphabet, 'B'));
     }
     catch(...) {
     }
 }
 
-//All adding functions are hard to test separately, but are all used for processing and reading TMs from XML files
+TEST_CASE("State Adding", "[TM]") {
+    std::set<char> alphabet;
+    std::set<char> alphabetT;
+    alphabet.insert('a'); alphabet.insert('b'); alphabet.insert('c');  alphabet.insert('d');
+    alphabetT.insert('a'); alphabetT.insert('b'); alphabetT.insert('c'); alphabetT.insert('B');
+    TuringMachine TM1(alphabet, alphabetT, 'B');
+    std::vector<char> storage1; std::vector<char> storage2; std::vector<char> storage3; std::vector<char> storage4; std::vector<char> storageEmpty;
+    storage1.push_back('a'); storage1.push_back('b'); storage2.push_back('c'); storage2.push_back('d'); storage3.push_back('a');
+    storage4.push_back('a'); storage4.push_back('b'); storage4.push_back('c');
+    SECTION("Adding states without storage") {
+        try {
+            CHECK(TM1.addState("Q1", 1, 0));
+            CHECK(TM1.addState("Q2", 0, 0));
+            CHECK(TM1.addState("Q3", 0, 0));
+            CHECK(TM1.addState("Q4", 0, 1));
+            CHECK(TM1.addState("Q5", 0, 1));
+            CHECK(TM1.addState("Somethingelse", 0, 1));
+        }
+        catch(...) {
+            std::cout << "Error while adding valid states" << std::endl;
+        }
+    }
+    SECTION("Adding states with storage") {
+        try {
+            CHECK(TM1.addState("Q1", 1, 0, storage1));
+            CHECK(TM1.addState("Q1", 0, 0, storage2));
+            CHECK(TM1.addState("Q2", 0, 1, storage1));
+        }
+        catch(...) {
+            std::cout << "Error while adding valid states with storage" << std::endl;
+        }
+    }
+    SECTION("Adding invalid states without storage") {
+        try {
+            CHECK(TM1.addState("Q1", 1, 0));
+            REQUIRE_THROWS(TM1.addState("Q1", 0, 0));
+            REQUIRE_THROWS(TM1.addState("Q2", 1, 0));
+        }
+        catch(...) {}
+    }
+    SECTION("Adding invalid states with storage") {
+
+        try {
+            CHECK(TM1.addState("Q1", 1, 0, storage1));
+            CHECK(TM1.addState("Q1", 0, 0, storage2));
+            REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storage1));
+            REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storage3));
+            REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storage4));
+            REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storageEmpty));
+        }
+        catch(...) {}
+    }
+}
+TEST_CASE("Transition Adding", "[TM]") {
+    std::set<char> alphabet;
+    std::set<char> alphabetT;
+    alphabet.insert('a'); alphabet.insert('b'); alphabet.insert('c');  alphabet.insert('d');
+    alphabetT.insert('a'); alphabetT.insert('b'); alphabetT.insert('c'); alphabetT.insert('d'); alphabetT.insert('B');
+    TuringMachine TM1(alphabet, alphabetT, 'B');
+    std::vector<char> storage1; std::vector<char> storage2; std::vector<char> storage3; std::vector<char> storage4; std::vector<char> storage5; std::vector<char> storageEmpty;
+    storage1.push_back('a'); storage1.push_back('b'); storage2.push_back('c'); storage2.push_back('d'); storage3.push_back('a');
+    storage4.push_back('a'); storage4.push_back('b'); storage4.push_back('c'); storage5.push_back('a'); storage5.push_back('e');
+    SECTION ("Adding valid transitions without storage or multitrack") {
+        TM1.addState("Q1", 1, 0);
+        TM1.addState("Q2", 0, 0);
+        TM1.addState("Q3", 0, 0);
+        TM1.addState("Q4", 0, 1);
+        CHECK(TM1.addTransition("Q1", "Q2", 'a', 'b', L));
+        CHECK(TM1.addTransition("Q2", "Q2", 'c', 'c', L));
+        CHECK(TM1.addTransition("Q2", "Q3", 'a', 'B', R));
+        CHECK(TM1.addTransition("Q4", "Q1", 'b', 'a', R));
+    }
+    SECTION ("Adding valid transitions with storage and multitrack") {
+        TM1.addState("Q1", 1, 0, storage1);
+        TM1.addState("Q1", 0, 0, storage2);
+        TM1.addState("Q2", 0, 0, storage1);
+        TM1.addState("Q2", 0, 1, storage2);
+        TM1.addState("Q3", 0, 1, storage1);
+        TM1.addState("Q3", 0, 0, storage2);
+        CHECK(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage1, storage1));
+        CHECK(TM1.addTransition("Q2", "Q2", storage2, storage1, L, storage2, storage2));
+        CHECK(TM1.addTransition("Q2", "Q3", storage1, storage1, R, storage1, storage2));
+        CHECK(TM1.addTransition("Q2", "Q1", storage2, storage2, R, storage2, storage1));
+    }
+    SECTION ("Adding invalid transitions without storage or multitrack") {
+        TM1.addState("Q1", 1, 0);
+        TM1.addState("Q2", 0, 0);
+        TM1.addState("Q3", 0, 0);
+        TM1.addState("Q4", 0, 1);
+        CHECK(TM1.addTransition("Q1", "Q2", 'a', 'b', L));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", 'a', 'b', L));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q5", 'a', 'b', L));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", 'e', 'b', L));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", 'a', 'e', L));
+
+    }
+    SECTION ("Adding invalid transitions with storage and multitrack") {
+        TM1.addState("Q1", 1, 0, storage1);
+        TM1.addState("Q1", 0, 0, storage2);
+        TM1.addState("Q2", 0, 0, storage1);
+        TM1.addState("Q2", 0, 1, storage2);
+        TM1.addState("Q3", 0, 1, storage1);
+        TM1.addState("Q3", 0, 0, storage2);
+        CHECK(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage1, storage1));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage1, storage1));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage3, storage1));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage3, storage3));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage3, storage3, L, storage1, storage1));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage3, storage2, L, storage1, storage1));
+        REQUIRE_THROWS(TM1.addTransition("Q4", "Q2", storage1, storage2, L, storage1, storage1));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q4", storage1, storage2, L, storage1, storage1));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage5, storage2, L, storage1, storage1));
+        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage5, L, storage1, storage1));
+    }
 
 
+}
+//other setting functions are considered thorougly tested through the following test
+TEST_CASE("XML", "[TM]") {
+    SECTION("Turing Machine without storage or multitrack (0^n1^n for n at least 1)") {
+        std::string fileName = "TM1.xml";
+        TuringMachine TM1 = generateTM(fileName);
+        std::string input;
+        input = "00001111";
+        CHECK(TM1.process(input));
+        input = "000011111";
+        CHECK_FALSE(TM1.process(input));
+        input = "0000111";
+        CHECK_FALSE(TM1.process(input));
+        input = "0001111";
+        CHECK_FALSE(TM1.process(input));
+        input = "000001111";
+        CHECK_FALSE(TM1.process(input));
+        input = "00000";
+        CHECK_FALSE(TM1.process(input));
+        input = "1";
+        CHECK_FALSE(TM1.process(input));
+        input = "10";
+        CHECK_FALSE(TM1.process(input));
+        input = "";
+        CHECK_FALSE(TM1.process(input));
+        input = "01";
+        CHECK(TM1.process(input));
+        input = "0101";
+        CHECK_FALSE(TM1.process(input));
+
+    }
+    SECTION("Turing Machine with storage") {
+        std::string fileName = "TM2.xml";
+        TuringMachine TM2 = generateTM(fileName);
+        std::string input2;
+        input2 = "01111";
+        CHECK(TM2.process(input2));
+        input2 = "011110";
+        CHECK_FALSE(TM2.process(input2));
+        input2 = "";
+        CHECK_FALSE(TM2.process(input2));
+        input2 = "0";
+        CHECK(TM2.process(input2));
+        input2 = "1";
+        CHECK(TM2.process(input2));
+        input2 = "1000";
+        CHECK(TM2.process(input2));
+        input2 = "10001";
+        CHECK_FALSE(TM2.process(input2));
+        input2 = "10";
+        CHECK(TM2.process(input2));
+        input2 = "01";
+        CHECK(TM2.process(input2));
+
+    }
+    SECTION("Turing Machine with storage and multitrack") {
+        std::string fileName = "TM3.xml";
+        TuringMachine TM3 = generateTM(fileName);
+        std::string input3;
+        input3 = "010c010";
+        CHECK(TM3.process(input3));
+        input3 = "01c01";
+        CHECK(TM3.process(input3));
+        input3 = "0c0";
+        CHECK(TM3.process(input3));
+        input3 = "00001c00001";
+        CHECK(TM3.process(input3));
+        input3 = "1111c1111";
+        CHECK(TM3.process(input3));
+        input3 = "0101c010";
+        CHECK_FALSE(TM3.process(input3));
+        input3 = "0101c101";
+        CHECK_FALSE(TM3.process(input3));
+        input3 = "010c010c010";
+        CHECK_FALSE(TM3.process(input3));
+        input3 = "010010";
+        CHECK_FALSE(TM3.process(input3));
+        input3 = "";
+        CHECK_FALSE(TM3.process(input3));
+        input3 = "0c1";
+        CHECK_FALSE(TM3.process(input3));
+    }
+}

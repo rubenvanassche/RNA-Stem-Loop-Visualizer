@@ -230,8 +230,8 @@ std::ostream& operator<<(std::ostream& output, const TMID& ID) {
 
 TuringMachine::TuringMachine() {}
 
-TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::set<std::vector<char>>& alphabetTape, char tapeBlank) :
-    fAlphabet(alphabetTuring), fTapeAlphabet(alphabetTape), fTrackCount((*alphabetTape.begin()).size()) {
+/*TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::set<char>& alphabetTape, char tapeBlank) :
+    fAlphabet(alphabetTuring), fTapeAlphabet(alphabetTape) {
     try {                                                          //Check if blank symbol in tape alphabet before adding
 
         std::vector<char> blankVec;
@@ -258,47 +258,30 @@ TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::se
         }
     }
     catch (std::runtime_error& e) {
-        std::cout << "Error in TuringMachine constructor: " << e.what() << std::endl;
         throw;
+        std::cout << "Error in TuringMachine constructor: " << e.what() << std::endl;
         return;
     }
     fBlank = tapeBlank;
 
-}
+}*/
 
 TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::set<char>& alphabetTape, char tapeBlank) :
-    fAlphabet(alphabetTuring), fTrackCount(1) {
-    std::set<std::vector<char>> alphabetVecTape;
-    for(auto i : alphabetTape)
-        alphabetVecTape.insert(std::vector<char> (1, i));
-    fTapeAlphabet = alphabetVecTape;
+    fAlphabet(alphabetTuring), fTapeAlphabet(alphabetTape) {
     try {                                                          //Check if blank symbol in tape alphabet before adding
-        std::vector<char> blankVec;
-        for (int i=0; i < fTrackCount; i++)
-            blankVec.push_back(tapeBlank);
         bool blankFound = false;
-        for (auto i : alphabetVecTape) {
-            if (std::equal(i.begin(), i.end(), blankVec.begin()))
+        for (auto i : alphabetTape) {
+            if (i == tapeBlank)
                 blankFound = true;
-            if (i.size() != fTrackCount)
-                throw std::runtime_error("All tape alphabet vectors should have equal size!");
         }
         if (!blankFound) {
-            std::vector<char> fBlank;
-            for (int i=0; i < fTrackCount; i++)
-                fBlank.push_back('B');
-            blankFound = false;
-            for (auto i : fTapeAlphabet)
-                if (std::equal(i.begin(), i.end(), fBlank.begin()))
-                    blankFound = true;
-            if (!blankFound)
-                fTapeAlphabet.insert(fBlank);
+            fTapeAlphabet.insert(fBlank);
             throw std::runtime_error("Blank symbol not in tape alphabet. Blank symbol set to 'B' and added to tape alphabet if necessary. Correct behaviour of this TM no longer guaranteed.");
         }
     }
     catch (std::runtime_error& e) {
-        std::cout << "Error in TuringMachine constructor: " << e.what() << std::endl;
         throw;
+        std::cout << "Error in TuringMachine constructor: " << e.what() << std::endl;
         return;
     }
     fBlank = tapeBlank;
@@ -333,7 +316,7 @@ bool TuringMachine::addState(const std::string& name, const bool isStarting, con
     try {
         for (auto i : fStates) {    //Check if state of that name already a state
             if (i->isCalled(name))
-                if (!fStateStorageSize)
+                if (fStateStorageSize == 0)
                     throw std::runtime_error("Name is not unique!");
                 else if (i->hasThisStorage(storage))
                     throw std::runtime_error("Name + storage is not unique!");
@@ -344,6 +327,7 @@ bool TuringMachine::addState(const std::string& name, const bool isStarting, con
             throw std::runtime_error ("All storages should have same size!");
     }
     catch (std::runtime_error& e) {
+        throw;
         std::cout << "Error adding state: " << e.what() << std::endl;
         return 0;
     }
@@ -377,6 +361,8 @@ bool TuringMachine::addTransition(const std::string& from, const std::string& to
             throw std::runtime_error("Read and write character count does not match track count!");
         if (fromStorage.size() != toStorage.size())
             throw std::runtime_error("Storages do not have same size!");
+        if (fStateStorageSize != 1 && fromStorage.size() != fStateStorageSize)
+            throw std::runtime_error("Storages do not have right size");
         for (auto i : fStates) {
             if (i->isCalled(from) && i->hasThisStorage(fromStorage))
                 fromPtr = i;
@@ -389,16 +375,22 @@ bool TuringMachine::addTransition(const std::string& from, const std::string& to
             throw std::runtime_error("From state not in set of states!");
         if (!toPtr)
             throw std::runtime_error("To state not in set of states!");
-        bool found = false;
-        for (auto i : fTapeAlphabet)
-            if (std::equal(read.begin(), read.end(), i.begin()))
-                found = true;
+        bool found = true;
+        for (auto i : read) {
+            if (fTapeAlphabet.find(i) == fTapeAlphabet.end())
+                found = false;
+            if (!found)
+                break;
+        }
         if (!found)
             throw std::runtime_error("Symbol to be read not in tape alphabet!");
-        found = false;
-        for (auto i : fTapeAlphabet)
-            if (std::equal(write.begin(), write.end(), i.begin()))
-                found = true;
+        found = true;
+        for (auto i : write) {
+            if (fTapeAlphabet.find(i) == fTapeAlphabet.end())
+                found = false;
+            if (!found)
+                break;
+        }
         if (!found)
             throw std::runtime_error("Symbol to be written not in tape alphabet!");
         for (auto i : fTransitions) {
@@ -408,6 +400,7 @@ bool TuringMachine::addTransition(const std::string& from, const std::string& to
 
     }
     catch (std::runtime_error& e) {
+        throw;
         std::cout << "Error adding transition: " << e.what() << std::endl;
         return 0;
     }
@@ -465,10 +458,6 @@ StatePtr TuringMachine::getStatePtr(std::string& name) const{
 }
 
 bool TuringMachine::process(std::string& input) {
-    for(auto i : fStates)
-        std::cout << *i << std::endl;
-    for (auto i : fTransitions)
-        std::cout << i << std::endl;
     try {
         if (fStartState == nullptr)
             throw std::runtime_error("No start state specified!");
@@ -479,6 +468,7 @@ bool TuringMachine::process(std::string& input) {
         }
     }
     catch (std::runtime_error& e) {
+        throw;
         std::cout << "Error while processing input string: " << e.what() << std::endl;
         return 0;
     }
@@ -749,7 +739,7 @@ TuringMachine generateTM(std::string fileName) {
                                 if (t == "L")
                                     dir = L;
                                 else if (t == "R")
-                                    dir = L;
+                                    dir = R;
                                 else
                                     std::cout << "invalid direction" << std::endl;
                             }
@@ -858,11 +848,11 @@ TuringMachine generateTM(std::string fileName) {
             }
         }
 
-        for(auto i : alphabet)
+        /*for(auto i : alphabet)
             std::cout << i << std::endl;
         for(auto i : tapeAlphabet)
             std::cout << i << std::endl;
-        std::cout << blank << std::endl;
+        std::cout << blank << std::endl;*/
         return TM;
     }
     return TuringMachine();
