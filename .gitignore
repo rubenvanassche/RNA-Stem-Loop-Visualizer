@@ -29,9 +29,20 @@ build/
 # Eclipse project
 .project
 .cproject
+<<<<<<< HEAD
 
 RNAslv
 
 src/Tests
 
+=======
+>>>>>>> dev/Ruben
+
+src/RNAslv
+
+src/Tests
+
+RNAslv
+
+>>>>>>> dev/Ruben
 Tests
