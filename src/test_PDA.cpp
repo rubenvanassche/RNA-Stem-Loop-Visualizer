@@ -8,7 +8,7 @@
 #include "PDA.h"
 #include <exception>
 
-TEST_CASE("Stack Operation","[PDATransition]"){
+TEST_CASE("Stack Operation","[PDA]"){
 	PDAState Q("Q", false);
 	PDAState P("P", false);
 	std::stack<char> stack;

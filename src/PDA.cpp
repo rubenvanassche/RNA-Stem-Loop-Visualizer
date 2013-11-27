@@ -344,7 +344,7 @@ bool PDA::process(std::string input){
 	}
 	selectedTransitions.clear();
 
-	std::cout << "ids size " << ids.size() <<std::endl;
+	//std::cout << "ids size " << ids.size() <<std::endl;
 
 	// That's done now start using these id's to find a succesfull path
 	while(ids.size() > 0){
@@ -370,14 +370,14 @@ bool PDA::process(std::string input){
 
 		if(selectedTransitions.size() == 0){
 			// there are no transition possible anymore so remove this ID
-			std::cout << "Remove ID:" << ids.front() << std::endl;
+			//std::cout << "Remove ID:" << ids.front() << std::endl;
 			ids.pop();
 		}else{
 			// there are multiple transitions possible so also multiple ID's
 			// Get the essential data from the current ID
 			std::stack<char> tempStack(ids.front().fStack);
 
-			std::cout << "Change ID:" << ids.front() << std::endl;
+			//std::cout << "Change ID:" << ids.front() << std::endl;
 
 			// Now we're gonna add new ID's for each transition
 			for(auto transitionsIt = selectedTransitions.begin();transitionsIt != selectedTransitions.end();transitionsIt++){
@@ -404,7 +404,7 @@ bool PDA::process(std::string input){
 				}else{
 					// We're not death of final yet so add the ID
 					ids.push(newID);
-					std::cout << "   for: " << newID << std::endl;
+					//std::cout << "   for: " << newID << std::endl;
 				}
 			}
 

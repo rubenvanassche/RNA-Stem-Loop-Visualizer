@@ -34,6 +34,7 @@ add_definitions(-DDATADIR="\\"${CMAKE_SOURCE_DIR}/data/\\"")
 set(SRC 
     src/CFG.cpp 
     src/CNF.cpp 
+    src/PDA.cpp 
     src/Turing.cpp 
     src/TinyXML/tinyxml.cpp 
     src/TinyXML/tinyxmlparser.cpp 
@@ -44,7 +45,8 @@ set(SRC
 set(TESTSRC 
     src/Tests.cpp 
     src/test_CFG.cpp 
-    src/test_Turing.cpp)
+    src/test_Turing.cpp
+    src/test_PDA.cpp)
 
 # Set flags
 set( CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -std=c++11 " )
