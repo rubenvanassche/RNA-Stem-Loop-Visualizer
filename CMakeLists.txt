@@ -16,8 +16,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Last modified: 15 November 2013
+# Last modified: 27 November 2013
 # By: Stijn Wouters
+cmake_minimum_required(VERSION 2.6)
+project("RNA Stem Loop Visualizer")
 
 # Some OS X changes
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -43,10 +45,11 @@ set(SRC
 set(TESTSRC 
     src/Tests.cpp 
     src/test_CFG.cpp 
+    src/test_CNF.cpp 
     src/test_Turing.cpp)
 
 # Set flags
-set( CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -std=c++11 " )
+set(CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -std=c++11")
 
 # Target to build all the tests
 add_executable(Tests ${TESTSRC} ${SRC})

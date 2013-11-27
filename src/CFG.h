@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 18 November 2013
+ * Last modified: 27 November 2013
  * By: Stijn Wouters
  */
 
@@ -28,13 +28,13 @@
 #include <string>
 
 /**
- * @brief SymbolString is just a std::string consisting of symbols from either
- * a set of variables or a set of terminals.
+ * @brief A consisting of symbols from either the set of variables or the 
+ * set of terminals.
  */
 typedef std::string SymbolString;
 
 /**
- * @brief Class representing a CFG
+ * @brief Class representing a context free grammar.
  */
 class CFG {
 public:
@@ -64,20 +64,6 @@ public:
         const std::multimap<char, SymbolString>& productions, 
         const char& startsymbol
         );
-
-    /**
-     * @brief Copy constructor.
-     *
-     * @param cfg The CFG you want to copy.
-     */
-    CFG(const CFG& cfg);
-
-    /**
-     * @brief Copy assignment operator.
-     *
-     * @param cfg The CFG you want to assign to it.
-     */
-    CFG& operator=(const CFG& cfg);
 
     /**
      * @brief Destructor.
@@ -166,7 +152,8 @@ public:
     /**
      * @brief Clean up CFG, that is, eleminate epsilon productions, useless
      * symbols and unit productions IN SAFE ORDER. This comes in handy for 
-     * converting to CNF (Chomsky Normal Form).
+     * converting to CNF (Chomsky Normal Form). Also: removes all variables
+     * which don't have any production rules at all.
      *
      * @post The production rules doesn't contain any nullable symbols.
      * @post The production rules doesn't contain any useless symbols.
@@ -175,11 +162,6 @@ public:
      */
     void cleanUp();
 
-/* 
- * for converting CFG's to CNF, I need access to the following data members.
- * Of course, you could write getters and setters, but that's pointless here
- * since you'll probably never use that getter and setters again.
- */
 protected:
     /**
      * @brief The set of terminal symbols.
@@ -187,19 +169,16 @@ protected:
     std::set<char> fTerminals;
 
     /**
-     * @brief The set of non-terminal symbols.
+     * @brief The set of variables.
      */
     std::set<char> fVariables;
 
     /**
-     * @brief The set of production rules where each terminal symbol is 
-     * (multi)mapped to a SymbolString
+     * @brief The set of production rules.
      */
     std::multimap<char, SymbolString> fProductions;
 
-    /**
-     * @brief The start symbol
-     */
+    // the starting symbol
     char fStartSymbol;
 };
 
