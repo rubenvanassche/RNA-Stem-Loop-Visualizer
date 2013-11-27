@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<TM>
+	<InputAlphabet>
+		<symbol>a</symbol>
+	</InputAlphabet>
+	<Blank>B</Blank>
+</TM>

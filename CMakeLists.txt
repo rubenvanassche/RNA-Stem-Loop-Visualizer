@@ -16,13 +16,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Last modified:  9 November 2013
+# Last modified: 15 November 2013
 # By: Stijn Wouters
 
-# some heading information
-cmake_minimum_required(VERSION 2.6)
-project("RNA Stem Loop Visualizer")
+# Some OS X changes
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   # Mac OS X specific code
+   SET(OperatingSystem "Mac OS X")
+   SET (CMAKE_CXX_COMPILER "/usr/bin/clang++")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
+<<<<<<< HEAD
 # Some OS X changes
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
@@ -33,6 +37,35 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # set some default flags (can be overriden through the CLI
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -ggdb")
+=======
+# define DATADIR for tests that need input files
+add_definitions(-DDATADIR="\\"${CMAKE_SOURCE_DIR}/data/\\"")
+>>>>>>> master
 
-# where you can find other CMakeLists
-add_subdirectory(src)
+# Lists all sourcefiles (no testfiles and no main)
+set(SRC 
+    src/CFG.cpp 
+    src/CNF.cpp 
+    src/Turing.cpp 
+    src/TinyXML/tinyxml.cpp 
+    src/TinyXML/tinyxmlparser.cpp 
+    src/TinyXML/tinyxmlerror.cpp 
+    src/TinyXML/tinystr.cpp)
+
+# Lists all testfiles, DO NOT remove Tests.cpp
+set(TESTSRC 
+    src/Tests.cpp 
+    src/test_CFG.cpp 
+    src/test_Turing.cpp)
+
+# Set flags
+set( CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -std=c++11 " )
+
+# Target to build all the tests
+add_executable(Tests ${TESTSRC} ${SRC})
+
+# Target to build the main program
+add_executable(RNAslv src/RNAslv.cpp ${SRC})
+
+# Install all executables into the bin directory.
+install(TARGETS Tests RNAslv DESTINATION ${PROJECT_SOURCE_DIR}/bin)
