@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 11 November 2013
+ * Last modified: 27 November 2013
  * By: Stijn Wouters
  */
 
@@ -24,6 +24,8 @@
 #define H_CNF_H
 
 #include "CFG.h"
+#include <set>
+#include <map>
 
 /**
  * @brief The class CNF (Chomsky Normal Form), this is actually a CFG (Context
@@ -34,9 +36,12 @@
 class CNF : public CFG {
 public:
     /**
-     * @brief Constructor, initialize all datamembers. This will reconstruct
-     * the CFG so that the production rules satisfies to the conditions imposed
-     * by the CNF.
+     * @brief Constructor, initialize all datamembers. This will construct
+     * production rules based upon the rules of the CFG cleaned up variant and
+     * satisfying the conditions imposed by the CNF. 
+     *
+     * @note You can still use the CFG methods as if it was only cleaned up
+     * (thus you can use the same variables for getting the bodies and such).
      *
      * @param terminals The set of terminal symbols.
      * @param variables The set of non-terminal symbols.
@@ -46,7 +51,8 @@ public:
      * @param start The start symbol.
      *
      * @post
-     * - The production rules satisfies the condition imposed by the CNF.
+     * - The CFG methods will produce the same result as if it was already
+     *   cleaned up without unwanted side-effects.
      */
     CNF(
         const std::set<char>& terminals,
@@ -56,50 +62,21 @@ public:
         );
 
     /**
-     * @brief Convert the CFG to a CNF by calling the constructor immediatelly.
-     *
-     * @param cfg The CFG to be converted to CNF.
-     *
-     * @post
-     * - The production rules satisfies the condition imposed by the CNF.
-     */
-    CNF(const CFG& cfg);
-
-    /**
-     * @brief Copy constructor.
-     *
-     * @param cnf The CNF to be copied.
-     */
-    CNF(const CNF& cnf);
-
-    /**
-     * @brief Copy assignment operator overloading.
-     *
-     * @param cnf The CNF to be assigned to.
-     */
-    CNF& operator=(const CNF& cnf);
-
-    /**
-     * @brief Destructor.
-     */
-    ~CNF();
-
-    /**
      * @brief Check whether the terminalstring is in the language of this CNF
      * by using the CYK algorithm.
      *
      * @param terminalstring The string to be checked whether this is in the
      * language of the CFG.
      *
-     * @return True if the terminalstring is in the language of this CFG, false
-     * if not.
+     * @return True if the terminalstring is in the language of this CFG,
+     * false if not.
      *
      * @pre
      * - The string passed consists only of terminal symbols in the set of
      *   terminals of this CFG.
      *
-     * @throw std::domain_error if the string passed is not a valid
-     * terminalstring (that is, not consisting of terminal symbols).
+     * @throw std::invalid_argument if the string passed is not a valid
+     * terminal string (that is, not consisting of terminal symbols).
      */
     bool CYK(const std::string& terminalstring) const;
 };
