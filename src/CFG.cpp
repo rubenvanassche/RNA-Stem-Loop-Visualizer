@@ -34,7 +34,7 @@
 std::set< std::set<int> > subset(std::set<int>& s) {
     if (s.empty()) {
         // base case
-        std::set<int> x = { std::set<int>{} };
+        std::set< std::set<int> > x = { std::set<int>{} };
         return x;
     } else {
         // recursion: remove one element from the subset
