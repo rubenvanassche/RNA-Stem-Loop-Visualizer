@@ -33,6 +33,7 @@
 #include <exception>
 #include <stdexcept>
 #include <algorithm>
+#include <queue>
 
 /**
  * @brief Class representing a state from a PDA
@@ -76,10 +77,18 @@ public:
 		 */
 		bool operator==(const PDAState& other);
 
+		friend std::ostream& operator<<(std::ostream& out, PDAState state);
+
         virtual ~PDAState();
 private:
         std::string fName;
         bool fFinal;
+};
+
+enum PDAStackOperation{
+    PUSH,
+    POP,
+    STAY
 };
 
 /**
@@ -87,6 +96,23 @@ private:
  */
 class PDATransition {
 public:
+	 /**
+	 * @brief Constructor
+	 *
+	 * @param from A pointer to the PDAState where this transition is coming from
+	 * @param to A pointer to the PDAState where this transition is going to
+	 * @param input The input symbol for the transition
+	 * @param stackTop Define what should be on the top of the stack when processing this transition
+	 * @param stackOperation Should the stack be popped, pushed or stay as it is
+	 */
+	PDATransition(
+		PDAState* from,
+		PDAState* to,
+		const char& input,
+		const char& stackTop,
+		const PDAStackOperation& stackOperation
+	);
+
      /**
      * @brief Constructor
      *
@@ -94,6 +120,7 @@ public:
      * @param to A pointer to the PDAState where this transition is going to
      * @param input The input symbol for the transition
      * @param stackTop Define what should be on the top of the stack when processing this transition
+     * @param stackOperation Should the stack be popped, pushed or stay as it is
      * @param stackPush The character that should be pushed to the stack during the transition
      */
     PDATransition(
@@ -101,6 +128,7 @@ public:
         PDAState* to, 
         const char& input, 
         const char& stackTop, 
+        const PDAStackOperation& stackOperation,
         const char& stackPush
     );
 
@@ -111,6 +139,7 @@ public:
      * @param to A pointer to the PDAState where this transition is going to
      * @param input The input symbol for the transition
      * @param stackTop Define what should be on the top of the stack when processing this transition
+     * @param stackOperation Should the stack be popped, pushed or stay as it is
      * @param stackPush The character vector that should be pushed to the stack during the transition
      */
     PDATransition(
@@ -118,6 +147,7 @@ public:
         PDAState* to, 
         const char& input, 
         const char& stackTop, 
+        const PDAStackOperation& stackOperation,
         const std::vector<char>& stackPush
         );
 
@@ -132,11 +162,14 @@ public:
 
     void stackOperation(std::stack<char>& in);
 
+    friend std::ostream& operator<<(std::ostream& out, PDATransition transition);
+
     PDAState *fFrom;
     PDAState *fTo;
     char fInputSymbol;
     char fTopStack;
     std::vector<char> fPushStack;
+    PDAStackOperation fStackOperation;
 };
 
 // Is the PDA final with empty stack or in final State
@@ -169,6 +202,8 @@ public:
      */
     void step(const std::string& input, PDAState* currentState, const std::stack<char> stack);
 
+    friend std::ostream& operator<<(std::ostream& out, PDAID id);
+
     std::string fInput;
     PDAState* fState;
     std::stack<char> fStack;
@@ -184,13 +219,11 @@ public:
      *
      * @param alphabetPDA A set containing characters representing the alphabet of the PDA
      * @param alphabetStack A set containing characters representing the alphabet of the stack
-     * @param stackStartSymbol The start symbol for the stack
      * @param PDAending The type of PDA(STACK: PDA is final with empty stack, STATE: PDA is final when it reaches an empty state)
      */
     PDA(
         const std::set<char>& alphabetPDA, 
         const std::set<char>& alphabetStack, 
-        const char& stackStartSymbol, 
         const PDAFinal& PDAending
         );
 
@@ -235,7 +268,7 @@ public:
 
 private:
 
-    std::vector<PDATransition> getTransitions(char symbol, char stackTopSymbol, PDAState* from);
+    std::vector<PDATransition> getTransitions(std::string input, char stackTopSymbol, PDAState* from);
 
     std::pair<bool, bool> isFinalDead(const std::string& input, PDAState* to, const std::stack<char> stack);
 
@@ -243,8 +276,6 @@ private:
     std::list<PDAState> fStates;
 
     PDAState* fStartState = nullptr;
-
-    char fStackStartSymbol;
 
     PDAFinal fPDAtype;
 

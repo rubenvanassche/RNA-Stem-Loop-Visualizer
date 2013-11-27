@@ -25,13 +25,15 @@ build/
 
 # VIm backup files
 *.swp
-=======
 # Eclipse project
 .project
 .cproject
 
-RNAslv
-
 src/Tests
+
+src/RNAslv
+
+
+RNAslv
 
 Tests
