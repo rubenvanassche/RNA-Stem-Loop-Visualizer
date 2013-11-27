@@ -29,7 +29,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # define DATADIR for tests that need input files
-add_definitions(-DDATADIR="\\"${CMAKE_SOURCE_DIR}/data/\\"")
+add_definitions(-DDATADIR="${CMAKE_SOURCE_DIR}/data/")
 
 # Lists all sourcefiles (no testfiles and no main)
 set(SRC 
