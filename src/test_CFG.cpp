@@ -424,13 +424,13 @@ TEST_CASE("Clean up CFG", "[CFG]") {
         REQUIRE(c0.bodies('S').empty());
         c0.cleanUp();
         CHECK(c0.nullable().empty());
-        CHECK(c0.units() == empty_units);
+        CHECK(c0.units().empty());
         CHECK(c0.reachable() == S);
         CHECK(c0.generating() == terminals);
-        CHECK(c0.bodies('A').empty());
-        CHECK(c0.bodies('B').empty());
-        CHECK(c0.bodies('C').empty());
-        CHECK(c0.bodies('S').empty());
+        CHECK_THROWS_AS(c0.bodies('A'), std::invalid_argument);
+        CHECK_THROWS_AS(c0.bodies('B'), std::invalid_argument);
+        CHECK_THROWS_AS(c0.bodies('C'), std::invalid_argument);
+        CHECK_THROWS_AS(c0.bodies('S'), std::invalid_argument);
 
         std::set<char> nullable = {'S', 'A', 'B'};
         std::set< std::pair<char, char> > units = {
@@ -447,6 +447,11 @@ TEST_CASE("Clean up CFG", "[CFG]") {
         std::set<SymbolString> A_productions = {"", "aAa"};
         std::set<SymbolString> B_productions = {"", "bBb"};
         std::set<SymbolString> C_productions = {"aCa", "bCb"};
+        std::set< std::pair<char, char> > units_cleanup = {
+                                                {'A', 'A'},
+                                                {'B', 'B'},
+                                                {'S', 'S'},
+                                                };
         std::set<SymbolString> S_productions_cleanup = {"aa", "aAa", "bb", "bBb"};
         std::set<SymbolString> A_productions_cleanup = {"aa", "aAa"};
         std::set<SymbolString> B_productions_cleanup = {"bb", "bBb"};
@@ -461,12 +466,12 @@ TEST_CASE("Clean up CFG", "[CFG]") {
         REQUIRE(c1.bodies('S') == S_productions);
         c1.cleanUp();
         CHECK(c1.nullable().empty());
-        CHECK(c1.units() == empty_units);
+        CHECK(c1.units() == units_cleanup);
         CHECK(c1.reachable() == reachable);
         CHECK(c1.generating() == generating);
         CHECK(c1.bodies('A') == A_productions_cleanup);
         CHECK(c1.bodies('B') == B_productions_cleanup);
-        CHECK(c1.bodies('C').empty());
+        CHECK_THROWS_AS(c0.bodies('C'), std::invalid_argument);
         CHECK(c1.bodies('S') == S_productions_cleanup);
     } catch (const std::invalid_argument& e) {
         FAIL("Could not construct CFG's: " << e.what());

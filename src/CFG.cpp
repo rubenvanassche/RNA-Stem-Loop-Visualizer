@@ -24,6 +24,8 @@
 #include <algorithm>
 #include <iterator>
 
+#include <iostream>
+
 /**
  * @brief Recursive implementation to get all the subsets of a given set.
  *
@@ -31,22 +33,23 @@
  *
  * @return The subset of the given set.
  */
-std::set< std::set<int> > subset(std::set<int>& s) {
+template <class T>
+std::set< std::set<T> > subset(std::set<T>& s) {
     if (s.empty()) {
         // base case
-        return { std::set<int>{} };
+        return { std::set<T>{} };
     } else {
         // recursion: remove one element from the subset
-        int i = *(s.begin());
+        T i = *(s.begin());
         s.erase(s.begin());
 
         // get all the subset of the set without the first element
-        std::set< std::set<int> > recursion = subset(s);
+        std::set< std::set<T> > recursion = subset(s);
 
         // now, add the removed element in all those subset found
-        std::set< std::set<int> > result;
+        std::set< std::set<T> > result;
 
-        for (std::set<int> r : recursion) {
+        for (std::set<T> r : recursion) {
             r.insert(i);
 
             result.insert(r);
@@ -67,16 +70,16 @@ CFG::CFG(
         fProductions(productions), fStartSymbol(start) {
     // check the preconditions
 
-    // get the intersection of the set of variables and the set of terminals
-    std::set<char> diff;
+    // the intersection of the set of variables and the set of terminals
+    // should be empty, since they should be disjoint
+    std::set<char> intersection;
     std::set_intersection(
                     fTerminals.begin(), fTerminals.end(),
                     fVariables.begin(), fVariables.end(),
-                    std::inserter(diff, diff.begin())
+                    std::inserter(intersection, intersection.begin())
                     );
 
-    // it must be empty, because they should be disjoints
-    if (!diff.empty())
+    if (!intersection.empty())
         throw std::invalid_argument("Set of terminals and variables are not disjoint.");
 
     // check the production rules
@@ -110,23 +113,6 @@ CFG::CFG(
         throw std::invalid_argument("Invalid start symbol.");
 }
 
-CFG::CFG(const CFG& cfg)
-    : fTerminals(cfg.fTerminals), fVariables(cfg.fVariables), 
-        fProductions(cfg.fProductions), fStartSymbol(cfg.fStartSymbol) {
-    // you don't have to check the preconditions, since you are sure that
-    // the cfg passed has a valid contstruction.
-}
-
-CFG& CFG::operator=(const CFG& cfg) {
-    // you don't have to check the preconditions, since you are sure that
-    // the cfg passed has a valid contstruction.
-    this->fTerminals = cfg.fTerminals;
-    this->fVariables = cfg.fVariables;
-    this->fProductions = cfg.fProductions;
-    this->fStartSymbol = cfg.fStartSymbol;
-    return *this;
-}
-
 CFG::~CFG() {
     // nothing to destroy
 }
@@ -148,43 +134,43 @@ std::set<SymbolString> CFG::bodies(const char& v) const {
 }
 
 std::set<char> CFG::nullable() const {
-    std::set<char> nullable;
+    std::set<char> nullables;
+
+    unsigned int size_before = nullables.size();
 
     // base case: all variables having an production A -> "" is surely nullable
-    for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
-        auto range = fProductions.equal_range(it->first);
-
-        for (auto it1 = range.first; it1 != range.second; ++it1) {
-            // check whether the body of the production has an empty string
-            // if so, then the head is nullable
-            if ((it1->second).empty())
-                nullable.insert(it->first);
+    for (char v : fVariables) {
+        for (SymbolString body : this->bodies(v)) {
+            if (body.empty()) {
+                nullables.insert(v);
+                break;
+            } else {
+                continue;
+            } // end if-else
         } // end for
     } // end for
 
+    unsigned int size_after = nullables.size();
 
     // inductive part: all variables having a production whose body consists
     // only of nullable variables are also nullable
-    bool newSymbols = true;
 
-    // keep going until no new nullable symbols were found
-    while (newSymbols) {
-        unsigned int size_before = nullable.size();
+    // keep going until no new symbols were found
+    while (size_before != size_after) {
+        size_before = nullables.size();
 
-        for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
+        for (char v : fVariables) {
             // if the key is already found to be nullable, skip them
-            if (nullable.find(it->first) != nullable.end())
+            if (nullables.find(v) != nullables.end())
                 continue;
 
-            // note that this never throws an exception, since productions
-            // consists of head that is only in the set of the variables.
-            for (SymbolString body : this->bodies(it->first)) {
+            for (SymbolString body : this->bodies(v)) {
                 // iterate over each symbol in the body and check whether they
                 // all are nullable
                 bool isNullable = true;
 
                 for (char s : body) {
-                    if (nullable.find(s) == nullable.end()) {
+                    if (nullables.find(s) == nullables.end()) {
                         isNullable = false;
                         break;
                     } else {
@@ -195,18 +181,19 @@ std::set<char> CFG::nullable() const {
                 // if all symbols in the body were nullable, then the head
                 // is also nullable and so add them to the set of nullable 
                 // symbols
-                if (isNullable) 
-                    nullable.insert(it->first);
+                if (isNullable) {
+                    nullables.insert(v);
+                    break;
+                } else {
+                    continue;
+                } // end if-else
             } // end for
         } // end for
 
-        unsigned int size_after = nullable.size();
-
-        // check whether new symbols were found
-        newSymbols = (size_before == size_after) ? false : true;
+        size_after = nullables.size();
     } // end while
 
-    return nullable;
+    return nullables;
 }
 
 void CFG::eleminateEpsilonProductions() {
@@ -241,7 +228,7 @@ void CFG::eleminateEpsilonProductions() {
                 } // end for
 
                 // skip if the body is already empty (we don't want that into
-                // our new production
+                // our new production)
                 if (b.empty())
                     continue;
 
@@ -266,14 +253,21 @@ std::set< std::pair<char, char> > CFG::units() const {
     } // end for
 
     // now, inductive part
-    for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
-        // note that this never throws an exception, since productions
-        // consists of head that is only in the set of the variables.
-        for (SymbolString body : this->bodies(it->first)) {
+    for (char v : fVariables) {
+        for (SymbolString body : this->bodies(v)) {
             // if the body is of length 1 and it's a variable, then we have
             // an unit pair
-            if (body.size() == 1 && fVariables.find(body.at(0)) != fVariables.end())
-                units.insert(std::pair<char, char>(it->first, body.at(0)) );
+            try {
+                char c = body.at(0);
+
+                if (body.size() == 1 && fVariables.find(c) != fVariables.end())
+                    units.insert(std::pair<char, char>(v, body.at(0)) );
+            } catch (const std::out_of_range& oor) {
+                // ignore this error (occurs only in empty bodies
+                // but that's not interesting for finding unit pairs
+                // anyway...
+                continue;
+            } // end try-catch
         } // end for
     } // end for
 
@@ -287,7 +281,7 @@ void CFG::eleminateUnitProductions() {
     // check whether there are no circular unit pairs
     // TODO
 
-    // the new productions
+    // the new set of production rules
     std::multimap<char, SymbolString> newProductions;
 
     for (std::pair<char, char> u : units) {
@@ -303,7 +297,7 @@ void CFG::eleminateUnitProductions() {
                 continue;
 
             // add the new rule
-            newProductions.insert( std::pair<char, SymbolString>(u.first, body) );
+            newProductions.insert(std::pair<char, SymbolString>(u.first, body));
         } // end for
     } // end for
 
@@ -313,25 +307,26 @@ void CFG::eleminateUnitProductions() {
 }
 
 std::set<char> CFG::generating() const {
+    unsigned int size_before = 0;
+
     // base case, all terminal symbols are generating
     std::set<char> generating = fTerminals;
 
+    unsigned int size_after = generating.size();
+
     // inductive part: all variables having a production whose body consists
     // only of generating symbols are also generating
-    bool newSymbols = true;
 
     // keep going until no new nullable symbols were found
-    while (newSymbols) {
-        unsigned int size_before = generating.size();
+    while (size_before != size_after) {
+        size_before = generating.size();
 
-        for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
-            // if the key is already generating, skip them
-            if (generating.find(it->first) != generating.end())
+        for (char v : fVariables) {
+            // if the variable is already generating, skip them
+            if (generating.find(v) != generating.end())
                 continue;
 
-            // note that this never throws an exception, since productions
-            // consists of head that is only in the set of the variables.
-            for (SymbolString body : this->bodies(it->first)) {
+            for (SymbolString body : this->bodies(v)) {
                 // iterate over each symbol in the body and check whether they
                 // are generating
                 bool isGenerating = true;
@@ -348,30 +343,33 @@ std::set<char> CFG::generating() const {
                 // if all symbols in the body were generating, then the head
                 // is also generating and thus insert in the set of generating
                 // symbols
-                if (isGenerating) 
-                    generating.insert(it->first);
+                if (isGenerating) {
+                    generating.insert(v);
+                    break;
+                } else {
+                    continue;
+                } // end if-else
             } // end for
         } // end for
 
-        unsigned int size_after = generating.size();
-
-        // check whether new symbols were found
-        newSymbols = (size_before == size_after) ? false : true;
+        size_after = generating.size();
     } // end for
 
     return generating;
 }
 
 std::set<char> CFG::reachable() const {
+    unsigned int size_before = 0;
+
     // base case: the start symbol is surely reachable
     std::set<char> reachable = {fStartSymbol};
 
+    unsigned int size_after = reachable.size();
+
     // inductive part: all symbols in the bodies from productions with as head
     // a variable that is reachable, are also reachable
-    bool newSymbols = true;
-
-    while (newSymbols) {
-        unsigned int size_before = reachable.size();
+    while (size_before != size_after) {
+        size_before = reachable.size();
 
         for (char s : reachable) {
             try {
@@ -388,10 +386,7 @@ std::set<char> CFG::reachable() const {
             } // end try-catch
         } // end for
 
-        unsigned int size_after = reachable.size();
-
-        // check whether new symbols were found
-        newSymbols = (size_before == size_after) ? false : true;
+        size_after = reachable.size();
     } // end for
 
     return reachable;
@@ -437,12 +432,15 @@ void CFG::eleminateUselessSymbols() {
     // now we have a set of production rules only containing generating
     // symbols, our next step is to eleminate non-reachable symbols
 
+    // get the set of all reachable symbols
     std::set<char> reachable = this->reachable();
 
-    for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
-        // if the key is not reachable, then remove the rules
-        if (reachable.find(it->first) == reachable.end())
-            fProductions.erase(it->first);
+    for (char v : fVariables) {
+        // if the variable is not reachable, then remove the rules
+        // and also remove it from the set of variables, because it's
+        // useless now
+        if (reachable.find(v) == reachable.end())
+            fProductions.erase(v);
     } // end for
 
     return;
@@ -453,6 +451,12 @@ void CFG::cleanUp() {
     this->eleminateEpsilonProductions();
     this->eleminateUnitProductions();
     this->eleminateUselessSymbols();
-    // that's it
+
+    // now, also remove all symbols from the set of the variables which
+    // don't have any production rule
+    for (char v : fVariables) {
+        if ((this->bodies(v)).empty())
+            fVariables.erase(v);
+    } // end for
     return;
 }
