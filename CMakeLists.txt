@@ -47,13 +47,9 @@ set(SRC
 set(TESTSRC 
     src/Tests.cpp 
     src/test_CFG.cpp 
-<<<<<<< HEAD
     src/test_Turing.cpp
     src/test_PDA.cpp)
-=======
-    src/test_CNF.cpp 
-    src/test_Turing.cpp)
->>>>>>> master
+
 
 # Set flags
 set(CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -std=c++11")
