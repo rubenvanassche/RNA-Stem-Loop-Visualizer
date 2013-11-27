@@ -25,7 +25,7 @@
 #include <map>
 #include <stdexcept>
 
-TEST_CASE("Constructing CNF's", "[CNF]") {
+TEST_CASE("Constructing CNF", "[CNF]") {
     const std::set<char> empty_set;
     const std::set<char> a = {'a'};
     const std::set<char> a_b = {'a', 'b'};

@@ -34,186 +34,173 @@ CNF::CNF(
     // first thing to do is clean up grammar
     this->cleanUp();
 
+    unsigned int size_before = fVariables.size();
+
     // new variables, keep incrementing until the variable is not already
     // in the set of variables
-    char c = 0;
+    char c = 1;
     while (fVariables.find(c) != fVariables.end()) { ++c; }
 
     // first, elemeninate terminal symbols in bodies (of size > 1)
-    std::map<char, char> terms;
+    std::map<char, char> terms; // which terminals belong to which variable
 
+    // generate productions of the form A --> a for a is each terminal
     for (char t : fTerminals) {
-        std::pair<char, SymbolString> rule(c, SymbolString(1, t));
-        fProductions.insert(rule);
+        // introduce a new variable
+        fVariables.insert(c);
+
+        fProductions.insert(std::pair<char, SymbolString>(c, SymbolString(1, t)));
 
         terms.insert(std::pair<char, char>(t, c));
 
+        // don't forget to update the variable!
         ++c;
         while (fVariables.find(c) != fVariables.end()) { ++c; }
     } // end for
 
-    
-    std::multimap<char, SymbolString> productions_no_terminals;
+    // now we can actually remove the terminals in the bodies of size > 1
+    std::multimap<char, SymbolString> newProductions;
 
-    for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
-        auto range = fProductions.equal_range(it->first);
+    for (char v : fVariables) {
+        for (SymbolString body : this->bodies(v)) {
+            if (body.size() > 1) {
+                // replace all terminals by the corresponding variables
+                SymbolString newBody;
 
-        for (auto it1 = range.first; it1 != range.second; ++it1) {
-            if ((it1->second).size() > 1) {
-                SymbolString body;
-                for (char t : it1->second) {
-                    if (fTerminals.find(t) == fTerminals.end()) {
-                        body += t;
+                for (char s : body) {
+                    if (fTerminals.find(s) == fTerminals.end()) {
+                        // you may append variables
+                        newBody += s;
                     } else {
-                        body += terms.find(t)->second;
+                        // replace terminal by the corresponding terminal
+                        newBody += terms.find(s)->second;
                     } // end if-else
                 } // end for
-                productions_no_terminals.insert(std::pair<char, SymbolString>(it->first, body));
+
+                newProductions.insert(std::pair<char, SymbolString>(v, newBody));
             } else {
-                productions_no_terminals.insert(std::pair<char, SymbolString>(it->first, it1->second));
+                newProductions.insert(std::pair<char, SymbolString>(v, body));
             } // end if-else
         } // end for
     } // end for
 
-    fProductions = productions_no_terminals;
+    fProductions = newProductions;
 
-    // check whether this set of productions is already in CNF
-    bool notChomsky = true;
+    unsigned int size_after = fVariables.size();
 
-    do {
-        notChomsky = false;
+    // keep going untill no new variables were introduced (indicating
+    // everything is now in Chomsky Normal Form)
+    while (size_before != size_after) {
+        size_before = fVariables.size();
 
-        for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
-            auto range = fProductions.equal_range(it->first);
+        // the new set of production rules
+        std::multimap<char, SymbolString> newProductions;
 
-            for (auto it1 = range.first; it1 != range.second; ++it1) {
-                if ((it1->second).size() > 2) {
-                    notChomsky = true;
-                    break;
+        for (char v : fVariables) {
+            for (SymbolString body : this->bodies(v)) {
+                if (body.size() <= 2) {
+                    // this rule is already in Chomsky Normal Form
+                    newProductions.insert(std::pair<char, SymbolString>(v, body));
                 } else {
-                    continue;
+                    // e.g. ABCDE becomes AB and VCDE bodies
+
+                    // introduce new variable
+                    fVariables.insert(c);
+
+                    // add the rule V --> AB
+                    newProductions.insert(std::pair<char, SymbolString>(c, SymbolString(body.begin(), body.begin()+2)));
+
+                    SymbolString newBody1(1, c);
+                    // append the rest of the original body (ABCDE) --> (VCDE)
+                    newBody1.append(body.begin()+2, body.end());
+                    newProductions.insert(std::pair<char, SymbolString>(v, newBody1));
+
+                    // don't forget to update the variable!
+                    ++c;
+                    while (fVariables.find(c) != fVariables.end()) { ++c; }
                 } // end if-else
             } // end for
         } // end for
 
-        // apply reform if this is not in CNF
-        if (notChomsky) {
-            // the new set of production rules
-            std::multimap<char, SymbolString> newProductions;
+        fProductions = newProductions;
 
-            for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
-                auto range = fProductions.equal_range(it->first);
-
-                for (auto it1 = range.first; it1 != range.second; ++it1) {
-                    if ((it1->second).size() <= 2) {
-                        // this rule is already in Chomsky Normal Form
-                        std::pair<char, SymbolString> rule(it->first, it1->second);
-                        newProductions.insert(rule);
-                    } else {
-                        // std::string constructor (converts char to string)
-                        SymbolString chomskyBody(1, c);
-                        // append the rest of the original body (ABCDE) --> (VCDE)
-                        chomskyBody.append((it1->second).begin()+2, (it1->second).end());
-                        // add the rule
-                        std::pair<char, SymbolString> rule(it->first, chomskyBody);
-                        newProductions.insert(rule);
-
-                        // also add the other rule V --> AB
-                        SymbolString chomskyBody1((it1->second).begin(), (it1->second).begin()+2);
-                        // add the rule
-                        std::pair<char, SymbolString> rule1(c, chomskyBody1);
-                        newProductions.insert(rule1);
-
-                        // don't forget to update the variable!
-                        ++c;
-                        while (fVariables.find(c) != fVariables.end()) { ++c; }
-                    } // end if-else
-                } // end for
-            } // end for
-
-            fProductions = newProductions;
-        } else {
-            // do nothing
-        } // end if-esle
-    } while (notChomsky);
-}
-
-CNF::CNF(const CNF& cnf) : CFG(cnf) {
-    // nothing to construct
-}
-
-CNF& CNF::operator=(const CNF& cnf) {
-    // nothing to copy
-    return *this;
-}
-
-CNF::~CNF() {
-    // nothing else to destroy
+        size_after = fVariables.size();
+    } // end while
 }
 
 bool CNF::CYK(const std::string& terminalstring) const {
     // first, check whether the terminalstring is valid
     for (char t : terminalstring) {
-        auto it = fTerminals.find(t);
-
-        if (it == fTerminals.end())
+        if (fTerminals.find(t) == fTerminals.end())
             throw std::invalid_argument("Invalid terminal string.");
     } // end for
 
-    // inverse production rules
-    std::multimap<SymbolString, char> inductiveProductions;
+    // first generate inverse production rules
     std::multimap<char, char> baseProductions;
-    for (auto it = fProductions.begin(); it != fProductions.end(); ++it) {
-        auto range = fProductions.equal_range(it->first);
+    std::multimap<SymbolString, char> inductiveProductions;
 
-        for (auto it1 = range.first; it1 != range.second; ++it1) {
-            if ((it1->second).size() > 1) {
-                std::pair<SymbolString, int> args(it1->second, it->first);
-                inductiveProductions.insert(args);
+    for (char v : fVariables) {
+        for (SymbolString body : this->bodies(v)) {
+            if (body.size() > 1) {
+                // inductive production rule
+                inductiveProductions.insert(std::pair<SymbolString, char>(body, v));
             } else {
-                std::pair<int, int> args((it1->second).at(0), it->first);
-                baseProductions.insert(args);
+                baseProductions.insert(std::pair<char, char>(body.at(0), v));
             } // end if-else
         } // end for
     } // end for
 
+    // the CYK table
     std::map<std::pair<int, int>, std::set<char>> table;
 
     // base case
-    std::vector<std::set<char>> row;
     for (unsigned int i = 1; i <= terminalstring.size(); ++i) {
+        // the set of variables producting this terminal
+        std::set<char> vset;
+
         auto range = baseProductions.equal_range(terminalstring.at(i-1));
-        std::set<char> xset;
+
         for (auto it = range.first; it != range.second; ++it) {
-            xset.insert(it->second);
+            vset.insert(it->second);
         } // end for
-        table.insert(std::pair<std::pair<int, int>, std::set<char>>(std::pair<int, int>(i, i), xset));
+
+        table.insert(std::pair<std::pair<int, int>, std::set<char>>(std::pair<int, int>(i, i), vset));
     } // end for
 
     unsigned int i = 1;
     unsigned int j_init = 2;
     unsigned int j = j_init;
-    while( !(i==1 && j == terminalstring.size()+1)) {
-            std::set<char> xset;
-        for (int k = i; k < j; ++k) {
-            for (char B : table.find(std::pair<int, int>(i, k))->second) {
-                for (char C : table.find(std::pair<int, int>(k+1, j))->second) {
-                    SymbolString Body;
-                    Body += std::string(1, B);
-                    Body += std::string(1, C);
-                    auto range = inductiveProductions.equal_range(Body);
+
+    // keep going until you reached row 1 column == size of the terminalstring
+    while( !(i==1 && j == terminalstring.size()+1) ) {
+        // the set of variables producing this X(ij)
+        std::set<char> vset;
+
+        for (unsigned int k = i; k < j; ++k) {
+            for (char v0 : table.find(std::pair<int, int>(i, k))->second) {
+                for (char v1 : table.find(std::pair<int, int>(k+1, j))->second) {
+                    SymbolString body;
+                    body += std::string(1, v0);
+                    body += std::string(1, v1);
+
+                    // try to find variables producing sentential form v(0)v(1)
+                    auto range = inductiveProductions.equal_range(body);
                     for (auto it = range.first; it != range.second; ++it) {
-                        xset.insert(it->second);
+                        vset.insert(it->second);
                     } // end for
                 } // end for
             } // end for
         } // end for
-                    table.insert(std::pair<std::pair<int, int>, std::set<char>>(std::pair<int, int>(i, j), xset));
 
+        table.insert(std::pair<std::pair<int, int>, std::set<char>>(std::pair<int, int>(i, j), vset));
+
+        // now iterate further, depending where you are now
         if (j == terminalstring.size()) {
+            // move row up
             j = ++j_init;
             i = 1;
         } else {
+            // move to the auxillary cell
             ++i; ++j;
         }  // end if-else
     } // end while

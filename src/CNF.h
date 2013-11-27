@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 26 November 2013
+ * Last modified: 27 November 2013
  * By: Stijn Wouters
  */
 
@@ -26,7 +26,6 @@
 #include "CFG.h"
 #include <set>
 #include <map>
-#include <vector>
 
 /**
  * @brief The class CNF (Chomsky Normal Form), this is actually a CFG (Context
@@ -61,25 +60,6 @@ public:
         const std::multimap<char, SymbolString>& productions,
         const char& start
         );
-
-    /**
-     * @brief Copy constructor.
-     *
-     * @param cnf The CNF to be copied.
-     */
-    CNF(const CNF& cnf);
-
-    /**
-     * @brief Copy assignment operator overloading.
-     *
-     * @param cnf The CNF to be assigned to.
-     */
-    CNF& operator=(const CNF& cnf);
-
-    /**
-     * @brief Destructor.
-     */
-    ~CNF();
 
     /**
      * @brief Check whether the terminalstring is in the language of this CNF
