@@ -104,6 +104,9 @@ TEST_CASE("CYK", "[CNF]") {
 
         CHECK_THROWS_AS(c.CYK("aacaa"), std::invalid_argument);
         CHECK_THROWS_AS(c.CYK("bbcbb"), std::invalid_argument);
+        CHECK(c.CYK("aaaa"));
+        CHECK(c.CYK("bbbb"));
+        CHECK_FALSE(c.CYK("abab"));
     } catch (const std::invalid_argument& e) {
         FAIL("Could not construct CNF's: " << e.what());
     } // end try-catch

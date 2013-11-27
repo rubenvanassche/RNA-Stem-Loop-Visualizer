@@ -16,12 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 26 November 2013
+ * Last modified: 27 November 2013
  * By: Stijn Wouters
  */
 #include "CNF.h"
 #include <map>
 #include <stdexcept>
+
+#include <iostream>
 
 CNF::CNF(
     const std::set<char>& terminals,
@@ -175,20 +177,48 @@ bool CNF::CYK(const std::string& terminalstring) const {
         } // end for
     } // end for
 
-    std::vector<std::vector<std::set<char>>> table;
+    std::map<std::pair<int, int>, std::set<char>> table;
 
     // base case
-    for (char t : terminalstring) {
-        auto range = baseProductions.equal_range(t);
-
-        std::set<char> s;
+    std::vector<std::set<char>> row;
+    for (unsigned int i = 1; i <= terminalstring.size(); ++i) {
+        auto range = baseProductions.equal_range(terminalstring.at(i-1));
+        std::set<char> xset;
         for (auto it = range.first; it != range.second; ++it) {
-            s.insert(it->second);
+            xset.insert(it->second);
         } // end for
-
-        std::vector<std::set<char>> row = {s};
-        table.push_back(row);
+        table.insert(std::pair<std::pair<int, int>, std::set<char>>(std::pair<int, int>(i, i), xset));
     } // end for
 
-    return true;
+    unsigned int i = 1;
+    unsigned int j_init = 2;
+    unsigned int j = j_init;
+    while( !(i==1 && j == terminalstring.size()+1)) {
+            std::set<char> xset;
+        for (int k = i; k < j; ++k) {
+            for (char B : table.find(std::pair<int, int>(i, k))->second) {
+                for (char C : table.find(std::pair<int, int>(k+1, j))->second) {
+                    SymbolString Body;
+                    Body += std::string(1, B);
+                    Body += std::string(1, C);
+                    auto range = inductiveProductions.equal_range(Body);
+                    for (auto it = range.first; it != range.second; ++it) {
+                        xset.insert(it->second);
+                    } // end for
+                } // end for
+            } // end for
+        } // end for
+                    table.insert(std::pair<std::pair<int, int>, std::set<char>>(std::pair<int, int>(i, j), xset));
+
+        if (j == terminalstring.size()) {
+            j = ++j_init;
+            i = 1;
+        } else {
+            ++i; ++j;
+        }  // end if-else
+    } // end while
+
+    auto it = table.find(std::pair<int, int>(1, terminalstring.size()));
+    auto setit = (it->second).find(fStartSymbol);
+    return (setit == (it->second).end()) ? false : true;
 }
