@@ -313,15 +313,21 @@ TEST_CASE("TM Construction", "[TM]") {
         std::cout << "Error while constructing valid TM: " << e.what() << std::endl;
     }
     //invalid
-    try {
-        REQUIRE_THROWS(TuringMachine TM3(alphabet, alphabetT, 'D'));
+    try {   //Note that these constructors are called twice: once to check if runtime error is thrown, once to check if it's the right one
+        REQUIRE_THROWS_AS(TuringMachine TM3(alphabet, alphabetT, 'D'), std::runtime_error);
+        TuringMachine TM3(alphabet, alphabetT, 'D');
     }
-    catch(...) {
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Blank symbol not in tape alphabet. Blank symbol set to 'B' and added to tape alphabet if necessary. Correct behaviour of this TM no longer guaranteed.");
     }
     try {
         REQUIRE_THROWS(TuringMachine TM4(alphabetT, alphabet, 'B'));
+        TuringMachine TM4(alphabetT, alphabet, 'B');
     }
-    catch(...) {
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Blank symbol not in tape alphabet. Blank symbol set to 'B' and added to tape alphabet if necessary. Correct behaviour of this TM no longer guaranteed.");
     }
 }
 
@@ -358,24 +364,72 @@ TEST_CASE("State Adding", "[TM]") {
         }
     }
     SECTION("Adding invalid states without storage") {
-        try {
-            CHECK(TM1.addState("Q1", 1, 0));
-            REQUIRE_THROWS(TM1.addState("Q1", 0, 0));
-            REQUIRE_THROWS(TM1.addState("Q2", 1, 0));
+        CHECK(TM1.addState("Q1", 1, 0));
+        SECTION ("Throw 1") {
+            try {
+                REQUIRE_THROWS(TM1.addState("Q1", 0, 0));
+                TM1.addState("Q1", 0, 0);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Name is not unique!");
+            }
         }
-        catch(...) {}
+        SECTION ("Throw 2") {
+            try {
+                REQUIRE_THROWS(TM1.addState("Q2", 1, 0));
+                TM1.addState("Q2", 1, 0);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Trying to create second start state!");
+            }
+        }
     }
     SECTION("Adding invalid states with storage") {
-
-        try {
-            CHECK(TM1.addState("Q1", 1, 0, storage1));
-            CHECK(TM1.addState("Q1", 0, 0, storage2));
-            REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storage1));
-            REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storage3));
-            REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storage4));
-            REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storageEmpty));
+        CHECK(TM1.addState("Q1", 1, 0, storage1));
+        CHECK(TM1.addState("Q1", 0, 0, storage2));
+        SECTION("Throw 1") {
+            try {
+                REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storage1));
+                TM1.addState("Q1", 0, 0, storage1);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Name + storage is not unique!");
+            }
         }
-        catch(...) {}
+        SECTION("Throw 2") {
+            try {
+                REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storage3));
+                TM1.addState("Q1", 0, 0, storage3);
+
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "All storages should have same size!");
+            }
+        }
+        SECTION("Throw 3") {
+            try {
+                REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storage4));
+                TM1.addState("Q1", 0, 0, storage4);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "All storages should have same size!");
+            }
+        }
+        SECTION("Throw 4") {
+            try {
+                REQUIRE_THROWS(TM1.addState("Q1", 0, 0, storageEmpty));
+                TM1.addState("Q1", 0, 0, storageEmpty);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "All storages should have same size!");
+            }
+        }
     }
 }
 TEST_CASE("Transition Adding", "[TM]") {
@@ -415,10 +469,59 @@ TEST_CASE("Transition Adding", "[TM]") {
         TM1.addState("Q3", 0, 0);
         TM1.addState("Q4", 0, 1);
         CHECK(TM1.addTransition("Q1", "Q2", 'a', 'b', L));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", 'a', 'b', L));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q5", 'a', 'b', L));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", 'e', 'b', L));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", 'a', 'e', L));
+        SECTION("Throw 1") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", 'a', 'b', L));
+                TM1.addTransition("Q1", "Q2", 'a', 'b', L);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Transition not unique!");
+            }
+
+        }
+        SECTION("Throw 2") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q5", "Q1", 'a', 'b', L));
+                TM1.addTransition("Q5", "Q1", 'a', 'b', L);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "From state not in set of states!");
+            }
+        }
+
+        SECTION("Throw 3") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q5", 'a', 'b', L));
+                TM1.addTransition("Q1", "Q5", 'a', 'b', L);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "To state not in set of states!");
+            }
+        }
+        SECTION("Throw 4") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", 'e', 'b', L));
+                TM1.addTransition("Q1", "Q2", 'e', 'b', L);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Symbol to be read not in tape alphabet!");
+            }
+        }
+        SECTION("Throw 5") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", 'a', 'e', L));
+                TM1.addTransition("Q1", "Q2", 'a', 'e', L);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Symbol to be written not in tape alphabet!");
+            }
+        }
+
 
     }
     SECTION ("Adding invalid transitions with storage and multitrack") {
@@ -429,15 +532,104 @@ TEST_CASE("Transition Adding", "[TM]") {
         TM1.addState("Q3", 0, 1, storage1);
         TM1.addState("Q3", 0, 0, storage2);
         CHECK(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage1, storage1));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage1, storage1));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage3, storage1));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage3, storage3));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage3, storage3, L, storage1, storage1));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage3, storage2, L, storage1, storage1));
-        REQUIRE_THROWS(TM1.addTransition("Q4", "Q2", storage1, storage2, L, storage1, storage1));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q4", storage1, storage2, L, storage1, storage1));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage5, storage2, L, storage1, storage1));
-        REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage5, L, storage1, storage1));
+        SECTION ("Throw 1") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage1, storage1));
+                TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage1, storage1);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Transition not unique!");
+            }
+        }
+        SECTION ("Throw 2") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage3, storage1));
+                TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage3, storage1);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Storages do not have same size!");
+            }
+        }
+        SECTION ("Throw 3") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage3, storage3));
+                TM1.addTransition("Q1", "Q2", storage1, storage2, L, storage3, storage3);
+
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Storages do not have right size!");
+            }
+        }
+        SECTION ("Throw 4") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage3, storage3, L, storage1, storage1));
+                TM1.addTransition("Q1", "Q2", storage3, storage3, L, storage1, storage1);
+
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Read and write character count does not match track count!");
+            }
+        }
+        SECTION ("Throw 5") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage3, storage2, L, storage1, storage1));
+                TM1.addTransition("Q1", "Q2", storage3, storage2, L, storage1, storage1);
+
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Read and write do not have same number of characters!");
+            }
+        }
+        SECTION ("Throw 6") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q4", "Q2", storage1, storage2, L, storage1, storage1));
+                TM1.addTransition("Q4", "Q2", storage1, storage2, L, storage1, storage1);
+
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "From state not in set of states!");
+            }
+        }
+        SECTION ("Throw 7") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q4", storage1, storage2, L, storage1, storage1));
+                TM1.addTransition("Q1", "Q4", storage1, storage2, L, storage1, storage1);
+
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "To state not in set of states!");
+            }
+        }
+        SECTION ("Throw 8") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage5, storage2, L, storage1, storage1));
+                TM1.addTransition("Q1", "Q2", storage5, storage2, L, storage1, storage1);
+
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Symbol to be read not in tape alphabet!");
+            }
+        }
+        SECTION ("Throw 9") {
+            try {
+                REQUIRE_THROWS(TM1.addTransition("Q1", "Q2", storage1, storage5, L, storage1, storage1));
+                TM1.addTransition("Q1", "Q2", storage1, storage5, L, storage1, storage1);
+            }
+            catch(std::runtime_error& e) {
+                std::string error(e.what());
+                REQUIRE(error == "Symbol to be written not in tape alphabet!");
+            }
+        }
+
+
     }
 
 
@@ -523,4 +715,143 @@ TEST_CASE("XML", "[TM]") {
         input3 = "0c1";
         CHECK_FALSE(TM3.process(input3));
     }
+}
+
+TEST_CASE("XML invalid", "[TM]") {
+    try {
+        std::string fileName = "TMinvalid0.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "File not found!");
+    }
+    try {
+        std::string fileName = "TMinvalid1.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Failed to load file: No root element.");
+    }
+    try {
+        std::string fileName = "TMinvalid2.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Not a Turing Machine XML file!");
+    }
+    try {
+        std::string fileName = "TMinvalid3.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "One input symbol per node please");
+    }
+    try {
+        std::string fileName = "TMinvalid4.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "One input symbol per node please");
+    }
+    try {
+        std::string fileName = "TMinvalid5.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "One blank symbol please");
+    }
+    try {
+        std::string fileName = "TMinvalid6.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Alphabet, tape alphabet or blank symbol missing!");
+    }
+    try {
+        std::string fileName = "TMinvalid7.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Alphabet, tape alphabet or blank symbol missing!");
+    }
+    try {
+        std::string fileName = "TMinvalid8.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Alphabet, tape alphabet or blank symbol missing!");
+    }
+    try {
+        std::string fileName = "TMinvalid9.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "State without name");
+    }
+    try {
+        std::string fileName = "TMinvalid10.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "invalid direction");
+    }
+    try {
+        std::string fileName = "TMinvalid11.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Incomplete transition");
+    }
+    try {
+        std::string fileName = "TMinvalid12.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Incomplete transition");
+    }
+    try {
+        std::string fileName = "TMinvalid13.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "No name for start state specified");
+    }
+    try {
+        std::string fileName = "TMinvalid14.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "No name for accepting state specified");
+    }
+
 }

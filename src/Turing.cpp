@@ -362,7 +362,7 @@ bool TuringMachine::addTransition(const std::string& from, const std::string& to
         if (fromStorage.size() != toStorage.size())
             throw std::runtime_error("Storages do not have same size!");
         if (fStateStorageSize != 1 && (int) fromStorage.size() != fStateStorageSize)
-            throw std::runtime_error("Storages do not have right size");
+            throw std::runtime_error("Storages do not have right size!");
         for (auto i : fStates) {
             if (i->isCalled(from) && i->hasThisStorage(fromStorage))
                 fromPtr = i;
@@ -497,21 +497,41 @@ TuringMachine::~TuringMachine() {}
 
 
 TuringMachine generateTM(std::string fileName) {
+
     TiXmlDocument doc;
-    if(!doc.LoadFile(fileName.c_str()))
-    {
-        std::cout << doc.ErrorDesc() << std::endl;
+    try {
+        std::string path = DATADIR + fileName;
+        if(!doc.LoadFile(path.c_str()))
+        {
+            throw std::runtime_error("File not found!");
+
+        }
+    }
+    catch(std::runtime_error& e) {
+        throw;
+        std::cout << "Error generating TM from XML: " << e.what() << std::endl;
         return TuringMachine();
     }
     TiXmlElement* root = doc.FirstChildElement();
-    if(root == NULL)
-    {
-        std::cout << "Failed to load file: No root element."
-             << std::endl;
-        doc.Clear();
+    std::string rootName;
+    try {
+        if(root == NULL)
+        {
+            throw std::runtime_error("Failed to load file: No root element.");
+            doc.Clear();
+
+        }
+        rootName = root->Value();
+        if (rootName != "TM") {
+            throw std::runtime_error("Not a Turing Machine XML file!");
+        }
+
+    }
+    catch(std::runtime_error& e) {
+        throw;
+        std::cout << "Error generating TM from XML: " << e.what() << std::endl;
         return TuringMachine();
     }
-    std::string rootName = root->Value();
     if (rootName == "TM") {
         std::set<char> alphabet;
         std::set<char> tapeAlphabet;
@@ -528,8 +548,14 @@ TuringMachine generateTM(std::string fileName) {
                         if(text == NULL)
                             continue;
                         std::string t = text->Value();
-                        if (t.size() != 1) {
-                            std::cout << "One input symbol per node please" << std::endl;
+                        try {
+                            if (t.size() != 1)
+                                throw std::runtime_error("One input symbol per node please");
+                        }
+                        catch(std::runtime_error& e) {
+                            throw;
+                            std::cout << "Error generating TM from XML: " << e.what() << std::endl;
+                            return TuringMachine();
                         }
                         alphabet.insert(t.front());
                     }
@@ -544,8 +570,15 @@ TuringMachine generateTM(std::string fileName) {
                         if(text == NULL)
                             continue;
                         std::string t = text->Value();
-                        if (t.size() != 1) {
-                            std::cout << "One input symbol per node please" << std::endl;
+                        try {
+                            if (t.size() != 1) {
+                                throw std::runtime_error("One input symbol per node please");
+                            }
+                        }
+                        catch(std::runtime_error& e) {
+                            throw;
+                            std::cout << "Error generating TM from XML: " << e.what() << std::endl;
+                            return TuringMachine();
                         }
                         tapeAlphabet.insert(t.front());
                     }
@@ -557,8 +590,15 @@ TuringMachine generateTM(std::string fileName) {
                 if(text == NULL)
                     continue;
                 std::string t = text->Value();
-                if (t.size() != 1) {
-                    std::cout << "One blank symbol please" << std::endl;
+                try {
+                    if (t.size() != 1) {
+                         throw std::runtime_error("One blank symbol please");
+                    }
+                }
+                catch(std::runtime_error& e) {
+                    throw;
+                    std::cout << "Error generating TM from XML: " << e.what() << std::endl;
+                    return TuringMachine();
                 }
                 blank = t.front();
             }
@@ -568,8 +608,15 @@ TuringMachine generateTM(std::string fileName) {
             }
 
         }
-        if (!allFound) {
-            std::cout << "Alphabet, tape alphabet or blank symbol missing!" << std::endl;
+        try {
+            if (!allFound) {
+                 throw std::runtime_error("Alphabet, tape alphabet or blank symbol missing!");
+                return TuringMachine();
+            }
+        }
+        catch(std::runtime_error& e) {
+            throw;
+            std::cout << "Error generating TM from XML: " << e.what() << std::endl;
             return TuringMachine();
         }
         TuringMachine TM(alphabet, tapeAlphabet, blank);
@@ -622,9 +669,15 @@ TuringMachine generateTM(std::string fileName) {
                             if (stateAttr == "true")
                                 isAccepting = true;
                         }
-                        if (elemOfQ->FirstChild() == NULL) {
-                            std::cout << "State without name, was skipped" << std::endl;
-                            continue;
+                        try {
+                            if (elemOfQ->FirstChild() == NULL) {
+                                 throw std::runtime_error("State without name");
+                            }
+                        }
+                        catch(std::runtime_error& e) {
+                            throw;
+                            std::cout << "Error generating TM from XML: " << e.what() << std::endl;
+                            return TuringMachine();
                         }
                         TiXmlNode* e = elemOfQ->FirstChild();
                         TiXmlText* text = e->ToText();
@@ -736,19 +789,32 @@ TuringMachine generateTM(std::string fileName) {
                                 if(text == NULL)
                                     continue;
                                 std::string t = text->Value();
-                                if (t == "L")
-                                    dir = L;
-                                else if (t == "R")
-                                    dir = R;
-                                else
-                                    std::cout << "invalid direction" << std::endl;
+                                try {
+                                    if (t == "L")
+                                        dir = L;
+                                    else if (t == "R")
+                                        dir = R;
+                                    else
+                                        throw std::runtime_error("invalid direction" );
+                                }
+                                catch(std::runtime_error& e) {
+                                    throw;
+                                    std::cout << "Error generating TM from XML: " << e.what() << std::endl;
+                                    return TuringMachine();
+                                }
                             }
                         }
-                        if (from.size() && to.size() && read.size() && write.size() && (dir == L || dir == R))
-                            TM.addTransition(from, to, read, write, dir, fromStorage, toStorage);
-                        else
-                            std::cout << "Incomplete transition" << std::endl;
-
+                        try {
+                            if (from.size() && to.size() && read.size() && write.size() && (dir == L || dir == R))
+                                TM.addTransition(from, to, read, write, dir, fromStorage, toStorage);
+                            else
+                                 throw std::runtime_error("Incomplete transition");
+                        }
+                        catch(std::runtime_error& e) {
+                            throw;
+                            std::cout << "Error generating TM from XML: " << e.what() << std::endl;
+                            return TuringMachine();
+                        }
 
 
                     }
@@ -788,15 +854,21 @@ TuringMachine generateTM(std::string fileName) {
                             storage.push_back(i);
                     }
                 }
-                if (stateName.size() != 0) {
-                    if (storage.size() == 0)
-                        TM.addStartState(stateName);
+                try {
+                    if (stateName.size() != 0) {
+                        if (storage.size() == 0)
+                            TM.addStartState(stateName);
+                        else
+                            TM.addStartState(stateName, storage);
+                    }
                     else
-                        TM.addStartState(stateName, storage);
+                        throw std::runtime_error("No name for start state specified");
                 }
-                else
-                    std::cout << "No name for start state specified" << std::endl;
-
+                catch(std::runtime_error& e) {
+                    throw;
+                    std::cout << "Error generating TM from XML: " << e.what() << std::endl;
+                    return TuringMachine();
+                }
 
             }
             if (elemName == "AcceptingStates") {
@@ -831,15 +903,22 @@ TuringMachine generateTM(std::string fileName) {
                                     storage.push_back(i);
                             }
                         }
-                        if (stateName.size() != 0) {
-                            if (storage.size() == 0)
-                                TM.addAcceptingState(stateName);
-                            else
-                                TM.addAcceptingState(stateName, storage);
+                        try {
+                            if (stateName.size() != 0) {
+                                if (storage.size() == 0)
+                                    TM.addAcceptingState(stateName);
+                                else
+                                    TM.addAcceptingState(stateName, storage);
 
+                            }
+                            else
+                            throw std::runtime_error("No name for accepting state specified");
                         }
-                        else
-                        std::cout << "No name for accepting state specified" << std::endl;
+                        catch(std::runtime_error& e) {
+                            throw;
+                            std::cout << "Error generating TM from XML: " << e.what() << std::endl;
+                            return TuringMachine();
+                        }
 
 
                     }
@@ -855,6 +934,7 @@ TuringMachine generateTM(std::string fileName) {
         std::cout << blank << std::endl;*/
         return TM;
     }
+
     return TuringMachine();
 }
 

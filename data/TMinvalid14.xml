@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<TM>
+	<TapeAlphabet>
+		<symbol>a</symbol>
+		<symbol>B</symbol>
+	</TapeAlphabet>
+	<InputAlphabet>
+		<symbol>a</symbol>
+	</InputAlphabet>
+	<Blank>B</Blank>
+	<States>
+		<state>Q0</state>
+	</States>
+	<Transitions>
+		<transition>
+			<from>Q0</from>
+			<to>Q0</to>
+			<read>a</read>
+			<write>a</write>
+			<dir>L</dir>
+		</transition>
+	</Transitions>
+	<AcceptingStates>
+		<state></state>
+	</AcceptingStates>
+</TM>
