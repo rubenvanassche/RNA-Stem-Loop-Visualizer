@@ -35,7 +35,7 @@ bool TuringState::isCalled(const std::string& name) const {
 
 bool TuringState::hasThisStorage(const std::vector<char> storage) const {
     if (storage.size() == fStorage.size())   {
-        for (int i=0; i < storage.size(); i++)
+        for (unsigned i=0; i < storage.size(); i++)
             if (storage[i] != fStorage[i])
                 return false;
         return true;
@@ -47,7 +47,7 @@ bool TuringState::hasThisStorage(const std::vector<char> storage) const {
 bool TuringState::operator<(const TuringState& that) const {
     if (this->fName < that.fName)
         return true;
-    for (int i=0; i < this->fStorage.size(); i++) {
+    for (unsigned i=0; i < this->fStorage.size(); i++) {
         if ((this->fStorage)[i] < (that.fStorage)[i])
             return true;
         if ((this->fStorage)[i] > (that.fStorage)[i])
@@ -59,7 +59,7 @@ bool TuringState::operator<(const TuringState& that) const {
 bool TuringState::operator>(const TuringState& that) const {
     if (this->fName > that.fName)
         return true;
-    for (int i=0; i < this->fStorage.size(); i++) {
+    for (unsigned i=0; i < this->fStorage.size(); i++) {
         if ((this->fStorage)[i] > (that.fStorage)[i])
             return true;
         if ((this->fStorage)[i] < (that.fStorage)[i])
@@ -105,14 +105,14 @@ bool TuringTransition::operator<(const TuringTransition& that) const {
     if (*(this->fTo) > *(that.fTo))
         return false;
     //to states are the same
-    for (int i=0; i < this->fRead.size(); i++) {
+    for (unsigned i=0; i < this->fRead.size(); i++) {
         if ((this->fRead)[i] < (that.fRead)[i])
             return true;
         if ((this->fRead)[i] > (that.fRead)[i])
             return false;
     }
     //read symbols the same
-    for (int i=0; i < this->fWrite.size(); i++) {
+    for (unsigned i=0; i < this->fWrite.size(); i++) {
         if ((this->fWrite)[i] < (that.fWrite)[i])
             return true;
         if ((this->fWrite)[i] > (that.fWrite)[i])
@@ -168,13 +168,13 @@ Tape::Tape(std::string& input, char blank, int trackCount) : fBlank(blank), fHea
 }
 
 std::vector<char> Tape::getSymbolAtHead() const {
-    if (fHead < fTape.size() && fHead >= 0)   //Not out of tape bounds
+    if (fHead < (int) fTape.size() && fHead >= 0)   //Not out of tape bounds
         return fTape[fHead];
     return std::vector<char>(fTrackCount, fBlank);     //if out of bounds; must be blank
 }
 
 void Tape::replaceSymbolAtHead(std::vector<char> symbol) {
-    if (fHead == fTape.size())   //One spot to the right of the tape saved in fTape; add one symbol to the back of tape ("overwrites a blank")
+    if (fHead == (int) fTape.size())   //One spot to the right of the tape saved in fTape; add one symbol to the back of tape ("overwrites a blank")
         fTape.push_back(symbol);
     else if (fHead == -1) {   //One spot to the left of the tape saved in fTape; add one symbol to the front of tape ("overwrites a blank")
         fTape.push_front(symbol);
@@ -315,15 +315,16 @@ TuringMachine::TuringMachine(const std::set<char>& alphabetTuring, const std::se
 bool TuringMachine::addState(const std::string& name, const bool isStarting, const bool isFinal, const std::vector<char>& storage) {
     try {
         for (auto i : fStates) {    //Check if state of that name already a state
-            if (i->isCalled(name))
+            if (i->isCalled(name)) {
                 if (fStateStorageSize == 0)
                     throw std::runtime_error("Name is not unique!");
                 else if (i->hasThisStorage(storage))
                     throw std::runtime_error("Name + storage is not unique!");
+            }
         }
         if (isStarting && fStartState != nullptr)
             throw std::runtime_error("Trying to create second start state!");
-        if (fStateStorageSize != -1 && fStateStorageSize != storage.size())
+        if (fStateStorageSize != -1 && fStateStorageSize != (int) storage.size())
             throw std::runtime_error ("All storages should have same size!");
     }
     catch (std::runtime_error& e) {
@@ -351,17 +352,16 @@ bool TuringMachine::addState(const std::string& name, const bool isStarting, con
 
 bool TuringMachine::addTransition(const std::string& from, const std::string& to, const std::vector<char>& read, const std::vector<char>& write, Direction dir,
                                   const std::vector<char>& fromStorage, const std::vector<char>& toStorage) {
-    bool storage = fromStorage.size();
     StatePtr fromPtr = nullptr;
     StatePtr toPtr = nullptr;
     try {
         if (read.size() != write.size())
             throw std::runtime_error("Read and write do not have same number of characters!");
-        if (fTrackCount != -1 && fTrackCount != read.size())
+        if (fTrackCount != -1 && fTrackCount != (int) read.size())
             throw std::runtime_error("Read and write character count does not match track count!");
         if (fromStorage.size() != toStorage.size())
             throw std::runtime_error("Storages do not have same size!");
-        if (fStateStorageSize != 1 && fromStorage.size() != fStateStorageSize)
+        if (fStateStorageSize != 1 && (int) fromStorage.size() != fStateStorageSize)
             throw std::runtime_error("Storages do not have right size");
         for (auto i : fStates) {
             if (i->isCalled(from) && i->hasThisStorage(fromStorage))
@@ -416,7 +416,7 @@ bool TuringMachine::addTransition(const std::string& from, const std::string& to
     std::vector<char> writeVec;
     readVec.push_back(read);
     writeVec.push_back(write);
-    addTransition(from, to, readVec, writeVec, dir, fromStorage, toStorage);
+    return addTransition(from, to, readVec, writeVec, dir, fromStorage, toStorage);
 }
 
 bool TuringMachine::addStartState(std::string name, std::vector<char> storage) {
@@ -861,7 +861,7 @@ TuringMachine generateTM(std::string fileName) {
 
 
 /*int main () {
-    /*std::set<char> alph;
+    std::set<char> alph;
     std::set<char> alphT;
     std::vector<char> storage;
     std::string input;

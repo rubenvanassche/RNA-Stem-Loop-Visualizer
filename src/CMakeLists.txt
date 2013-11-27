@@ -27,10 +27,13 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # Lists all sourcefiles (no testfiles and no main)
-set(SRC CFG.cpp CNF.cpp)
+set(SRC CFG.cpp CNF.cpp Turing.cpp TinyXML/tinyxml.cpp TinyXML/tinyxmlparser.cpp TinyXML/tinyxmlerror.cpp TinyXML/tinystr.cpp)
 
 # Lists all testfiles, DO NOT remove Tests.cpp
-set(TESTSRC Tests.cpp test_CFG.cpp)
+set(TESTSRC Tests.cpp test_CFG.cpp test_Turing.cpp)
+
+# Set flags
+set( CMAKE_CXX_FLAGS "-Wall -std=c++11 " )
 
 # Target to build all the tests
 add_executable(Tests ${TESTSRC} ${SRC})
