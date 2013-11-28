@@ -193,6 +193,9 @@ void Tape::moveHead(Direction dir) {
     case R:
         fHead++;
         break;
+    case U:
+        //should not happen
+        break;
     }
 }
 
@@ -705,7 +708,7 @@ TuringMachine generateTM(std::string fileName) {
                         std::vector<char> toStorage;
                         std::vector<char> read;
                         std::vector<char> write;
-                        Direction dir;
+                        Direction dir = U;
                         for(TiXmlElement* elemOfTransition = elemOfDelta->FirstChildElement(); elemOfTransition != NULL; elemOfTransition = elemOfTransition->NextSiblingElement()) {
                             std::string elemOfTransitionName = elemOfTransition->Value();
                             if (elemOfTransitionName == "from") {

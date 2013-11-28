@@ -36,7 +36,7 @@
 #include <memory>
 #include "TinyXML/tinyxml.h"
 
-enum Direction {L, R};
+enum Direction {L, R, U}; //left, right, or undefined
 class TuringState;
 typedef std::shared_ptr<const TuringState> StatePtr;
 

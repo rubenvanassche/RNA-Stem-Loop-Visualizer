@@ -454,9 +454,16 @@ void CFG::cleanUp() {
 
     // now, also remove all symbols from the set of the variables which
     // don't have any production rule
+    std::set<char> to_be_removed;
+
     for (char v : fVariables) {
         if ((this->bodies(v)).empty())
-            fVariables.erase(v);
+            to_be_removed.insert(v);
     } // end for
+
+    for (char v : to_be_removed) {
+        fVariables.erase(v);
+    } // end for
+
     return;
 }
