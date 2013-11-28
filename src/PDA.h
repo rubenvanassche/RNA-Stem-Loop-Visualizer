@@ -202,6 +202,25 @@ public:
      */
     void step(const std::string& input, PDAState* currentState, const std::stack<char> stack);
 
+    /**
+	 * @brief Check if this ID will be accepted by the PDA
+	 *
+	 * @param pdaType Type of PDA(State or Stack)
+	 *
+	 * @return bool telling if the ID is accepted
+	 */
+    bool isAccepted(PDAFinal pdaType);
+
+
+    /**
+	 * @brief Check if this ID is dead
+	 *
+	 * @param pdaType Type of PDA(State or Stack)
+	 *
+	 * @return bool telling if the ID is dead
+	 */
+    bool isDead(PDAFinal pdaType);
+
     friend std::ostream& operator<<(std::ostream& out, PDAID id);
 
     std::string fInput;
@@ -267,10 +286,17 @@ public:
     virtual ~PDA();
 
 private:
-
+    /**
+     * @brief Get transitions based upon an input, stackTopsymbol and state
+     *
+     * @param input Which string should be processed by the state
+     * @param stackTopSymbol The symbol on the top of the stack at the moment this function is called
+     * @param from A PDAState from where the transitions should start
+     *
+     * @return A vector<PDATransition> giving you all the transitions starting from the specified state
+     */
     std::vector<PDATransition> getTransitions(std::string input, char stackTopSymbol, PDAState* from);
 
-    std::pair<bool, bool> isFinalDead(const std::string& input, PDAState* to, const std::stack<char> stack);
 
     std::list<PDATransition> fTransitions;
     std::list<PDAState> fStates;

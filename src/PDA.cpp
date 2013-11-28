@@ -152,6 +152,41 @@ void PDAID::step(const std::string& input, PDAState* to, const std::stack<char> 
 	this->fStack = stack;
 }
 
+bool PDAID::isAccepted(PDAFinal pdaType){
+	bool accepted = false;
+
+	if(pdaType == STATE){
+		// PDA is state ending
+		if(this->fInput.size() == 0){
+			if(this->fState->isFinal()){
+				accepted = true;
+			}
+		}
+	}else{
+		// PDA is stack ending
+		if(this->fStack.size() == 0){
+			accepted = true;
+		}
+	}
+
+	return accepted;
+}
+
+bool PDAID::isDead(PDAFinal pdaType){
+	bool dead = false;
+
+	if(pdaType == STATE){
+		// PDA is state ending
+		if(this->fInput.size() == 0){
+			if(this->fState->isFinal() == false){
+				dead = true;
+			}
+		}
+	}
+
+	return dead;
+}
+
 std::ostream& operator<<(std::ostream& out, PDAID id){
 	out << "PDA ID(" << id.fInput << ", " << id.fState->getName() << ", ";
 	for(unsigned int i = 0; i < id.fStack.size(); i++){
@@ -295,30 +330,6 @@ std::vector<PDATransition> PDA::getTransitions(std::string input, char stackTopS
 	return selectedTransitions;
 }
 
-std::pair<bool, bool> PDA::isFinalDead(const std::string& input, PDAState* to,const std::stack<char> stack){
-	bool isDead = false;
-	bool isFinal = false;
-
-	if(this->fPDAtype == STATE){
-		// PDA is state ending
-		if(input.size() == 0){
-			if(to->isFinal()){
-				isFinal = true;
-			}else{
-				isDead = true;
-			}
-		}
-	}else{
-		// PDA is stack ending
-		if(stack.size() == 0){
-			isFinal = true;
-		}
-	}
-
-	std::pair<bool, bool> result(isDead, isFinal);
-	return result;
-}
-
 bool PDA::process(std::string input){
 	if(this->fStartState == nullptr){
 		throw std::runtime_error("Please define a  start state before processing a string");
@@ -349,12 +360,11 @@ bool PDA::process(std::string input){
 	// That's done now start using these id's to find a succesfull path
 	while(ids.size() > 0){
 		// Now let's check if we are already dead, final or something else
-		std::pair<bool, bool> finalDeath = this->isFinalDead(ids.front().fInput, ids.front().fState, ids.front().fStack);
-		if(finalDeath.second == true){
+		if(ids.front().isAccepted(this->fPDAtype) == true){
 			// YES, we're final!
 			return true;
 		}
-		if(finalDeath.first == true){
+		if(ids.front().isDead(this->fPDAtype) == true){
 			// No! We're death
 			ids.pop();
 			continue;
@@ -392,14 +402,12 @@ bool PDA::process(std::string input){
 				PDAID newID(newInput, transitionsIt->fTo, newStack);
 
 				// check whether we are final or death
-				std::pair<bool, bool> finalDeath = this->isFinalDead(newInput, transitionsIt->fTo, newStack);
-
-				if(finalDeath.second == true){
+				if(ids.front().isAccepted(this->fPDAtype) == true){
 					// YES, we're final!
 					return true;
 				}
 
-				if(finalDeath.first == true){
+				if(ids.front().isDead(this->fPDAtype) == true){
 					// NO, we're death, so actually do not add this ID
 				}else{
 					// We're not death of final yet so add the ID
