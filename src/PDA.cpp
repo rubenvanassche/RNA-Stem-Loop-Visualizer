@@ -154,7 +154,7 @@ void PDAID::step(const std::string& input, PDAState* to, const std::stack<char> 
 
 std::ostream& operator<<(std::ostream& out, PDAID id){
 	out << "PDA ID(" << id.fInput << ", " << id.fState->getName() << ", ";
-	for(int i = 0; i < id.fStack.size(); i++){
+	for(unsigned int i = 0; i < id.fStack.size(); i++){
 		out << id.fStack.top();
 		id.fStack.pop();
 	}

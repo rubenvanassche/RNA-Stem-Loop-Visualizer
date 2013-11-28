@@ -23,18 +23,16 @@ install_manifest.txt
 bin/
 build/
 
-<<<<<<< HEAD
 # VIm backup files
 *.swp
-=======
 # Eclipse project
 .project
 .cproject
->>>>>>> dev/Ruben
+
+src/Tests
 
 src/RNAslv
 
-src/Tests
 
 RNAslv
 
