@@ -16,15 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 27 November 2013
+ * Last modified: 28 November 2013
  * By: Stijn Wouters
  */
 #include "CFG.h"
 #include <stdexcept>
 #include <algorithm>
 #include <iterator>
-
-#include <iostream>
+#include <stack>
 
 /**
  * @brief Recursive implementation to get all the subsets of a given set.
@@ -454,16 +453,17 @@ void CFG::cleanUp() {
 
     // now, also remove all symbols from the set of the variables which
     // don't have any production rule
-    std::set<char> to_be_removed;
+    std::stack<char> to_be_removed;
 
     for (char v : fVariables) {
         if ((this->bodies(v)).empty())
-            to_be_removed.insert(v);
+            to_be_removed.push(v);
     } // end for
 
-    for (char v : to_be_removed) {
-        fVariables.erase(v);
-    } // end for
+    while (!to_be_removed.empty()) {
+        fVariables.erase(to_be_removed.top());
+        to_be_removed.pop();
+    } // end while
 
     return;
 }
