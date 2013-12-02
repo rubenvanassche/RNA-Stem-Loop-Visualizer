@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 25 November 2013
+ * Last modified: 2 December 2013
  * By: Pieter Lauwers
  */
 
@@ -25,12 +25,22 @@
 
 #include "CFG.h"
 #include <stack>
-#include <vector>   
+#include <vector>
+#include <iostream>   
+
+/**
+ * @brief Symbol for representing the end of string.
+ */
+const std::string EOS = " ";
+
+/**
+ * @brief Symbol for representing epsilon.
+ */
+const std::string EPSILON = "e";
 
 /**
  * @brief Class representing an LL Parse Table
  */
-
 class LLTable {
 public:
      /**
@@ -82,7 +92,24 @@ public:
      */
     virtual ~LLTable();
 
+    /**
+     * @brief Enumerates all possible combinations of the given terminals 
+     *
+     * @param result Container for all combinations
+     * @param terminals All terminals that can be used in a combination
+     * @param length The desired length of the combinations
+     */
     static void enumerate(std::vector<SymbolString>& result, std::vector<SymbolString>& terminals, unsigned int length);
+
+    /**
+     * @brief Returns a string representation of the parse table.
+     *
+     * @param CFGTerminals A set containing the terminals of the CFG
+     * @param CFGVariables A set containing the variables of the CFG
+     *
+     * @return String representation.
+     */
+    std::string toString(const std::set<char>& CFGTerminals, const std::set<char>& CFGVariables) const;
 
 private:
     /**
@@ -131,6 +158,16 @@ private:
         const unsigned int dimension
         );
 
+    /**
+     * @brief Returns the right side of the transition that has to be used.
+     *
+     * @param variable The variable at the left side of the transition
+     * @param lookahead The lookahead symbols
+     *
+     * @return A vector with the combinations of terminals.
+     */
+    SymbolString get_transition(char variable, SymbolString lookahead) const;
+
     const unsigned int dimension;
 
     /**
@@ -144,10 +181,11 @@ private:
     const std::map<char, std::map<SymbolString, SymbolString> > table;
 };
 
+
+
 /**
  * @brief Class representing an LL Parser
  */
-
 class LLParser {
 public:
      /**
@@ -196,9 +234,21 @@ public:
      */
     virtual ~LLParser();
 
+    /**
+     * @brief Prints the parse table to the given output stream.
+     *
+     * @param stream The output stream
+     * @param obj The parser
+     *
+     * @return The output stream.
+     */
+    friend std::ostream& operator<<(std::ostream& stream, const LLParser& obj);
+
 private:
     const char startsymbol;
     const LLTable parseTable;
+    const std::set<char> CFGTerminals;
+    const std::set<char> CFGVariables;
 };
 
 #endif /*LLPARSER_H*/

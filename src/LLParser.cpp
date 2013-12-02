@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 25 November 2013
+ * Last modified: 2 December 2013
  * By: Pieter Lauwers
  */
 
@@ -25,14 +25,16 @@
  #include <iostream>
 
 // Implementation of the LLParser methods:
- LLParser::LLParser(
+LLParser::LLParser(
         const std::set<char>& CFGTerminals, 
         const std::set<char>& CFGVariables, 
         const std::multimap<char, SymbolString>& CFGProductions, 
         const char& CFGStartsymbol, 
         const unsigned int lookahead
-        ) : parseTable(CFGTerminals, CFGVariables, CFGProductions, 2),  // TEMP: manual dimension
-            startsymbol(CFGStartsymbol) {     
+        ) : parseTable(CFGTerminals, CFGVariables, CFGProductions, lookahead),
+            startsymbol(CFGStartsymbol),
+            CFGTerminals(CFGTerminals),
+            CFGVariables(CFGVariables) {     
 
 }
 
@@ -48,6 +50,13 @@ bool LLParser::process(const std::string& input) const {
 
 LLParser::~LLParser() {
     // nothing to destroy
+}
+
+std::ostream& operator<<(std::ostream& stream, const LLParser& obj) {
+    stream << "Start symbol: " << obj.startsymbol << std::endl;
+    stream << "Parse table: " << std::endl << obj.parseTable.toString(obj.CFGTerminals, obj.CFGVariables) << std::endl;
+
+    return stream;
 }
 
 
@@ -101,13 +110,27 @@ std::map<SymbolString, SymbolString> LLTable::generateRow(
     std::map<SymbolString, SymbolString> result;
 
     for (auto terminals_it = terminalCombinations.begin(); terminals_it != terminalCombinations.end(); terminals_it++) {
+        std::cout << *terminals_it << " (" << (*terminals_it).length() << ")" << std::endl;
         // find the matching production rule
+        bool epsilon_transition;
         for (auto production_it = CFGProductions.lower_bound(variable); production_it != CFGProductions.upper_bound(variable); production_it++) {
+            std::cout << "\t" << std::get<1>(*production_it) << std::endl;
+            epsilon_transition = false;
             if (std::get<1>(*production_it).compare(0, (*terminals_it).length(), *terminals_it) == 0)
             {
                 // The current production rule matches the lookahead symbols
                 result.emplace(*terminals_it, std::get<1>(*production_it));
                 break;                                                  // TODO: wat if match occures multiple time? Increase dimension of the table?
+            }
+            if (std::get<1>(*production_it).compare(EPSILON) == 0)
+            {
+                epsilon_transition = true;
+            }
+            if (epsilon_transition and std::next(production_it) == CFGProductions.upper_bound(variable))
+            {
+                // The current production rule matches the lookahead symbols
+                result.emplace(*terminals_it, EPSILON);
+                break;                                                  
             }
         }   
     }
@@ -126,12 +149,10 @@ std::vector<SymbolString> LLTable::getTerminalCombinations(
         ss << *it;
         terminals.push_back(ss.str());
     }
-    terminals.push_back("\t"); // empty char
+    terminals.push_back(EOS); // empty char
 
     std::vector<SymbolString> result;
     enumerate(result, terminals, dimension);
-
-                                                                        // TODO: filter result, \t only as last element
 
     return result;
 }
@@ -148,8 +169,13 @@ void LLTable::enumerate(std::vector<SymbolString>& result, std::vector<SymbolStr
             SymbolString base = result.back();
             result.pop_back();
 
-            for (unsigned int k = 0; k < terminals.size(); k++) {
-                temp.push_back(base + terminals[k]);
+            if (base.back() == EOS.back()) {
+                temp.push_back(base + EOS);
+            }
+            else {
+                for (unsigned int k = 0; k < terminals.size(); k++) {
+                    temp.push_back(base + terminals[k]);
+                }
             }
         }
         for (unsigned int l = 0; l < temp.size(); l++)
@@ -160,4 +186,47 @@ void LLTable::enumerate(std::vector<SymbolString>& result, std::vector<SymbolStr
     if (result.back().length() == length) { return; }
 
     enumerate(result, terminals, length);
+}
+
+std::string LLTable::toString(const std::set<char>& CFGTerminals, const std::set<char>& CFGVariables) const {
+    std::stringstream stream;
+    const char H = '-';
+    const char V = '|';
+    const char C = '+';
+
+    std::vector<SymbolString> terminalCombinations = getTerminalCombinations(CFGTerminals, dimension);
+
+    // print heading
+    for (auto head = terminalCombinations.begin(); head != terminalCombinations.end(); head++) {
+        stream << '\t' << V << " " << *head;
+    }
+    unsigned int table_length = stream.str().length();
+
+    stream << std::endl << "-";
+    for (unsigned int i = 0; i < table_length; i += 5) {
+        stream << "-------+";
+    }
+    stream << "-------" << std::endl;
+
+    // print rows
+    for (auto variable = CFGVariables.begin(); variable != CFGVariables.end(); variable++) {
+        stream << *variable;
+
+        for (auto head = terminalCombinations.begin(); head != terminalCombinations.end(); head++) {
+            stream << '\t' << '|' << ' ';
+            try {
+                stream << get_transition(*variable, *head);
+            }
+            catch (const std::out_of_range& oor) {
+                stream << "error";
+            }
+        }
+        stream << std::endl;
+    }
+
+    return stream.str();
+}
+
+SymbolString LLTable::get_transition(char variable, SymbolString lookahead) const {
+    return (table.at(variable)).at(lookahead);
 }
