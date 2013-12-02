@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<TM>
+	<TapeAlphabet>
+		<symbol>a</symbol>
+	</TapeAlphabet>
+	<InputAlphabet>
+		<symbol>a</symbol>
+	</InputAlphabet>
+
+</TM>
