@@ -37,7 +37,8 @@ set(SRC
     src/CFG.cpp 
     src/CNF.cpp 
     src/PDA.cpp 
-    src/Turing.cpp 
+    src/Turing.cpp
+    src/LLParser.cpp
     src/TinyXML/tinyxml.cpp 
     src/TinyXML/tinyxmlparser.cpp 
     src/TinyXML/tinyxmlerror.cpp 
@@ -51,8 +52,16 @@ set(TESTSRC
     src/test_PDA.cpp)
 
 
+# Lists only Turing related files
+set (TURINGSRC
+    src/Turing.cpp
+    src/TinyXML/tinyxml.cpp 
+    src/TinyXML/tinyxmlparser.cpp 
+    src/TinyXML/tinyxmlerror.cpp 
+    src/TinyXML/tinystr.cpp)
+
 # Set flags
-set(CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++11")
 
 # Target to build all the tests
 add_executable(Tests ${TESTSRC} ${SRC})
@@ -60,5 +69,8 @@ add_executable(Tests ${TESTSRC} ${SRC})
 # Target to build the main program
 add_executable(RNAslv src/RNAslv.cpp ${SRC})
 
+# Target to build the Turing Machine manual test
+add_executable(RunTuring src/runTuringInput.cpp ${TURINGSRC})
+
 # Install all executables into the bin directory.
-install(TARGETS Tests RNAslv DESTINATION ${PROJECT_SOURCE_DIR}/bin)
+install(TARGETS Tests RNAslv RunTuring DESTINATION ${PROJECT_SOURCE_DIR}/bin)
