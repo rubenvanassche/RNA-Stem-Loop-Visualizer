@@ -1,5 +1,0 @@
-./RunTuring will print "String accepted" if the provided string belongs to the language described by the Turing Machine,and "String NOT accepted" if not.
-
-Note that TuringMachineInputExample.xml has to be copied to the /data/ directory in order to work!
-The TuringMachine in the example xml file is pretty pointless (it accepts all strings consisting of 0s and 1s) and is mainly meant to show the structure of a TM .xml file.
-You're supposed to edit it (or use TM1, TM2 or TM3 in /data/, see README for explanations) to properly test the Turing Machine.
