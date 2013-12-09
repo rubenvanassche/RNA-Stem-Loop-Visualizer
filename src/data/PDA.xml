@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<PDA>
+	<Type>Stack</Type>
+	<Alphabet>
+	    <symbol>0</symbol>
+	    <symbol>1</symbol>
+	</Alphabet>
+	<StackAlphabet>
+	    <symbol>0</symbol>
+        <symbol>1</symbol>
+        <symbol>X</symbol>
+        <symbol>Y</symbol>
+        <symbol>B</symbol>
+	</StackAlphabet>
+    <States>
+        <state>
+        	<name>Q0</name>
+        	<accepting>yes</accepting>
+        	<starting>no</starting>
+        </state>
+    </States>
+    <Transitions>
+            <transition>
+                    <from>Q0</from>
+                    <to>Q1</to>
+                    <input>0</input>
+                    <stacktop>X</stacktop>
+                    <push>R</push>
+            </transition>
+    </Transitions>
+</PDA>

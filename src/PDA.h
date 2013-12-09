@@ -34,6 +34,8 @@
 #include <stdexcept>
 #include <algorithm>
 #include <queue>
+#include "CFG.h"
+#include "TinyXML/tinyxml.h"
 
 /**
  * @brief Class representing a state from a PDA
@@ -88,7 +90,8 @@ private:
 enum PDAStackOperation{
     PUSH,
     POP,
-    STAY
+    STAY,
+    EMPTY
 };
 
 /**
@@ -245,6 +248,21 @@ public:
         const std::set<char>& alphabetStack, 
         const PDAFinal& PDAending
         );
+
+
+    /**
+    * @brief Constructor
+    *
+    * @param cfg A Context Free Grammar to be transformed to a PDA
+    */
+    PDA(CFG cfg);
+
+    /**
+     * @brief Constructor
+     *
+     * @param fileName A XML file containing info about the PDA
+     */
+    PDA(const std::string& fileName);
 
      /**
      * @brief Add a new state to the PDA
