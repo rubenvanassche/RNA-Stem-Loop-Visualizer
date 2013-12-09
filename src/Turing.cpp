@@ -360,7 +360,7 @@ bool TuringMachine::process(const std::string& input) const {
 TuringMachine::~TuringMachine() {}
 
 
-TuringMachine* generateTM(const std::string& fileName) {
+TuringPtr generateTM(const std::string& fileName) {
     TiXmlDocument doc;
     std::string path = DATADIR + fileName;
     if(!doc.LoadFile(path.c_str()))
@@ -436,7 +436,7 @@ TuringMachine* generateTM(const std::string& fileName) {
          throw std::runtime_error("Error generating TM from XML: Alphabet, tape alphabet or blank symbol missing!");
         return nullptr;
     }
-    TuringMachine* TM = new TuringMachine(alphabet, tapeAlphabet, blank);
+    TuringPtr TM(new TuringMachine(alphabet, tapeAlphabet, blank));
 
     for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()) {  //find  alphabets and blank symbol
         std::string elemName = elem->Value();

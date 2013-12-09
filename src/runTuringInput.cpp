@@ -6,7 +6,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Please provide the name of an xml file describing a turing machine as command line argument!" << std::endl;
         return 0;
     }
-    TuringMachine* TM;
+    TuringPtr TM;
 
     try {
         TM = generateTM(argv[1]);
