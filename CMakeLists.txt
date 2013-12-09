@@ -51,7 +51,6 @@ set(TESTSRC
     src/test_Turing.cpp
     src/test_PDA.cpp)
 
-
 # Lists only Turing related files
 set (TURINGSRC
     src/Turing.cpp
@@ -59,6 +58,16 @@ set (TURINGSRC
     src/TinyXML/tinyxmlparser.cpp 
     src/TinyXML/tinyxmlerror.cpp 
     src/TinyXML/tinystr.cpp)
+
+# Lists only CYK related files
+set(CYKSRC
+    src/CFG.cpp
+    src/CNF.cpp
+    src/TinyXML/tinyxml.cpp 
+    src/TinyXML/tinyxmlparser.cpp 
+    src/TinyXML/tinyxmlerror.cpp 
+    src/TinyXML/tinystr.cpp
+    )
 
 # Set flags
 set(CMAKE_CXX_FLAGS "-std=c++11")
@@ -72,5 +81,8 @@ add_executable(RNAslv src/RNAslv.cpp ${SRC})
 # Target to build the Turing Machine manual test
 add_executable(RunTuring src/runTuringInput.cpp ${TURINGSRC})
 
+# Target to build the CYK algorithm
+add_executable(RunCYK src/runCYK.cpp ${CYKSRC})
+
 # Install all executables into the bin directory.
-install(TARGETS Tests RNAslv RunTuring DESTINATION ${PROJECT_SOURCE_DIR}/bin)
+install(TARGETS Tests RNAslv RunTuring RunCYK DESTINATION ${PROJECT_SOURCE_DIR}/bin)
