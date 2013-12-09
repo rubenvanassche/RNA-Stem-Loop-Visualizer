@@ -1,0 +1,8 @@
+TuringMachine
+---------
+Input: 	Provide the name of a Turing Machine in .xml-format (including the ".xml") as a command line argument.
+		When prompted, enter an input string
+		Two Turing Machines in .xml format are provided as examples. 
+        TMInput1.xml shows the basic structure of the .xml file
+		TMInput2.xml is a fully functional TM using both storage in states and multitrack and accepts all strings wcw (w being any string consisting of 0s and 1s of at least length 1)
+Output: "String accepted" or "String not accepted" for every input string entered (or an exception)

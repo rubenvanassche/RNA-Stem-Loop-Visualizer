@@ -712,6 +712,8 @@ TEST_CASE("XML", "[TM]") {
         CHECK_FALSE(TM3->process(input3));
         input3 = "0c1";
         CHECK_FALSE(TM3->process(input3));
+        input3 = "c";
+        CHECK_FALSE(TM3->process(input3));
         try {
             input3 = "abc";
             REQUIRE_THROWS_AS(TM3->process(input3), std::runtime_error);
