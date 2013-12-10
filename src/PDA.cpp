@@ -493,10 +493,14 @@ PDA::PDA(const std::string& fileName){
                                 continue;
                             std::string t = text->Value();
                             if(t.size() != 1){
-                            	throw std::runtime_error("Error generating PDA from XML: input must be only one character by transition");
+                            	if(t == "epsilon"){
+                            		input = 0;
+                            	}else{
+                            		throw std::runtime_error("Error generating PDA from XML: input must be only one character by transition");
+                            	}
+                            }else{
+                            	input = t.at(0);
                             }
-
-                            input = t.at(0);
                         }
                         if (elemOfTransitionName == "stacktop") {
                             if (elemOfTransition->FirstChild() == NULL) {
@@ -508,9 +512,15 @@ PDA::PDA(const std::string& fileName){
                                 continue;
                             std::string t = text->Value();
                             if(t.size() != 1){
-								throw std::runtime_error("Error generating PDA from XML: input must be only one character by transition");
+                            	if(t == "Z0"){
+                            		stackTop = 9;
+                            	}else{
+                            		throw std::runtime_error("Error generating PDA from XML: input must be only one character by transition");
+                            	}
+							}else{
+								stackTop = t.at(0);
 							}
-                            stackTop = t.at(0);
+
                         }
                         if (elemOfTransitionName == "push") {
                             if (elemOfTransition->FirstChild() == NULL) {
