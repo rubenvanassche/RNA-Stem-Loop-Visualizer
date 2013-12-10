@@ -242,6 +242,33 @@ TEST_CASE("CFGPDA 1","[PDA]"){
 }
 
 TEST_CASE("CFGPDA 2","[PDA]"){
+    const std::set<char> terminals = {'x', 'y'};
+    const std::set<char> variables = {'P', 'Q', 'R'};
+
+    const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'P', "Q"},
+                                                        {'P', "R"},
+                                                        {'R', "xy"},
+                                                        {'R', "xQy"},
+                                                        {'R', "xyy"},
+                                                        {'R', "xRyy"},
+                                                        {'Q', "xy"},
+                                                        {'Q', "xQy"}
+                                                        };
+    CFG c0(terminals, variables, productions, 'P');
+    PDA pda(c0);
+
+    CHECK(pda.process("xy") == true);
+    CHECK(pda.process("xxyy") == true);
+    CHECK(pda.process("xxyyyy") == true);
+    CHECK(pda.process("xxxxy") == false);
+    CHECK(pda.process("xyyy") == false);
+    CHECK(pda.process("y") == false);
+    CHECK(pda.process("x") == false);
+}
+
+TEST_CASE("CFGPDA 3","[PDA]"){
     const std::set<char> terminals = {'0', '1'};
     const std::set<char> variables = {'A'};
 
@@ -254,15 +281,13 @@ TEST_CASE("CFGPDA 2","[PDA]"){
     CFG c0(terminals, variables, productions, 'A');
     PDA pda(c0);
 
-    /*
     CHECK(pda.process("001") == true);
     CHECK(pda.process("01") == false);
-    CHECK(pda.process("1") == false);
+    CHECK(pda.process("1") == true);
     CHECK(pda.process("011") == true);
     CHECK(pda.process("00111") == true);
-    */
+    CHECK(pda.process("000111") == false);
 }
-
 
 
 
