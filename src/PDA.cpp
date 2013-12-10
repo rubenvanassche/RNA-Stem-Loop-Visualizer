@@ -780,7 +780,7 @@ bool PDA::process(std::string input){
 
 	// the first thing we do is adding all the ID's we get with the first input symbol from the start state
 	std::vector<PDATransition> selectedTransitions = this->getTransitions(input, this->fStack.top(), this->fStartState);
-	std::cout << "Selected Transitions size " << selectedTransitions.size() << std::endl;
+	//std::cout << "Selected Transitions size " << selectedTransitions.size() << std::endl;
 	// add the initial ID's
 	for(auto transitionsIt = selectedTransitions.begin();transitionsIt != selectedTransitions.end();transitionsIt++){
 		// Determine the remaining input for the new id
@@ -799,7 +799,7 @@ bool PDA::process(std::string input){
 
 		// If the id is already accepted we can stop here
 		if(newID.isAccepted(this->fPDAtype) == true){
-			std::cout << "Final in first stage with " << newID << std::endl;
+			//std::cout << "Final in first stage with " << newID << std::endl;
 			return true;
 		}
 
@@ -816,7 +816,7 @@ bool PDA::process(std::string input){
 			}else if(this->fPDAtype == STATE){
 				// No input so this one is also accepting if:
 				if(this->fStartState->isFinal()){
-					std::cout << "Final due to a empty string and no transitions from the start state" <<std::endl;
+					//std::cout << "Final due to a empty string and no transitions from the start state" <<std::endl;
 					return true;
 				}
 			}
@@ -827,7 +827,7 @@ bool PDA::process(std::string input){
 	selectedTransitions.clear();
 
 
-	std::cout << "ids size " << ids.size() <<std::endl;
+	//std::cout << "ids size " << ids.size() <<std::endl;
 
 	// That's done now start using these id's to find a succesfull path
 	while(ids.size() > 0){
@@ -839,16 +839,16 @@ bool PDA::process(std::string input){
 
 		// get the transitions corresponding with the character and the top of the stack
 		selectedTransitions = this->getTransitions(ids.front().getInput(), ids.front().getStack().top(), ids.front().getState());
-		std::cout << selectedTransitions.size() <<  "Transitions found for " << ids.front() <<std::endl;
+		//std::cout << selectedTransitions.size() <<  "Transitions found for " << ids.front() <<std::endl;
 
 		if(selectedTransitions.size() == 0){
 			// there are no transition possible anymore so remove this ID
-			std::cout << "Remove ID:" << ids.front() << std::endl;
+			//std::cout << "Remove ID:" << ids.front() << std::endl;
 			ids.pop();
 		}else{
 			// there are multiple transitions possible so also multiple ID's
 
-			std::cout << "Change ID:" << ids.front() << std::endl;
+			//std::cout << "Change ID:" << ids.front() << std::endl;
 
 			// Now we're gonna add new ID's for each transition
 			for(auto transitionsIt = selectedTransitions.begin();transitionsIt != selectedTransitions.end();transitionsIt++){
@@ -879,7 +879,7 @@ bool PDA::process(std::string input){
 
 				// Add the new ID
 				ids.push(newID);
-				std::cout << "   for: " << newID << std::endl;
+				//std::cout << "   for: " << newID << std::endl;
 			}
 
 			// Remove the current ID so we won't process it again
