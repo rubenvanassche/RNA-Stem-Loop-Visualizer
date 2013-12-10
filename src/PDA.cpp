@@ -767,7 +767,13 @@ bool PDA::process(std::string input){
 	std::queue<PDAID> ids;
 
 	// the first thing we do is adding all the ID's we get with the first input symbol from the start state
-	std::vector<PDATransition> selectedTransitions = this->getTransitions(input, this->fStack.top(), this->fStartState);
+	char stackTop;
+	if(this->fStack.size() == 0){
+		stackTop = 9;
+	}else{
+		stackTop = this->fStack.top();
+	}
+	std::vector<PDATransition> selectedTransitions = this->getTransitions(input, stackTop, this->fStartState);
 	//std::cout << "Selected Transitions size " << selectedTransitions.size() << std::endl;
 	for(auto transitionsIt = selectedTransitions.begin();transitionsIt != selectedTransitions.end();transitionsIt++){
 		// add the initial ID's
