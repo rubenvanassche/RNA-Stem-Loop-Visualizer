@@ -99,7 +99,9 @@ void PDATransition::stackOperation(std::stack<char>& in){
 		}
 
 		if(in.top() == this->fTopStack){
-			in.pop();
+			if( this->fTopStack != 9){
+				in.pop();
+			}
 		}else{
 			throw std::runtime_error("Try to pop an element which is not at the top of the stack according to the transition info");
 		}
@@ -110,7 +112,9 @@ void PDATransition::stackOperation(std::stack<char>& in){
 		}
 
 		if(in.top() == this->fTopStack){
-			in.pop();
+			if( this->fTopStack != 9){
+				in.pop();
+			}
 			for(auto pushStackIt = this->fPushStack.begin(); pushStackIt != this->fPushStack.end();pushStackIt++){
 				in.push(*pushStackIt);
 			}
@@ -199,7 +203,7 @@ bool PDAID::isAccepted(PDAFinal pdaType){
 			accepted = true;
 		}else if(pdaType == STACK and this->fStack.size() == 1 and this->fStack.top() == 9){
 			// PDA is stack ending
-						accepted = true;
+			accepted = true;
 		}
 	}
 
@@ -273,6 +277,9 @@ PDA::PDA(CFG cfg){
 		for(auto it2 = it->second.begin();it2 != it->second.end();it2++){
 			push.push_back(*it2);
 		}
+
+		// reverse push vector for correct stack use
+		std::reverse(push.begin(), push.end());
 
 		PDATransition transition(from, to, input, stacktop, operation, push);
 		this->addTransition(transition);
@@ -384,6 +391,9 @@ PDA::PDA(const std::string& fileName){
     this->fAlphabet = alphabet;
     this->fStackAlphabet = stackAlphabet;
     this->fPDAtype = type;
+
+    // push a Z0 symbol to the stack
+    this->fStack.push(9);
 
     std::list<PDAState> states;
 
@@ -769,118 +779,114 @@ bool PDA::process(std::string input){
 	std::queue<PDAID> ids;
 
 	// the first thing we do is adding all the ID's we get with the first input symbol from the start state
-	char stackTop;
-	if(this->fStack.size() == 0){
-		stackTop = 9;
-	}else{
-		stackTop = this->fStack.top();
-	}
-	std::vector<PDATransition> selectedTransitions = this->getTransitions(input, stackTop, this->fStartState);
-	//std::cout << "Selected Transitions size " << selectedTransitions.size() << std::endl;
+	std::vector<PDATransition> selectedTransitions = this->getTransitions(input, this->fStack.top(), this->fStartState);
+	std::cout << "Selected Transitions size " << selectedTransitions.size() << std::endl;
+	// add the initial ID's
 	for(auto transitionsIt = selectedTransitions.begin();transitionsIt != selectedTransitions.end();transitionsIt++){
-		// add the initial ID's
+		// Determine the remaining input for the new id
 		std::string newInput = input;
 		if(transitionsIt->getInputSymbol() != 0){
 			// If the input symbol is not zero we need to remove a character from the input string
 			newInput.erase(0, 1);
 		}
 
+		// Determine the remaining stack for the new id
 		std::stack<char> tempStack = this->fStack;
 		transitionsIt->stackOperation(tempStack);
 
+		// Make id
 		PDAID newID(newInput, transitionsIt->getTo(), tempStack);
 
+		// If the id is already accepted we can stop here
 		if(newID.isAccepted(this->fPDAtype) == true){
-			//std::cout << "Final in first stage with " << newID << std::endl;
-			// YES, we're final!
+			std::cout << "Final in first stage with " << newID << std::endl;
 			return true;
 		}
 
 		ids.push(newID);
 	}
 
-	selectedTransitions.clear();
 
+	// If there are no transitions found starting from the start state but maybe the start state is already accepting
 	if(selectedTransitions.size() == 0){
-		// There are no transitions found starting from the start state but maybe the start state is already accepting
 		if(input.size() == 0){
 			if(this->fPDAtype == STACK){
 				// No states to go to anymore so it's final!
 				return true;
-			}else{
+			}else if(this->fPDAtype == STATE){
 				// No input so this one is also accepting if:
 				if(this->fStartState->isFinal()){
-					//std::cout << "Final due to a empty string and no transitions from the start state" <<std::endl;
-					// Start state is final
+					std::cout << "Final due to a empty string and no transitions from the start state" <<std::endl;
 					return true;
 				}
 			}
 		}
 	}
 
-	//std::cout << "ids size " << ids.size() <<std::endl;
+	// Clean the vector so we can use it elsewhere
+	selectedTransitions.clear();
+
+
+	std::cout << "ids size " << ids.size() <<std::endl;
 
 	// That's done now start using these id's to find a succesfull path
 	while(ids.size() > 0){
-		// Now let's check if we are already dead, final or something else
+		// Now let's check if we are already accepted
 		if(ids.front().isAccepted(this->fPDAtype) == true){
 			// YES, we're final!
 			return true;
 		}
 
-
 		// get the transitions corresponding with the character and the top of the stack
-		char stackTopSymbol = 9;
-		if(ids.front().getStack().size() != 0){
-			stackTopSymbol = ids.front().getStack().top();
-		}
-
-		selectedTransitions = this->getTransitions(ids.front().getInput(), stackTopSymbol, ids.front().getState());
-		//std::cout << selectedTransitions.size() <<  "Transitions found for " << ids.front() <<std::endl;
+		selectedTransitions = this->getTransitions(ids.front().getInput(), ids.front().getStack().top(), ids.front().getState());
+		std::cout << selectedTransitions.size() <<  "Transitions found for " << ids.front() <<std::endl;
 
 		if(selectedTransitions.size() == 0){
 			// there are no transition possible anymore so remove this ID
-			//std::cout << "Remove ID:" << ids.front() << std::endl;
+			std::cout << "Remove ID:" << ids.front() << std::endl;
 			ids.pop();
 		}else{
 			// there are multiple transitions possible so also multiple ID's
-			// Get the essential data from the current ID
-			std::stack<char> tempStack(ids.front().getStack());
 
-			//std::cout << "Change ID:" << ids.front() << std::endl;
+			std::cout << "Change ID:" << ids.front() << std::endl;
 
 			// Now we're gonna add new ID's for each transition
 			for(auto transitionsIt = selectedTransitions.begin();transitionsIt != selectedTransitions.end();transitionsIt++){
+				// Determine new input
 				std::string newInput = ids.front().getInput();
 				if(transitionsIt->getInputSymbol() != 0){
 					// If the input symbol is not zero we need to remove a character from the input string
 					newInput.erase(0, 1);
 				}
-				std::stack<char> newStack(tempStack);
+
+				// Determine new stack
+				std::stack<char> newStack(ids.front().getStack());
 				transitionsIt->stackOperation(newStack);
 
+				// Make new ID
 				PDAID newID(newInput, transitionsIt->getTo(), newStack);
 
-				// check whether we are final or death
+				// check whether we are accepted
 				if(newID.isAccepted(this->fPDAtype) == true){
 					// YES, we're final!
 					return true;
 				}
 
-				// We're not death of final yet so add the ID
+				// We're not going to add endless id's when we're building based upon a cfg
 				if(this->fBasedUponCFG == true and newID.getStack().size() > newID.getInput().size() + 5){
-					// We're not going to add endless id's with the same production e.g. A->AA from a CFG, if the stack size > input size we stop
 					continue;
 				}
 
+				// Add the new ID
 				ids.push(newID);
-				//std::cout << "   for: " << newID << std::endl;
+				std::cout << "   for: " << newID << std::endl;
 			}
 
-			// Remove the current ID
+			// Remove the current ID so we won't process it again
 			ids.pop();
 		}
 
+		// clean the vector for the next turn
 		selectedTransitions.clear();
 	}
 
