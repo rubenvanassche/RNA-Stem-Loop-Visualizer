@@ -255,7 +255,7 @@ public:
     *
     * @param cfg A Context Free Grammar to be transformed to a PDA
     */
-    PDA(PDACFG *cfg);
+    PDA(CFG cfg);
 
     /**
      * @brief Constructor

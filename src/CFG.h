@@ -162,6 +162,34 @@ public:
      */
     void cleanUp();
 
+    /*
+     * @brief Get the terminals of the CFG.
+     */
+    std::set<char> getTerminals(){
+    	return this->fTerminals;
+    }
+
+    /*
+	* @brief Get the variables of the CFG.
+	*/
+	std::set<char> getVariables(){
+		return this->fVariables;
+	}
+
+	 /*
+	 * @brief Get the productions of the CFG.
+	 */
+	std::multimap<char, SymbolString> getProductions(){
+		return this->fProductions;
+	}
+
+	 /*
+	 * @brief Get the start symbol of the CFG.
+	 */
+	char getStartsymbol(){
+		return this->fStartSymbol;
+	}
+
 protected:
     /**
      * @brief The set of terminal symbols.

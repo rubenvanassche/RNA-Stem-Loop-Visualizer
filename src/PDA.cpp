@@ -228,12 +228,65 @@ PDA::PDA(const std::set<char>& alphabetPDA, const std::set<char>& alphabetStack,
 }
 
 PDA::PDA(CFG cfg){
+	std::set<char> terminals = cfg.getTerminals();
+	std::set<char> variables = cfg.getVariables();
+	std::multimap<char, SymbolString> productions = cfg.getProductions();
+	char startSymbol = cfg.getStartsymbol();
+
 	// First add a state q;
 	PDAState q("q");
 	this->addState(q, true);
 
 	// Add the alphabet
-	//cfg.
+	this->fAlphabet = terminals;
+
+	// Add the stack alphabet
+	this->fStackAlphabet = terminals;
+	this->fStackAlphabet.insert(variables.begin(), variables.end());
+
+	// Set the type of PDA
+	this->fPDAtype = STACK;
+
+	// Add initial z0 to the stack
+	this->fStack.push(9);
+
+	// Add the productions based upon variables
+	for(auto it = productions.begin();it != productions.end();it++){
+		PDAState* from = &q;
+		PDAState* to = &q;
+		char input = 0;
+		char stacktop;
+		if(it->first != startSymbol){
+			stacktop = it->first;
+		}else{
+			stacktop = 9;
+		}
+		PDAStackOperation operation = PUSH;
+		std::vector<char> push;
+		for(auto it2 = it->second.begin();it2 != it->second.end();it2++){
+			if(*it2 != startSymbol){
+				push.push_back(*it2);
+			}else{
+				push.push_back(9);
+			}
+		}
+
+		PDATransition transition(from, to, input, stacktop, operation, push);
+		this->addTransition(transition);
+	}
+
+	// add the productions based upon terminals
+	for(auto it = terminals.begin();it != terminals.end();it++){
+		PDAState* from = &q;
+		PDAState* to = &q;
+		char input = *it;
+		char stacktop = *it;
+		PDAStackOperation operation = POP;
+
+		PDATransition transition(from, to, input, stacktop, operation);
+		this->addTransition(transition);
+	}
+
 }
 
 

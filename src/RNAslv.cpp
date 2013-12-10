@@ -20,9 +20,18 @@
  * By: Stijn Wouters
  */
 #include "PDA.h"
+#include "CFG.h"
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-	PDA Q("src/data/PDA.xml");
-	std::cout << Q << std::endl;
+	  const std::set<char> terminals = {'a', 'b'};
+	    const std::set<char> variables = {'A', 'B'};
+	    const std::multimap<char, SymbolString> all_nullable = {
+	                                                        {'A', "AB"},
+	                                                        {'A', ""},
+	                                                        {'B', ""}
+	                                                        };
+	    const CFG c0(terminals, variables, all_nullable , 'A');
+	    PDA pda(c0);
+	    std::cout << pda << std::endl;
 }
