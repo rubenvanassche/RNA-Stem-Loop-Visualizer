@@ -16,20 +16,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 15 November 2013
+ * Last modified: 2 December 2013
  * By: Pieter Lauwers
  */
 
 #ifndef LLPARSER_H
 #define LLPARSER_H
 
+#include "CFG.h"
 #include <stack>
-#include "GFG.h"   
+#include <vector>
+#include <iostream>   
+
+/**
+ * @brief Symbol for representing the end of string.
+ */
+const std::string EOS = " ";
+
+/**
+ * @brief Symbol for representing epsilon.
+ */
+const std::string EPSILON = "e";
 
 /**
  * @brief Class representing an LL Parse Table
  */
-
 class LLTable {
 public:
      /**
@@ -37,7 +48,7 @@ public:
      *
      * @param CFGTerminals A set containing the terminals of the CFG
      * @param CFGVariables A set containing the variables of the CFG
-     * @param CFGProductions A multimap that maps a symbol to an symbolString
+     * @param CFGProductions A multimap that maps a variable to an symbolString
      * @param dimension The dimension of the table, thus the size of the lookahead (k)
      *
      * @exception invalid_argument Throws this exception when the Table can't be contructed
@@ -46,7 +57,7 @@ public:
         const std::set<char>& CFGTerminals,            
         const std::set<char>& CFGVariables,
         const std::multimap<char, SymbolString>& CFGProductions, 
-        unsigned int dimension
+        const unsigned int dimension
         );
 
     /**
@@ -59,7 +70,7 @@ public:
      */
     LLTable(
         const CFG& grammar, 
-        unsigned int dimension
+        const unsigned int dimension
         );
 
     /**
@@ -74,25 +85,107 @@ public:
      *
      * @return The right side of the used production rule.
      */
-    SymbolString process(const char& topStack, const SymbolString& remainingInput);
+    SymbolString process(const char& topStack, const SymbolString& remainingInput) const;
+
+    /**
+     * @brief Destructor
+     */
+    virtual ~LLTable();
+
+    /**
+     * @brief Enumerates all possible combinations of the given terminals 
+     *
+     * @param result Container for all combinations
+     * @param terminals All terminals that can be used in a combination
+     * @param length The desired length of the combinations
+     */
+    static void enumerate(std::vector<SymbolString>& result, std::vector<SymbolString>& terminals, unsigned int length);
+
+    /**
+     * @brief Returns a string representation of the parse table.
+     *
+     * @param CFGTerminals A set containing the terminals of the CFG
+     * @param CFGVariables A set containing the variables of the CFG
+     *
+     * @return String representation.
+     */
+    std::string toString(const std::set<char>& CFGTerminals, const std::set<char>& CFGVariables) const;
 
 private:
+    /**
+     * @brief Generates the parse table.
+     *
+     * @param CFGTerminals A set containing the terminals of the CFG
+     * @param CFGVariables A set containing the variables of the CFG
+     * @param CFGProductions A multimap that maps a variable to an symbolString
+     * @param dimension The dimension of the table, thus the size of the lookahead (k)
+     *
+     * @return The generated parse table.
+     */
+    static std::map<char, std::map<SymbolString, SymbolString> > generateTable(
+        const std::set<char>& CFGTerminals,            
+        const std::set<char>& CFGVariables,
+        const std::multimap<char, SymbolString>& CFGProductions, 
+        const unsigned int dimension
+        );
+
+    /**
+     * @brief Generates a row for the parse table with the given variable as head of the row.
+     *
+     * @param variable The variable for this row
+     * @param terminalCombinations A vector with all combinations of the terminals of the CFG
+     * @param CFGProductions A multimap that maps a variable to an symbolString
+     *
+     * @return The generated row.
+     */
+    static std::map<SymbolString, SymbolString> generateRow(
+        const char variable,
+        const std::vector<SymbolString>& terminalCombinations,           
+        const std::multimap<char, SymbolString>& CFGProductions 
+        );
+
+    /**
+     * @brief Generates a vector with all combinations of the given terminals.
+     *        The string length is determined by the given dimension.
+     *
+     * @param CFGTerminals A set containing the terminals of the CFG
+     * @param dimension The dimension of the table, thus the size of the lookahead (k)
+     *
+     * @return A vector with the combinations of terminals.
+     */
+    static std::vector<SymbolString> getTerminalCombinations(
+        const std::set<char>& CFGTerminals,
+        const unsigned int dimension
+        );
+
+    /**
+     * @brief Returns the right side of the transition that has to be used.
+     *
+     * @param variable The variable at the left side of the transition
+     * @param lookahead The lookahead symbols
+     *
+     * @return A vector with the combinations of terminals.
+     */
+    SymbolString get_transition(char variable, SymbolString lookahead) const;
+
     const unsigned int dimension;
 
     /**
     * Representation of the Parse Table by a map.
-    * Key:   left side of the production rule (variable) + lookahead symbols (terminals)
+    * Key 1: left side of the production rule (variable)
+    * Key 2: lookahead symbols (terminals)
     * Value: right side of the production rule
     *
     * If the wanted key doesn't occur this means 'error'. 
     */
-    std::map<SymbolString, SymbolString> table;
+    const std::map<char, std::map<SymbolString, SymbolString> > table;
 };
+
+
 
 /**
  * @brief Class representing an LL Parser
  */
-
 class LLParser {
 public:
      /**
@@ -100,7 +193,7 @@ public:
      *
      * @param CFGTerminals A set containing the terminals of the CFG
      * @param CFGVariables A set containing the variables of the CFG
-     * @param CFGProductions A multimap that maps a symbol to an symbolString
+     * @param CFGProductions A multimap that maps a variable to an symbolString
      * @param CFGStartsymbol The startsymbol for the CFG
      * @param lookahead The size of the lookahead (k)
      *
@@ -111,7 +204,7 @@ public:
         const std::set<char>& CFGVariables,
         const std::multimap<char, SymbolString>& CFGProductions, 
         const char& CFGStartsymbol,
-        unsigned int lookahead
+        const unsigned int lookahead
         );
 
     /**
@@ -124,7 +217,7 @@ public:
      */
     LLParser(
         const CFG& grammar, 
-        unsigned int lookahead
+        const unsigned int lookahead
         );
 
     /**
@@ -134,16 +227,28 @@ public:
      *
      * @return A bool telling if the Parser accepted
      */
-    bool process(std::string& input);
+    bool process(const std::string& input) const;
 
     /**
      * @brief Destructor
      */
     virtual ~LLParser();
 
+    /**
+     * @brief Prints the parse table to the given output stream.
+     *
+     * @param stream The output stream
+     * @param obj The parser
+     *
+     * @return The output stream.
+     */
+    friend std::ostream& operator<<(std::ostream& stream, const LLParser& obj);
+
 private:
     const char startsymbol;
     const LLTable parseTable;
+    const std::set<char> CFGTerminals;
+    const std::set<char> CFGVariables;
 };
 
 #endif /*LLPARSER_H*/

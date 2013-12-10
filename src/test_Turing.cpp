@@ -19,13 +19,11 @@
  * By: Jakob Struye
  */
 
-//#define CATCH_CONFIG_MAIN
 #include "Catch.h"
 #include "Turing.h"
 #include <set>
 #include <vector>
 #include <stdexcept>
-
 
 
 TEST_CASE("TM States", "[TMState]") {
@@ -180,83 +178,83 @@ TEST_CASE("TM Tape", "[Tape]") {
         Tape TMT1(str1, 'B', 1);
         Tape TMT2(str2, 'C', 2);
         Tape TMT3 (str3, 'D', 10);
-        REQUIRE(TMT1.getSymbolAtHead() == cell1a);
-        REQUIRE(TMT1.getSymbolAtHead() != cell1d);
-        TMT1.replaceSymbolAtHead(cell1d);
+        REQUIRE(TMT1.getSymbolsAtHead() == cell1a);
+        REQUIRE(TMT1.getSymbolsAtHead() != cell1d);
+        TMT1.replaceSymbolsAtHead(cell1d);
         TMT1.moveHead(L);
-        REQUIRE(TMT1.getSymbolAtHead() == cell1e);
-        REQUIRE(TMT1.getSymbolAtHead() != cell1a);
+        REQUIRE(TMT1.getSymbolsAtHead() == cell1e);
+        REQUIRE(TMT1.getSymbolsAtHead() != cell1a);
         TMT1.moveHead(R);
         TMT1.moveHead(R);
-        REQUIRE(TMT1.getSymbolAtHead() == cell1b);
-        REQUIRE(TMT1.getSymbolAtHead() != cell1c);
-        TMT1.replaceSymbolAtHead(cell1c);
+        REQUIRE(TMT1.getSymbolsAtHead() == cell1b);
+        REQUIRE(TMT1.getSymbolsAtHead() != cell1c);
+        TMT1.replaceSymbolsAtHead(cell1c);
         TMT1.moveHead(R);
-        REQUIRE(TMT1.getSymbolAtHead() == cell1c);
-        REQUIRE(TMT1.getSymbolAtHead() != cell1b);
-        TMT1.replaceSymbolAtHead(cell1b);
+        REQUIRE(TMT1.getSymbolsAtHead() == cell1c);
+        REQUIRE(TMT1.getSymbolsAtHead() != cell1b);
+        TMT1.replaceSymbolsAtHead(cell1b);
         TMT1.moveHead(R);
-        REQUIRE(TMT1.getSymbolAtHead() == cell1d);
-        REQUIRE(TMT1.getSymbolAtHead() != cell1a);
-        TMT1.replaceSymbolAtHead(cell1a);
-        REQUIRE(TMT1.getSymbolAtHead() == cell1a);
-        REQUIRE(TMT1.getSymbolAtHead() != cell1d);
+        REQUIRE(TMT1.getSymbolsAtHead() == cell1d);
+        REQUIRE(TMT1.getSymbolsAtHead() != cell1a);
+        TMT1.replaceSymbolsAtHead(cell1a);
+        REQUIRE(TMT1.getSymbolsAtHead() == cell1a);
+        REQUIRE(TMT1.getSymbolsAtHead() != cell1d);
         TMT1.moveHead(L);
-        REQUIRE(TMT1.getSymbolAtHead() == cell1b);
-        REQUIRE(TMT1.getSymbolAtHead() != cell1c);
+        REQUIRE(TMT1.getSymbolsAtHead() == cell1b);
+        REQUIRE(TMT1.getSymbolsAtHead() != cell1c);
         TMT1.moveHead(L);
-        REQUIRE(TMT1.getSymbolAtHead() == cell1c);
-        REQUIRE(TMT1.getSymbolAtHead() != cell1b);
+        REQUIRE(TMT1.getSymbolsAtHead() == cell1c);
+        REQUIRE(TMT1.getSymbolsAtHead() != cell1b);
         TMT1.moveHead(L);
-        REQUIRE(TMT1.getSymbolAtHead() == cell1d);
-        REQUIRE(TMT1.getSymbolAtHead() != cell1a);
+        REQUIRE(TMT1.getSymbolsAtHead() == cell1d);
+        REQUIRE(TMT1.getSymbolsAtHead() != cell1a);
 
-        REQUIRE(TMT2.getSymbolAtHead() == cell2a);
-        REQUIRE(TMT2.getSymbolAtHead() != cell2e);
-        TMT2.replaceSymbolAtHead(cell2e);
+        REQUIRE(TMT2.getSymbolsAtHead() == cell2a);
+        REQUIRE(TMT2.getSymbolsAtHead() != cell2e);
+        TMT2.replaceSymbolsAtHead(cell2e);
         TMT2.moveHead(R);
-        REQUIRE(TMT2.getSymbolAtHead() == cell2b);
-        REQUIRE(TMT2.getSymbolAtHead() != cell2e);
-        TMT2.replaceSymbolAtHead(cell2e);
+        REQUIRE(TMT2.getSymbolsAtHead() == cell2b);
+        REQUIRE(TMT2.getSymbolsAtHead() != cell2e);
+        TMT2.replaceSymbolsAtHead(cell2e);
         TMT2.moveHead(R);
-        REQUIRE(TMT2.getSymbolAtHead() == cell2c);
-        REQUIRE(TMT2.getSymbolAtHead() != cell2f);
-        TMT2.replaceSymbolAtHead(cell2f);
+        REQUIRE(TMT2.getSymbolsAtHead() == cell2c);
+        REQUIRE(TMT2.getSymbolsAtHead() != cell2f);
+        TMT2.replaceSymbolsAtHead(cell2f);
         TMT2.moveHead(R);
-        REQUIRE(TMT2.getSymbolAtHead() == cell2d);
-        REQUIRE(TMT2.getSymbolAtHead() != cell2e);
+        REQUIRE(TMT2.getSymbolsAtHead() == cell2d);
+        REQUIRE(TMT2.getSymbolsAtHead() != cell2e);
         TMT2.moveHead(L);
-        REQUIRE(TMT2.getSymbolAtHead() == cell2f);
-        REQUIRE(TMT2.getSymbolAtHead() != cell2c);
+        REQUIRE(TMT2.getSymbolsAtHead() == cell2f);
+        REQUIRE(TMT2.getSymbolsAtHead() != cell2c);
         TMT2.moveHead(L);
-        REQUIRE(TMT2.getSymbolAtHead() == cell2e);
-        REQUIRE(TMT2.getSymbolAtHead() != cell2b);
+        REQUIRE(TMT2.getSymbolsAtHead() == cell2e);
+        REQUIRE(TMT2.getSymbolsAtHead() != cell2b);
         TMT2.moveHead(L);
-        REQUIRE(TMT2.getSymbolAtHead() == cell2e);
-        REQUIRE(TMT2.getSymbolAtHead() != cell2a);
+        REQUIRE(TMT2.getSymbolsAtHead() == cell2e);
+        REQUIRE(TMT2.getSymbolsAtHead() != cell2a);
 
-        REQUIRE(TMT3.getSymbolAtHead() == cell3a);
-        REQUIRE(TMT3.getSymbolAtHead() != cell3e);
-        TMT3.replaceSymbolAtHead(cell3e);
+        REQUIRE(TMT3.getSymbolsAtHead() == cell3a);
+        REQUIRE(TMT3.getSymbolsAtHead() != cell3e);
+        TMT3.replaceSymbolsAtHead(cell3e);
         TMT3.moveHead(R);
-        REQUIRE(TMT3.getSymbolAtHead() == cell3b);
-        REQUIRE(TMT3.getSymbolAtHead() != cell3e);
-        TMT3.replaceSymbolAtHead(cell3e);
+        REQUIRE(TMT3.getSymbolsAtHead() == cell3b);
+        REQUIRE(TMT3.getSymbolsAtHead() != cell3e);
+        TMT3.replaceSymbolsAtHead(cell3e);
         TMT3.moveHead(R);
-        REQUIRE(TMT3.getSymbolAtHead() == cell3c);
-        REQUIRE(TMT3.getSymbolAtHead() != cell3e);
-        TMT3.replaceSymbolAtHead(cell3e);
+        REQUIRE(TMT3.getSymbolsAtHead() == cell3c);
+        REQUIRE(TMT3.getSymbolsAtHead() != cell3e);
+        TMT3.replaceSymbolsAtHead(cell3e);
         TMT3.moveHead(R);
-        REQUIRE(TMT3.getSymbolAtHead() == cell3d);
-        REQUIRE(TMT3.getSymbolAtHead() != cell3e);
+        REQUIRE(TMT3.getSymbolsAtHead() == cell3d);
+        REQUIRE(TMT3.getSymbolsAtHead() != cell3e);
         TMT3.moveHead(L);
-        REQUIRE(TMT3.getSymbolAtHead() == cell3e);
+        REQUIRE(TMT3.getSymbolsAtHead() == cell3e);
         TMT3.moveHead(L);
-        REQUIRE(TMT3.getSymbolAtHead() == cell3e);
+        REQUIRE(TMT3.getSymbolsAtHead() == cell3e);
         TMT3.moveHead(L);
-        REQUIRE(TMT3.getSymbolAtHead() == cell3e);
+        REQUIRE(TMT3.getSymbolsAtHead() == cell3e);
         TMT3.moveHead(L);
-        REQUIRE(TMT3.getSymbolAtHead() == cell3d);
+        REQUIRE(TMT3.getSymbolsAtHead() == cell3d);
     }
     catch(...) {
     }
@@ -280,18 +278,18 @@ TEST_CASE("TM ID", "[TMID]") {
     std::pair<StatePtr, std::vector<char>> out6(TS4, IDvec5);
     try {
         TMID ID1(str1, TS1, 'B', 1);
-        REQUIRE(ID1.getStateAndSymbol() == out1);
+        REQUIRE(ID1.getStateAndSymbols() == out1);
         ID1.step(TS2, IDvec3, R);
-        REQUIRE(ID1.getStateAndSymbol() == out2);
+        REQUIRE(ID1.getStateAndSymbols() == out2);
         ID1.step(TS3, IDvec4, R);
-        REQUIRE(ID1.getStateAndSymbol() == out3);
+        REQUIRE(ID1.getStateAndSymbols() == out3);
         ID1.step(TS4, IDvec5, R);
         ID1.step(TS4, IDvec5, L);
-        REQUIRE(ID1.getStateAndSymbol() == out6);
+        REQUIRE(ID1.getStateAndSymbols() == out6);
         ID1.step(TS5, IDvec5, L);
-        REQUIRE(ID1.getStateAndSymbol() == out5);
+        REQUIRE(ID1.getStateAndSymbols() == out5);
         ID1.step(TS1, IDvec5, L);
-        REQUIRE(ID1.getStateAndSymbol() == out4);
+        REQUIRE(ID1.getStateAndSymbols() == out4);
     }
     catch(...) {
 
@@ -319,7 +317,7 @@ TEST_CASE("TM Construction", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "Blank symbol not in tape alphabet. Blank symbol set to 'B' and added to tape alphabet if necessary. Correct behaviour of this TM no longer guaranteed.");
+        REQUIRE(error == "Error in TuringMachine constructor: Blank symbol not in tape alphabet. Blank symbol set to 'B' and added to tape alphabet if necessary. Correct behaviour of this TM no longer guaranteed.");
     }
     try {
         REQUIRE_THROWS(TuringMachine TM4(alphabetT, alphabet, 'B'));
@@ -327,7 +325,7 @@ TEST_CASE("TM Construction", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "Blank symbol not in tape alphabet. Blank symbol set to 'B' and added to tape alphabet if necessary. Correct behaviour of this TM no longer guaranteed.");
+        REQUIRE(error == "Error in TuringMachine constructor: Blank symbol not in tape alphabet. Blank symbol set to 'B' and added to tape alphabet if necessary. Correct behaviour of this TM no longer guaranteed.");
     }
 }
 
@@ -372,7 +370,7 @@ TEST_CASE("State Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Name is not unique!");
+                REQUIRE(error == "Error adding state: Name is not unique!");
             }
         }
         SECTION ("Throw 2") {
@@ -382,7 +380,7 @@ TEST_CASE("State Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Trying to create second start state!");
+                REQUIRE(error == "Error adding state: Trying to create second start state!");
             }
         }
     }
@@ -396,7 +394,7 @@ TEST_CASE("State Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Name + storage is not unique!");
+                REQUIRE(error == "Error adding state: Name + storage is not unique!");
             }
         }
         SECTION("Throw 2") {
@@ -407,7 +405,7 @@ TEST_CASE("State Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "All storages should have same size!");
+                REQUIRE(error == "Error adding state: All storages should have same size!");
             }
         }
         SECTION("Throw 3") {
@@ -417,7 +415,7 @@ TEST_CASE("State Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "All storages should have same size!");
+                REQUIRE(error == "Error adding state: All storages should have same size!");
             }
         }
         SECTION("Throw 4") {
@@ -427,7 +425,7 @@ TEST_CASE("State Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "All storages should have same size!");
+                REQUIRE(error == "Error adding state: All storages should have same size!");
             }
         }
     }
@@ -476,7 +474,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Transition not unique!");
+                REQUIRE(error == "Error adding transition: Transition not unique!");
             }
 
         }
@@ -487,7 +485,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "From state not in set of states!");
+                REQUIRE(error == "Error adding transition: From state not in set of states!");
             }
         }
 
@@ -498,7 +496,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "To state not in set of states!");
+                REQUIRE(error == "Error adding transition: To state not in set of states!");
             }
         }
         SECTION("Throw 4") {
@@ -508,7 +506,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Symbol to be read not in tape alphabet!");
+                REQUIRE(error == "Error adding transition: Symbol to be read not in tape alphabet!");
             }
         }
         SECTION("Throw 5") {
@@ -518,7 +516,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Symbol to be written not in tape alphabet!");
+                REQUIRE(error == "Error adding transition: Symbol to be written not in tape alphabet!");
             }
         }
 
@@ -539,7 +537,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Transition not unique!");
+                REQUIRE(error == "Error adding transition: Transition not unique!");
             }
         }
         SECTION ("Throw 2") {
@@ -549,7 +547,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Storages do not have same size!");
+                REQUIRE(error == "Error adding transition: Storages do not have same size!");
             }
         }
         SECTION ("Throw 3") {
@@ -560,7 +558,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Storages do not have right size!");
+                REQUIRE(error == "Error adding transition: Storages do not have right size!");
             }
         }
         SECTION ("Throw 4") {
@@ -571,7 +569,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Read and write character count does not match track count!");
+                REQUIRE(error == "Error adding transition: Read and write character count does not match track count!");
             }
         }
         SECTION ("Throw 5") {
@@ -582,7 +580,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Read and write do not have same number of characters!");
+                REQUIRE(error == "Error adding transition: Read and write do not have same number of characters!");
             }
         }
         SECTION ("Throw 6") {
@@ -593,7 +591,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "From state not in set of states!");
+                REQUIRE(error == "Error adding transition: From state not in set of states!");
             }
         }
         SECTION ("Throw 7") {
@@ -604,7 +602,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "To state not in set of states!");
+                REQUIRE(error == "Error adding transition: To state not in set of states!");
             }
         }
         SECTION ("Throw 8") {
@@ -615,7 +613,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Symbol to be read not in tape alphabet!");
+                REQUIRE(error == "Error adding transition: Symbol to be read not in tape alphabet!");
             }
         }
         SECTION ("Throw 9") {
@@ -625,7 +623,7 @@ TEST_CASE("Transition Adding", "[TM]") {
             }
             catch(std::runtime_error& e) {
                 std::string error(e.what());
-                REQUIRE(error == "Symbol to be written not in tape alphabet!");
+                REQUIRE(error == "Error adding transition: Symbol to be written not in tape alphabet!");
             }
         }
 
@@ -638,82 +636,93 @@ TEST_CASE("Transition Adding", "[TM]") {
 TEST_CASE("XML", "[TM]") {
     SECTION("Turing Machine without storage or multitrack (0^n1^n for n at least 1)") {
         std::string fileName = "TM1.xml";
-        TuringMachine TM1 = generateTM(fileName);
+        TuringPtr TM1 (generateTM(fileName));
         std::string input;
         input = "00001111";
-        CHECK(TM1.process(input));
+        CHECK(TM1->process(input));
         input = "000011111";
-        CHECK_FALSE(TM1.process(input));
+        CHECK_FALSE(TM1->process(input));
         input = "0000111";
-        CHECK_FALSE(TM1.process(input));
+        CHECK_FALSE(TM1->process(input));
         input = "0001111";
-        CHECK_FALSE(TM1.process(input));
+        CHECK_FALSE(TM1->process(input));
         input = "000001111";
-        CHECK_FALSE(TM1.process(input));
+        CHECK_FALSE(TM1->process(input));
         input = "00000";
-        CHECK_FALSE(TM1.process(input));
+        CHECK_FALSE(TM1->process(input));
         input = "1";
-        CHECK_FALSE(TM1.process(input));
+        CHECK_FALSE(TM1->process(input));
         input = "10";
-        CHECK_FALSE(TM1.process(input));
+        CHECK_FALSE(TM1->process(input));
         input = "";
-        CHECK_FALSE(TM1.process(input));
+        CHECK_FALSE(TM1->process(input));
         input = "01";
-        CHECK(TM1.process(input));
+        CHECK(TM1->process(input));
         input = "0101";
-        CHECK_FALSE(TM1.process(input));
+        CHECK_FALSE(TM1->process(input));
 
     }
     SECTION("Turing Machine with storage") {
         std::string fileName = "TM2.xml";
-        TuringMachine TM2 = generateTM(fileName);
+        TuringPtr TM2(generateTM(fileName));
         std::string input2;
         input2 = "01111";
-        CHECK(TM2.process(input2));
+        CHECK(TM2->process(input2));
         input2 = "011110";
-        CHECK_FALSE(TM2.process(input2));
+        CHECK_FALSE(TM2->process(input2));
         input2 = "";
-        CHECK_FALSE(TM2.process(input2));
+        CHECK_FALSE(TM2->process(input2));
         input2 = "0";
-        CHECK(TM2.process(input2));
+        CHECK(TM2->process(input2));
         input2 = "1";
-        CHECK(TM2.process(input2));
+        CHECK(TM2->process(input2));
         input2 = "1000";
-        CHECK(TM2.process(input2));
+        CHECK(TM2->process(input2));
         input2 = "10001";
-        CHECK_FALSE(TM2.process(input2));
+        CHECK_FALSE(TM2->process(input2));
         input2 = "10";
-        CHECK(TM2.process(input2));
+        CHECK(TM2->process(input2));
         input2 = "01";
-        CHECK(TM2.process(input2));
+        CHECK(TM2->process(input2));
 
     }
     SECTION("Turing Machine with storage and multitrack") {
         std::string fileName = "TM3.xml";
-        TuringMachine TM3 = generateTM(fileName);
+        TuringPtr TM3(generateTM(fileName));
         std::string input3;
         input3 = "010c010";
-        CHECK(TM3.process(input3));
+        CHECK(TM3->process(input3));
         input3 = "01c01";
-        CHECK(TM3.process(input3));
+        CHECK(TM3->process(input3));
         input3 = "0c0";
-        CHECK(TM3.process(input3));
+        CHECK(TM3->process(input3));
         input3 = "00001c00001";
-        CHECK(TM3.process(input3));
+        CHECK(TM3->process(input3));
         input3 = "1111c1111";
-        CHECK(TM3.process(input3));
+        CHECK(TM3->process(input3));
         input3 = "0101c010";
-        CHECK_FALSE(TM3.process(input3));
+        CHECK_FALSE(TM3->process(input3));
         input3 = "0101c101";
-        CHECK_FALSE(TM3.process(input3));
+        CHECK_FALSE(TM3->process(input3));
         input3 = "010c010c010";
-        CHECK_FALSE(TM3.process(input3));
+        CHECK_FALSE(TM3->process(input3));
         input3 = "010010";
-        CHECK_FALSE(TM3.process(input3));
+        CHECK_FALSE(TM3->process(input3));
         input3 = "";
-        CHECK_FALSE(TM3.process(input3));
+        CHECK_FALSE(TM3->process(input3));
         input3 = "0c1";
-        CHECK_FALSE(TM3.process(input3));
+        CHECK_FALSE(TM3->process(input3));
+        input3 = "c";
+        CHECK_FALSE(TM3->process(input3));
+        try {
+            input3 = "abc";
+            REQUIRE_THROWS_AS(TM3->process(input3), std::runtime_error);
+            TM3->process(input3);
+        }
+        catch (std::runtime_error& e) {
+            std::string error = e.what();
+            REQUIRE(error == "Error while processing input string: Character in input but not in input alphabet!");
+        }
     }
 }
 
@@ -725,7 +734,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "File not found!");
+        REQUIRE(error == "Error generating TM from XML: File not found!");
     }
     try {
         std::string fileName = "TMinvalid1.xml";
@@ -734,7 +743,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "Failed to load file: No root element.");
+        REQUIRE(error == "Error generating TM from XML: Failed to load file: No root element.");
     }
     try {
         std::string fileName = "TMinvalid2.xml";
@@ -743,7 +752,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "Not a Turing Machine XML file!");
+        REQUIRE(error == "Error generating TM from XML: Not a Turing Machine XML file!");
     }
     try {
         std::string fileName = "TMinvalid3.xml";
@@ -752,7 +761,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "One input symbol per node please");
+        REQUIRE(error == "Error generating TM from XML: One input symbol per node please");
     }
     try {
         std::string fileName = "TMinvalid4.xml";
@@ -761,7 +770,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "One input symbol per node please");
+        REQUIRE(error == "Error generating TM from XML: One input symbol per node please");
     }
     try {
         std::string fileName = "TMinvalid5.xml";
@@ -770,7 +779,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "One blank symbol please");
+        REQUIRE(error == "Error generating TM from XML: One blank symbol please");
     }
     try {
         std::string fileName = "TMinvalid6.xml";
@@ -779,7 +788,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "Alphabet, tape alphabet or blank symbol missing!");
+        REQUIRE(error == "Error generating TM from XML: Alphabet, tape alphabet or blank symbol missing!");
     }
     try {
         std::string fileName = "TMinvalid7.xml";
@@ -788,7 +797,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "Alphabet, tape alphabet or blank symbol missing!");
+        REQUIRE(error == "Error generating TM from XML: Alphabet, tape alphabet or blank symbol missing!");
     }
     try {
         std::string fileName = "TMinvalid8.xml";
@@ -797,7 +806,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "Alphabet, tape alphabet or blank symbol missing!");
+        REQUIRE(error == "Error generating TM from XML: Alphabet, tape alphabet or blank symbol missing!");
     }
     try {
         std::string fileName = "TMinvalid9.xml";
@@ -806,7 +815,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "State without name");
+        REQUIRE(error == "Error generating TM from XML: State without name");
     }
     try {
         std::string fileName = "TMinvalid10.xml";
@@ -815,7 +824,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "invalid direction");
+        REQUIRE(error == "Error generating TM from XML: invalid direction");
     }
     try {
         std::string fileName = "TMinvalid11.xml";
@@ -824,7 +833,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "Incomplete transition");
+        REQUIRE(error == "Error generating TM from XML: Incomplete transition");
     }
     try {
         std::string fileName = "TMinvalid12.xml";
@@ -833,7 +842,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "Incomplete transition");
+        REQUIRE(error == "Error generating TM from XML: Incomplete transition");
     }
     try {
         std::string fileName = "TMinvalid13.xml";
@@ -842,7 +851,7 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "No name for start state specified");
+        REQUIRE(error == "Error generating TM from XML: No name for start state specified");
     }
     try {
         std::string fileName = "TMinvalid14.xml";
@@ -851,7 +860,34 @@ TEST_CASE("XML invalid", "[TM]") {
     }
     catch(std::runtime_error& e) {
         std::string error(e.what());
-        REQUIRE(error == "No name for accepting state specified");
+        REQUIRE(error == "Error generating TM from XML: No name for accepting state specified");
+    }
+    try {
+        std::string fileName = "TMinvalid15.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Error adding transition: Symbol to be written not in tape alphabet!");
+    }
+    try {
+        std::string fileName = "TMinvalid16.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Error adding transition: From state not in set of states!");
+    }
+    try {
+        std::string fileName = "TMinvalid17.xml";
+        REQUIRE_THROWS_AS(generateTM(fileName), std::runtime_error);
+        generateTM(fileName);
+    }
+    catch(std::runtime_error& e) {
+        std::string error(e.what());
+        REQUIRE(error == "Error adding state: Name is not unique!");
     }
 
 }

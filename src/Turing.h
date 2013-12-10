@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 13 November 2013
+ * Last modified: 28 November 2013
  * By: Jakob Struye
  */
 
@@ -36,10 +36,19 @@
 #include <memory>
 #include "TinyXML/tinyxml.h"
 
+/**
+ * Please note that the TuringState, TuringTransition, TMID and Tape classes were designed specifically for use with the TuringMachine class.
+ * Correct behaviour with invalid arguments is not guaranteed, though the TuringMachine class is guaranteed not to provide invalid arguments to the aforementioned classes.
+ *
+ * The user is only supposed to use generateTM and TuringMachine::process. This is currently not enforced, but calling other functions may cause bad stuff.
+ * Both functions can (only) throw std::runtime_error. The user is responsible for catching them and printing the .what() if desired
+ */
+
 enum Direction {L, R, U}; //left, right, or undefined
 class TuringState;
+class TuringMachine;
 typedef std::shared_ptr<const TuringState> StatePtr;
-
+typedef std::shared_ptr<TuringMachine> TuringPtr;
 
 /**
  * @brief Class representing a state of a Turing Machine
@@ -79,26 +88,17 @@ public:
      * @return True if storage is given storage
      */
 
-    bool hasThisStorage(const std::vector<char> storage) const;
-
-
-    /**
-     * @brief overload for boolean < (set support)
-     */
-
-    bool operator<(const TuringState&) const;
+    bool hasThisStorage(const std::vector<char>& storage) const;
 
     /**
-     * @brief overload for boolean > (set support)
-     */
-
-    bool operator>(const TuringState&) const;
-
-    /**
-     * @brief output overload
+     * @brief Output overload
      */
 
     friend std::ostream& operator<<(std::ostream& output, const TuringState& TS);
+
+    /**
+     * @brief Destructor
+     */
 
     virtual ~TuringState();
 
@@ -120,8 +120,8 @@ public:
      *
      * @param from A pointer to the TuringState where this transition is coming from
      * @param to A pointer to the TuringState where this transition is going to
-     * @param read The read symbol(s) on the tape
-     * @param write The symbol(s) to be written to the tape
+     * @param read The read symbol(s) on the tape (in a vector)
+     * @param write The symbol(s) to be written to the tape (in a vector)
      * @param dir Direction in which to move head
      */
     TuringTransition(
@@ -136,34 +136,28 @@ public:
      * @brief Checks if transition is for given state and tape symbol
      *
      * @param state State from which transition should start
-     * @param symbol Symbol that should be under head on tape
+     * @param symbols Symbol(s) that should be under head on tape
      *
      * @return True if matching transition
      */
 
-    bool match(StatePtr state, std::vector<char> symbol);
+    bool match(StatePtr state, const std::vector<char>& symbols) const;
 
     /**
-     * @brief Gets next state, symbol to write and direction
+     * @brief Gets next state, symbol(s) to write and direction
      *
-     * @return Tuple of next state, symbol to write and direction to move in
+     * @return Tuple of next state, symbol(s) to write and direction to move in
      */
 
     std::tuple<StatePtr, std::vector<char>, Direction> getTransition() const;
 
     /**
-     * @brief overload for boolean <, needed to insert TuringTransitions into a set
-     */
-
-    bool operator<(const TuringTransition&) const;
-
-    /**
-     * @brief all of the given arguments are the transition's
+     * @brief Checks if all of the given arguments are also the transition's
      *
      * @param from From pointer to check
      * @param to To pointer to check
-     * @param read Read symbol to check
-     * @param write Write symbol to check
+     * @param read Read symbol(s) to check
+     * @param write Write symbol(s) to check
      * @param dir Direction to check
      *
      *
@@ -182,6 +176,9 @@ public:
 
     friend std::ostream& operator<<(std::ostream& output, const TuringTransition& TT);
 
+    /**
+     * @Brief Destructor
+     */
 
     virtual ~TuringTransition();
 
@@ -208,24 +205,24 @@ public:
      * @param trackCount number of tracks on the tape
      */
 
-    Tape(std::string& input, char blank, int trackCount);
+    Tape(const std::string& input, char blank, int trackCount);
 
     /*
-     * @brief fetches the symbol at a given position
+     * @brief fetches the symbol(s) at a given position
      *
-     * @return the symbol
+     * @return the symbol(s)
      */
-    std::vector<char> getSymbolAtHead() const;
+    std::vector<char> getSymbolsAtHead() const;
 
     /**
-     * @brief Replaces symbol at given position by given symbol
+     * @brief Replaces symbol(s) at given position by given symbol(s)
      *
-     * @param symbol The symbol to be written to tape
+     * @param symbol The symbol(s) to be written to tape
      */
-    void replaceSymbolAtHead(std::vector<char> symbol);
+    void replaceSymbolsAtHead(const std::vector<char>& symbols);
 
     /**
-     * @brief Move head one stop
+     * @brief Move head one spot
      *
      * @param dir Left or right
      */
@@ -241,7 +238,7 @@ public:
 private:
     std::deque<std::vector<char>> fTape;
     char fBlank;
-    int fHead;
+    int fHead;     //Position of head, 0 being the cell where the first character of the input was written to
     int fTrackCount;
 
 };
@@ -263,23 +260,23 @@ public:
      * @param trackCount Number of tracks on the tape
      */
 
-    TMID(std::string& input, StatePtr startState, char blank, int trackCount);
+    TMID(const std::string& input, StatePtr startState, char blank, int trackCount);
 
     /**
-     * @brief Get the symbol at the current head position and the current state of the ID
+     * @brief Gets the symbol at the current head position and the current state of the ID
      *
      * @return Pair of the symbol and the state
      */
-    std::pair<StatePtr, std::vector<char>> getStateAndSymbol() const;
+    std::pair<StatePtr, std::vector<char>> getStateAndSymbols() const;
 
     /**
-     * @brief Process the ID according to one transition for one step
+     * @brief Processes the ID according to one transition for one step
      *
      * @param to Pointer to next state
      * @param write Symbol to be written to tape
      * @param dir Direction to move head in
      */
-    void step(StatePtr to, std::vector<char> write, Direction dir);
+    void step(StatePtr to, const std::vector<char>& write, Direction dir);
 
     /**
      * @brief output overload
@@ -302,8 +299,7 @@ class TuringMachine {
 public:
 
     /**
-     * @brief Constructor
-     *
+     * @brief Constructor (will construct TM with empty alphabets, empty state, final state and transition sets and no blank symbol or start state)
      */
 
     TuringMachine();
@@ -312,68 +308,33 @@ public:
      *
      * @param alphabetTuring A set containing characters representing the alphabet of the Turing Machine
      * @param alphabetTape A set containing characters representing the alphabet of the tape
-     * @param tapeBlank The blank symbol for the stack
+     * @param tapeBlank The blank symbol for the tape
      */
     TuringMachine(
         const std::set<char>& alphabetTuring,
         const std::set<char>& alphabetTape,
         char tapeBlank
         );
-
-    /**
-    * @brief Constructor
-    *
-    * @param alphabetTuring A set containing characters representing the alphabet of the Turing Machine
-    * @param alphabetTape A set containing characters representing the alphabet of the tape
-    * @param tapeBlank The blank symbol for the stack
-    */
-   /*TuringMachine(
-       const std::set<char>& alphabetTuring,
-       const std::set<char>& alphabetTape,
-       char tapeBlank
-       );*/
-
-    /**
-    * @brief Constructor. Note that this constructor supposes the given states (and start/accepting) and transitions are valid; no further checks are made!
-    *
-    * @param alphabetTuring A set containing characters representing the alphabet of the Turing Machine
-    * @param alphabetTape A set containing characters representing the alphabet of the tape
-    * @param tapeBlank The blank symbol for the stack
-    * @param states The set of states
-    * @param transitions The set of transitions
-    * @param startState Pointer to start state
-    * @param acceptingStates The set of accepting states
-    *
-    */
-  /* TuringMachine(
-       const std::set<char>& alphabetTuring,
-       const std::set<std::vector<char>>& alphabetTape,
-       const char& tapeBlank,
-       const std::set<StatePtr>& states,
-       const std::set<TuringTransition>& transitions,
-       StatePtr startState,
-       const std::set<StatePtr>& acceptingStates
-       );*/
-
-
      /**
-     * @brief Add a new state to the Turing Machine
+     * @brief Adds a new state to the Turing Machine
      *
      * @param state The name of the state to be added
-     * @param isEnding A bool describing if the state is a final state
-     * @param isStarting A bool describing if the state is the start state
+     * @param isStarting A bool indicating whether the state is the start state
+     * @param isEnding A bool indicating whether the state is a final state
      *
-     * @return A bool telling if the state is added or not
+     * @return True if state was added
+     *
+     * Note that start and final states may also be set to true afterwards.
+     * Comes in handy when adding states through loops (when adding states with different storages!)
      */
     bool addState(
             const std::string& state,
-            const bool isStarting,
-            const bool isFinal,
+            bool isStarting = 0,
+            bool isFinal = 0,
             const std::vector<char>& storage = std::vector<char> ()
             );
-
      /**
-     * @brief Add a new transition to the Turing Machine
+     * @brief Add a new transition to the Turing Machine (single track only)
      *
      * @param from The name of the state where the transition starts
      * @param to The name of the state where the transition leads to
@@ -383,18 +344,18 @@ public:
      * @param fromStorage Storage for the start state
      * @param toStorage Storage for the start state
      *
-     * @return A bool telling if the transition is added or not
+     * @return True if transition was added
      */
     bool addTransition(const std::string& from,
             const std::string& to,
-            const char& read,
-            const char& write,
+            char read,
+            char write,
             Direction dir,
             const std::vector<char>& fromStorage = std::vector<char> (),
             const std::vector<char>& toStorage = std::vector<char> ());
 
     /**
-    * @brief Add a new transition to the Turing Machine
+    * @brief Add a new transition to the Turing Machine (multitrack supported)
     *
     * @param from The name of the state where the transition starts
     * @param to The name of the state where the transition leads to
@@ -415,31 +376,42 @@ public:
            const std::vector<char>& toStorage = std::vector<char> ());
 
    /**
-    * @brief Adds start state pointer after adding the states. Useful for XML with state storage
+    * @brief Indicates start state pointer after adding the states (so the state has to be in the TM first!). Useful for XML with state storage
+    *
+    * @param name Name of the start state
+    * @param storage Storage of the start state
+    *
+    * @return True if start state pointer was added
     */
-   bool addStartState(std::string name, std::vector<char> storage = std::vector<char> ());
+   bool indicateStartState(const std::string& name, const std::vector<char>& storage = std::vector<char> ());
 
    /**
-    * @brief Adds an accepting state after adding the states. Useful for XML with state storage
+    * @brief Indicates an accepting state after adding the states (so the state has to be in the TM first!). Useful for XML with state storage
+    *
+    * @param name Name of the accepting state
+    * @param storage Storage of the accepting state
+    *
+    * @return True if start state pointer was added
     */
-   bool addAcceptingState(std::string name, std::vector<char> storage = std::vector<char> ());
+   bool indicateAcceptingState(const std::string& name, const std::vector<char>& storage = std::vector<char> ());
 
 
     /**
-     * @brief Process an input string through the Turing Machine
+     * @brief Processes an input string through the Turing Machine
      *
      * @param input The string to be processed by the Turing Machine
      *
-     * @return A bool telling if the Turing Machine accepted
+     * @return True if the input string is part of the language described by the TM
      */
-    bool process(std::string& input);
+    bool process(const std::string& input) const;
+
+    /**
+     * @brief Destructor
+     */
 
     virtual ~TuringMachine();
 
 private:
-    StatePtr getStatePtr(std::string& name) const;
-
-
     std::vector<StatePtr> fStates;
     std::set<char> fAlphabet;
     std::set<char> fTapeAlphabet;
@@ -447,7 +419,7 @@ private:
     StatePtr fStartState = nullptr;
     char fBlank;
     std::set<StatePtr> fAccepting;
-    int fStateStorageSize = -1;
+    int fStateStorageSize = -1;   //-1 is temporary value, will be set when first transition is added
     int fTrackCount = -1;
 };
 
@@ -457,8 +429,8 @@ private:
  *
  * @param fileName Name of the XML file
  *
- * @return TM The generated Turing Machine
+ * @return TM Pointer to the generated Turing Machine
  */
-TuringMachine generateTM(std::string fileName);
+TuringPtr generateTM(const std::string& fileName);
 
 #endif /*TURING_H*/
