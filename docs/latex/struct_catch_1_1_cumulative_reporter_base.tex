@@ -1,0 +1,115 @@
+\hypertarget{struct_catch_1_1_cumulative_reporter_base}{\section{Catch\-:\-:Cumulative\-Reporter\-Base Struct Reference}
+\label{struct_catch_1_1_cumulative_reporter_base}\index{Catch\-::\-Cumulative\-Reporter\-Base@{Catch\-::\-Cumulative\-Reporter\-Base}}
+}
+Inheritance diagram for Catch\-:\-:Cumulative\-Reporter\-Base\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=5.000000cm]{struct_catch_1_1_cumulative_reporter_base}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_node}{Node}
+\item 
+struct \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\-Node}
+\end{DoxyCompactItemize}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a46853912952f5286abbebfeba2266055}{typedef \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_node}{Node}$<$ \hyperlink{struct_catch_1_1_test_case_stats}{Test\-Case\-Stats}, \\*
+\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\-Node} $>$ {\bfseries Test\-Case\-Node}}\label{struct_catch_1_1_cumulative_reporter_base_a46853912952f5286abbebfeba2266055}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a4c3fa5afc75155641d11f3aa01b97898}{typedef \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_node}{Node}$<$ \hyperlink{struct_catch_1_1_test_group_stats}{Test\-Group\-Stats}, \\*
+\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_node}{Test\-Case\-Node} $>$ {\bfseries Test\-Group\-Node}}\label{struct_catch_1_1_cumulative_reporter_base_a4c3fa5afc75155641d11f3aa01b97898}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_ac3f51b6d1942f4aa46afbb174f7265e6}{typedef \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_node}{Node}$<$ \hyperlink{struct_catch_1_1_test_run_stats}{Test\-Run\-Stats}, \\*
+\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_node}{Test\-Group\-Node} $>$ {\bfseries Test\-Run\-Node}}\label{struct_catch_1_1_cumulative_reporter_base_ac3f51b6d1942f4aa46afbb174f7265e6}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_ae25c7146268ae81fa0f944481d7ea5a5}{{\bfseries Cumulative\-Reporter\-Base} (\hyperlink{struct_catch_1_1_reporter_config}{Reporter\-Config} const \&\-\_\-config)}\label{struct_catch_1_1_cumulative_reporter_base_ae25c7146268ae81fa0f944481d7ea5a5}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a6326c26db277590f1d261953fd4b6733}{virtual void {\bfseries test\-Run\-Starting} (\hyperlink{struct_catch_1_1_test_run_info}{Test\-Run\-Info} const \&)}\label{struct_catch_1_1_cumulative_reporter_base_a6326c26db277590f1d261953fd4b6733}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a43f07792f2de8dce50ac0a24dbda6f5a}{virtual void {\bfseries test\-Group\-Starting} (\hyperlink{struct_catch_1_1_group_info}{Group\-Info} const \&)}\label{struct_catch_1_1_cumulative_reporter_base_a43f07792f2de8dce50ac0a24dbda6f5a}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_affa61c6fb32e28a388afa45aa492c265}{virtual void {\bfseries test\-Case\-Starting} (\hyperlink{struct_catch_1_1_test_case_info}{Test\-Case\-Info} const \&)}\label{struct_catch_1_1_cumulative_reporter_base_affa61c6fb32e28a388afa45aa492c265}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a65bfe4710217c2d3eed5efe389adcd77}{virtual void {\bfseries section\-Starting} (\hyperlink{struct_catch_1_1_section_info}{Section\-Info} const \&section\-Info)}\label{struct_catch_1_1_cumulative_reporter_base_a65bfe4710217c2d3eed5efe389adcd77}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a7b5dfe0f0597083e686066ce7aeaaf35}{virtual void {\bfseries assertion\-Starting} (\hyperlink{struct_catch_1_1_assertion_info}{Assertion\-Info} const \&)}\label{struct_catch_1_1_cumulative_reporter_base_a7b5dfe0f0597083e686066ce7aeaaf35}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a22c7dfc613e911f97c621e436cde016c}{virtual bool {\bfseries assertion\-Ended} (\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\-Stats} const \&assertion\-Stats)}\label{struct_catch_1_1_cumulative_reporter_base_a22c7dfc613e911f97c621e436cde016c}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a4d52c30f530df1ae55e44b09b5516f35}{virtual void {\bfseries section\-Ended} (\hyperlink{struct_catch_1_1_section_stats}{Section\-Stats} const \&section\-Stats)}\label{struct_catch_1_1_cumulative_reporter_base_a4d52c30f530df1ae55e44b09b5516f35}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_af750cf4139005c09a0edc748919d5d60}{virtual void {\bfseries test\-Case\-Ended} (\hyperlink{struct_catch_1_1_test_case_stats}{Test\-Case\-Stats} const \&test\-Case\-Stats)}\label{struct_catch_1_1_cumulative_reporter_base_af750cf4139005c09a0edc748919d5d60}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a8a8072432ccbc7065d70493d68122bc5}{virtual void {\bfseries test\-Group\-Ended} (\hyperlink{struct_catch_1_1_test_group_stats}{Test\-Group\-Stats} const \&test\-Group\-Stats)}\label{struct_catch_1_1_cumulative_reporter_base_a8a8072432ccbc7065d70493d68122bc5}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_ac4fa6adc0a7721e4f0094bd1f767cb2d}{virtual void {\bfseries test\-Run\-Ended} (\hyperlink{struct_catch_1_1_test_run_stats}{Test\-Run\-Stats} const \&test\-Run\-Stats)}\label{struct_catch_1_1_cumulative_reporter_base_ac4fa6adc0a7721e4f0094bd1f767cb2d}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a8c2077aad85caf632cbe2aad30e497a2}{virtual void {\bfseries test\-Run\-Ended} ()=0}\label{struct_catch_1_1_cumulative_reporter_base_a8c2077aad85caf632cbe2aad30e497a2}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a19a52c03908bdc2f781a99d844f07c8e}{\hyperlink{class_catch_1_1_ptr}{Ptr}$<$ \hyperlink{struct_catch_1_1_i_config}{I\-Config} $>$ {\bfseries m\-\_\-config}}\label{struct_catch_1_1_cumulative_reporter_base_a19a52c03908bdc2f781a99d844f07c8e}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_add96a41a3e449be82c629a9cefc84aac}{std\-::ostream \& {\bfseries stream}}\label{struct_catch_1_1_cumulative_reporter_base_add96a41a3e449be82c629a9cefc84aac}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_acb33a9784c0e8c0b8d477dff96ed36cb}{std\-::vector$<$ \hyperlink{struct_catch_1_1_assertion_stats}{Assertion\-Stats} $>$ {\bfseries m\-\_\-assertions}}\label{struct_catch_1_1_cumulative_reporter_base_acb33a9784c0e8c0b8d477dff96ed36cb}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_ad88d6066ef6c5ef1f02f64a41672d259}{std\-::vector$<$ std\-::vector$<$ \hyperlink{class_catch_1_1_ptr}{Ptr}\\*
+$<$ \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\-Node} $>$ $>$ $>$ {\bfseries m\-\_\-sections}}\label{struct_catch_1_1_cumulative_reporter_base_ad88d6066ef6c5ef1f02f64a41672d259}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_aabb351de73df367d80ec12734997448c}{std\-::vector$<$ \hyperlink{class_catch_1_1_ptr}{Ptr}$<$ \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_node}{Test\-Case\-Node} $>$ $>$ {\bfseries m\-\_\-test\-Cases}}\label{struct_catch_1_1_cumulative_reporter_base_aabb351de73df367d80ec12734997448c}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a39db5cc0dc6646aa42f20b2b981b9ae5}{std\-::vector$<$ \hyperlink{class_catch_1_1_ptr}{Ptr}$<$ \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_node}{Test\-Group\-Node} $>$ $>$ {\bfseries m\-\_\-test\-Groups}}\label{struct_catch_1_1_cumulative_reporter_base_a39db5cc0dc6646aa42f20b2b981b9ae5}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_abbcd7bb9f8ec2dff8520c2d04df1e6ce}{std\-::vector$<$ \hyperlink{class_catch_1_1_ptr}{Ptr}$<$ \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_node}{Test\-Run\-Node} $>$ $>$ {\bfseries m\-\_\-test\-Runs}}\label{struct_catch_1_1_cumulative_reporter_base_abbcd7bb9f8ec2dff8520c2d04df1e6ce}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a407c1ad0723f3e10efbb982c5adbd07c}{\hyperlink{class_catch_1_1_ptr}{Ptr}$<$ \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\-Node} $>$ {\bfseries m\-\_\-root\-Section}}\label{struct_catch_1_1_cumulative_reporter_base_a407c1ad0723f3e10efbb982c5adbd07c}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a9058ef2fc03d698503fccd918c64d0f2}{\hyperlink{class_catch_1_1_ptr}{Ptr}$<$ \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\-Node} $>$ {\bfseries m\-\_\-deepest\-Section}}\label{struct_catch_1_1_cumulative_reporter_base_a9058ef2fc03d698503fccd918c64d0f2}
+
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_ae64972fbf6026c4f72ebbc9c0b1c9d41}{std\-::vector$<$ \hyperlink{class_catch_1_1_ptr}{Ptr}$<$ \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\-Node} $>$ $>$ {\bfseries m\-\_\-section\-Stack}}\label{struct_catch_1_1_cumulative_reporter_base_ae64972fbf6026c4f72ebbc9c0b1c9d41}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_a8a9f836c62348333bde04b059851b738}{bool {\bfseries operator==} (\hyperlink{class_catch_1_1_ptr}{Ptr}$<$ \hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\-Node} $>$ const \&node, \hyperlink{struct_catch_1_1_section_info}{Section\-Info} const \&other)}\label{struct_catch_1_1_cumulative_reporter_base_a8a9f836c62348333bde04b059851b738}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this struct was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+Catch.\-h\end{DoxyCompactItemize}

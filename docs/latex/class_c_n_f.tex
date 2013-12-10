@@ -1,0 +1,111 @@
+\hypertarget{class_c_n_f}{\section{C\-N\-F Class Reference}
+\label{class_c_n_f}\index{C\-N\-F@{C\-N\-F}}
+}
+
+
+The class \hyperlink{class_c_n_f}{C\-N\-F} (Chomsky Normal Form), this is actually a \hyperlink{class_c_f_g}{C\-F\-G} (Context Free Grammar) but with production rules of the form\-:  
+
+
+
+
+{\ttfamily \#include $<$C\-N\-F.\-h$>$}
+
+Inheritance diagram for C\-N\-F\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_c_n_f}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_c_n_f_a284b4ec60a90f49dabba546ea637a345}{C\-N\-F} (const std\-::set$<$ char $>$ \&terminals, const std\-::set$<$ char $>$ \&variables, const std\-::multimap$<$ char, Symbol\-String $>$ \&productions, const char \&start)
+\begin{DoxyCompactList}\small\item\em Constructor, initialize all datamembers. This will construct production rules based upon the rules of the \hyperlink{class_c_f_g}{C\-F\-G} cleaned up variant and satisfying the conditions imposed by the \hyperlink{class_c_n_f}{C\-N\-F}. \end{DoxyCompactList}\item 
+bool \hyperlink{class_c_n_f_ae6dd043b79759b038cd627267bf7295c}{C\-Y\-K} (const std\-::string \&terminalstring) const 
+\begin{DoxyCompactList}\small\item\em Check whether the terminalstring is in the language of this \hyperlink{class_c_n_f}{C\-N\-F} by using the C\-Y\-K algorithm. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+The class \hyperlink{class_c_n_f}{C\-N\-F} (Chomsky Normal Form), this is actually a \hyperlink{class_c_f_g}{C\-F\-G} (Context Free Grammar) but with production rules of the form\-: 
+
+
+\begin{DoxyItemize}
+\item A --$>$ B\-C (with A, B and C variables) or
+\item A --$>$ a (with A a variable and a a terminal) 
+\end{DoxyItemize}
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_c_n_f_a284b4ec60a90f49dabba546ea637a345}{\index{C\-N\-F@{C\-N\-F}!C\-N\-F@{C\-N\-F}}
+\index{C\-N\-F@{C\-N\-F}!CNF@{C\-N\-F}}
+\subsubsection[{C\-N\-F}]{\setlength{\rightskip}{0pt plus 5cm}C\-N\-F\-::\-C\-N\-F (
+\begin{DoxyParamCaption}
+\item[{const std\-::set$<$ char $>$ \&}]{terminals, }
+\item[{const std\-::set$<$ char $>$ \&}]{variables, }
+\item[{const std\-::multimap$<$ char, Symbol\-String $>$ \&}]{productions, }
+\item[{const char \&}]{start}
+\end{DoxyParamCaption}
+)}}\label{class_c_n_f_a284b4ec60a90f49dabba546ea637a345}
+
+
+Constructor, initialize all datamembers. This will construct production rules based upon the rules of the \hyperlink{class_c_f_g}{C\-F\-G} cleaned up variant and satisfying the conditions imposed by the \hyperlink{class_c_n_f}{C\-N\-F}. 
+
+\begin{DoxyNote}{Note}
+You can still use the \hyperlink{class_c_f_g}{C\-F\-G} methods as if it was only cleaned up (thus you can use the same variables for getting the bodies and such).
+\end{DoxyNote}
+
+\begin{DoxyParams}{Parameters}
+{\em terminals} & The set of terminal symbols. \\
+\hline
+{\em variables} & The set of non-\/terminal symbols. \\
+\hline
+{\em productions} & The set of production rules (which is actually a std\-::map where each non-\/terminal symbol maps to a string consisting of terminals and variables. \\
+\hline
+{\em start} & The start symbol.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyPostcond}{Postcondition}
+
+\begin{DoxyItemize}
+\item The \hyperlink{class_c_f_g}{C\-F\-G} methods will produce the same result as if it was already cleaned up without unwanted side-\/effects. 
+\end{DoxyItemize}
+\end{DoxyPostcond}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_c_n_f_ae6dd043b79759b038cd627267bf7295c}{\index{C\-N\-F@{C\-N\-F}!C\-Y\-K@{C\-Y\-K}}
+\index{C\-Y\-K@{C\-Y\-K}!CNF@{C\-N\-F}}
+\subsubsection[{C\-Y\-K}]{\setlength{\rightskip}{0pt plus 5cm}bool C\-N\-F\-::\-C\-Y\-K (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{terminalstring}
+\end{DoxyParamCaption}
+) const}}\label{class_c_n_f_ae6dd043b79759b038cd627267bf7295c}
+
+
+Check whether the terminalstring is in the language of this \hyperlink{class_c_n_f}{C\-N\-F} by using the C\-Y\-K algorithm. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em terminalstring} & The string to be checked whether this is in the language of the \hyperlink{class_c_f_g}{C\-F\-G}.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the terminalstring is in the language of this \hyperlink{class_c_f_g}{C\-F\-G}, false if not.
+\end{DoxyReturn}
+\begin{DoxyPrecond}{Precondition}
+
+\begin{DoxyItemize}
+\item The string passed consists only of terminal symbols in the set of terminals of this \hyperlink{class_c_f_g}{C\-F\-G}.
+\end{DoxyItemize}
+\end{DoxyPrecond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & if the string passed is not a valid terminal string (that is, not consisting of terminal symbols). \\
+\hline
+\end{DoxyExceptions}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+C\-N\-F.\-h\item 
+C\-N\-F.\-cpp\end{DoxyCompactItemize}

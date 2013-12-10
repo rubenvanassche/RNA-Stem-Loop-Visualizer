@@ -1,0 +1,13 @@
+var searchData=
+[
+  ['pda',['PDA',['../class_p_d_a.html',1,'PDA'],['../class_p_d_a.html#ada371103866d34235247f65ddbd5bf8e',1,'PDA::PDA(const std::set&lt; char &gt; &amp;alphabetPDA, const std::set&lt; char &gt; &amp;alphabetStack, const PDAFinal &amp;PDAending)'],['../class_p_d_a.html#a0bb4ed22f081c4b89510021fdf8aa125',1,'PDA::PDA(CFG cfg)'],['../class_p_d_a.html#a5bdc4c651e9b6da0b76cf61504c82034',1,'PDA::PDA(const std::string &amp;fileName)']]],
+  ['pdaid',['PDAID',['../class_p_d_a_i_d.html',1,'PDAID'],['../class_p_d_a_i_d.html#a2771c16218559b027029c12a0135353a',1,'PDAID::PDAID()']]],
+  ['pdastate',['PDAState',['../class_p_d_a_state.html',1,'PDAState'],['../class_p_d_a_state.html#a23a8145588cdb3d637009cde2772b231',1,'PDAState::PDAState(std::string name)'],['../class_p_d_a_state.html#a22f60087f927a3f6eec2d32d399a3a59',1,'PDAState::PDAState(std::string name, bool isFinal)']]],
+  ['pdatransition',['PDATransition',['../class_p_d_a_transition.html',1,'PDATransition'],['../class_p_d_a_transition.html#abbfb0059d8f657ad434e5b07d337e361',1,'PDATransition::PDATransition(PDAState *from, PDAState *to, const char &amp;input, const char &amp;stackTop, const PDAStackOperation &amp;stackOperation)'],['../class_p_d_a_transition.html#a060bbd689533147e128fb7c4827fd801',1,'PDATransition::PDATransition(PDAState *from, PDAState *to, const char &amp;input, const char &amp;stackTop, const PDAStackOperation &amp;stackOperation, const char &amp;stackPush)'],['../class_p_d_a_transition.html#adf9edc281ee9ad54b07aea48ce85670e',1,'PDATransition::PDATransition(PDAState *from, PDAState *to, const char &amp;input, const char &amp;stackTop, const PDAStackOperation &amp;stackOperation, const std::vector&lt; char &gt; &amp;stackPush)']]],
+  ['pluralise',['pluralise',['../struct_catch_1_1pluralise.html',1,'Catch']]],
+  ['process',['process',['../class_l_l_table.html#a403059b89fd2f82f2b4d83cca658ef08',1,'LLTable::process()'],['../class_l_l_parser.html#a3c849d307e60f966469d21c76f7ddc58',1,'LLParser::process()'],['../class_p_d_a.html#a6ae74a864d002fcd9b1e1118b72ce1ab',1,'PDA::process()'],['../class_turing_machine.html#a69e804d3e6d6b0c4288687a371a5c906',1,'TuringMachine::process()']]],
+  ['ptr',['Ptr',['../class_catch_1_1_ptr.html',1,'Catch']]],
+  ['ptr_3c_20catch_3a_3acumulativereporterbase_3a_3asectionnode_20_3e',['Ptr&lt; Catch::CumulativeReporterBase::SectionNode &gt;',['../class_catch_1_1_ptr.html',1,'Catch']]],
+  ['ptr_3c_20catch_3a_3aiconfig_20_3e',['Ptr&lt; Catch::IConfig &gt;',['../class_catch_1_1_ptr.html',1,'Catch']]],
+  ['ptr_3c_20catch_3a_3aitestcase_20_3e',['Ptr&lt; Catch::ITestCase &gt;',['../class_catch_1_1_ptr.html',1,'Catch']]]
+];
