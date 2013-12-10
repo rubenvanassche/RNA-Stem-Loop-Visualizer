@@ -214,16 +214,6 @@ public:
 	 */
     bool isAccepted(PDAFinal pdaType);
 
-
-    /**
-	 * @brief Check if this ID is dead
-	 *
-	 * @param pdaType Type of PDA(State or Stack)
-	 *
-	 * @return bool telling if the ID is dead
-	 */
-    bool isDead(PDAFinal pdaType);
-
     friend std::ostream& operator<<(std::ostream& out, PDAID id);
 
     std::string fInput;

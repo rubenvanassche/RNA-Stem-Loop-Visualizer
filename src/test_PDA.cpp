@@ -147,6 +147,7 @@ TEST_CASE("PDA 1", "[PDA]"){
 	CHECK(pda.process("001") == false);
 }
 
+/*
 TEST_CASE("PDA 2", "[PDA]"){
 	PDAState P("P");
 	PDAState Q("Q");
@@ -179,6 +180,7 @@ TEST_CASE("PDA 2", "[PDA]"){
 	//CHECK(pda.process("iiee") == true);
 
 }
+*/
 
 TEST_CASE("PDA 3", "[PDA]"){
 	PDAState Q("Q");

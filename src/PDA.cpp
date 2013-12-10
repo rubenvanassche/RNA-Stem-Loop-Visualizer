@@ -187,22 +187,6 @@ bool PDAID::isAccepted(PDAFinal pdaType){
 	return accepted;
 }
 
-bool PDAID::isDead(PDAFinal pdaType){
-	bool dead = false;
-
-	/*
-	if(pdaType == STATE){
-		// PDA is state ending
-		if(this->fInput.size() == 0){
-			if(this->fState->isFinal() == false){
-				dead = true;
-			}
-		}
-	}
-	*/
-
-	return dead;
-}
 
 std::ostream& operator<<(std::ostream& out, PDAID id){
 	std::stack<char> temp = id.fStack;
@@ -782,12 +766,6 @@ bool PDA::process(std::string input){
 			return true;
 		}
 
-		if(ids.front().isDead(this->fPDAtype) == true){
-			// No! We're death
-			std::cout << ids.front() <<  " is dead(1)" << std::endl;
-			ids.pop();
-			continue;
-		}
 
 		// get the transitions corresponding with the character and the top of the stack
 		char stackTopSymbol = 9;
@@ -827,14 +805,9 @@ bool PDA::process(std::string input){
 					return true;
 				}
 
-				if(newID.isDead(this->fPDAtype) == true){
-					// NO, we're death, so actually do not add this ID
-					std::cout << newID <<  " is dead(2)" << std::endl;
-				}else{
-					// We're not death of final yet so add the ID
-					ids.push(newID);
-					std::cout << "   for: " << newID << std::endl;
-				}
+				// We're not death of final yet so add the ID
+				ids.push(newID);
+				std::cout << "   for: " << newID << std::endl;
 			}
 
 			// Remove the current ID
