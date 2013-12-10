@@ -62,4 +62,11 @@ One ODA in .xml format is provided as example:
 
 LLParser (Pieter Lauwers)
 -------------------------
-To be cont'd
+	INPUT
+Provide a grammar in the form of the given example file.
+
+    OUTPUT
+The parse table for the provided grammar.
+
+    EXAMPLES
+LLParserInput.txt results in LLParserOutput.txt
