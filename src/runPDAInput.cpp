@@ -10,8 +10,7 @@ int main(int argc, char* argv[]) {
     PDA *pda;
 
     try {
-        PDA pdareal(argv[1]);
-        pda = &pdareal;
+        pda = new PDA(argv[1]);
     }
     catch (std::runtime_error& e) {
         std::cout << e.what() << std::endl;
@@ -20,7 +19,7 @@ int main(int argc, char* argv[]) {
     while (true) {
         std::cout << "Please enter a string to be processed by PDA (type 'quit' to quit program): " << std::endl;;
         std::string input;
-        std::getline(std::cin, input);
+        std::cin >> input;
         bool answer;
         if (input == "quit")
             return 0;
@@ -32,8 +31,8 @@ int main(int argc, char* argv[]) {
             continue;
         }
         if (answer)
-            std::cout << "String accepted!" << std::endl;
+            std::cout << "String " << input << " accepted!" << std::endl;
         else
-            std::cout << "String NOT accepted!" << std::endl;
+            std::cout << "String " << input << " NOT accepted!" << std::endl;
     }
 }

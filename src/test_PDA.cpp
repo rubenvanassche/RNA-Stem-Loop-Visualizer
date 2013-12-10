@@ -6,6 +6,7 @@
  */
 #include "Catch.h"
 #include "PDA.h"
+#include "CFG.h"
 #include <exception>
 
 TEST_CASE("Stack Operation","[PDA]"){
@@ -147,18 +148,18 @@ TEST_CASE("PDA 1", "[PDA]"){
 	CHECK(pda.process("001") == false);
 }
 
-/*
+
 TEST_CASE("PDA 2", "[PDA]"){
 	PDAState P("P");
 	PDAState Q("Q");
-	PDAState R("R", false);
+	PDAState R("R", true);
 
-	PDATransition t11(&P, &Q, 0, 9, PUSH, 'X');
+	PDATransition t11(&P, &Q, 0, 9, PUSH, 'Z');
 
 	PDATransition t21(&Q, &Q, 'e', 'Z', POP);
 	PDATransition t22(&Q, &Q, 'i', 'Z', PUSH, 'Z');
 
-	//PDATransition t31(&Q, &R, 5, 'X', POP);
+	PDATransition t31(&Q, &R, 5, 9, POP);
 
 
 	std::set<char> alphabet = {'e', 'i'};
@@ -175,12 +176,17 @@ TEST_CASE("PDA 2", "[PDA]"){
 	pda.addTransition(t11);
 	pda.addTransition(t21);
 	pda.addTransition(t22);
-	//pda.addTransition(t31);
+	pda.addTransition(t31);
 
-	//CHECK(pda.process("iiee") == true);
+	CHECK(pda.process("") == false);
+	CHECK(pda.process("e") == true);
+	CHECK(pda.process("ie") == false);
+	CHECK(pda.process("iee") == true);
+	CHECK(pda.process("iiee") == false);
+	CHECK(pda.process("ieieieie") == false);
 
 }
-*/
+
 
 TEST_CASE("PDA 3", "[PDA]"){
 	PDAState Q("Q");
@@ -213,6 +219,48 @@ TEST_CASE("PDA 3", "[PDA]"){
 	CHECK(pda.process("iiee") == true);
 	CHECK(pda.process("iieiieeiee") == true);
 	CHECK(pda.process("iieiieeie") == false);
+}
+
+TEST_CASE("CFGPDA 1","[PDA]"){
+    const std::set<char> terminals = {'a', 'b'};
+    const std::set<char> variables = {'A', 'B', 'C'};
+
+    const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'A', "ABB"},
+                                                        {'A', ""},
+                                                        {'B', "a"}
+                                                        };
+    CFG c0(terminals, variables, productions, 'A');
+    PDA pda(c0);
+
+    CHECK(pda.process("") == true);
+    CHECK(pda.process("a") == false);
+    CHECK(pda.process("aa") == true);
+    CHECK(pda.process("aaa") == false);
+    CHECK(pda.process("aaaa") == true);
+}
+
+TEST_CASE("CFGPDA 2","[PDA]"){
+    const std::set<char> terminals = {'0', '1'};
+    const std::set<char> variables = {'A'};
+
+    const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'A', "0A1"},
+                                                        {'A', "0"},
+                                                        {'A', "1"}
+                                                        };
+    CFG c0(terminals, variables, productions, 'A');
+    PDA pda(c0);
+
+    /*
+    CHECK(pda.process("001") == true);
+    CHECK(pda.process("01") == false);
+    CHECK(pda.process("1") == false);
+    CHECK(pda.process("011") == true);
+    CHECK(pda.process("00111") == true);
+    */
 }
 
 
