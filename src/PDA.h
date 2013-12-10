@@ -255,7 +255,7 @@ public:
     *
     * @param cfg A Context Free Grammar to be transformed to a PDA
     */
-    PDA(CFG cfg);
+    PDA(PDACFG *cfg);
 
     /**
      * @brief Constructor
@@ -301,6 +301,8 @@ public:
      */
     bool process(std::string input);
 
+    friend std::ostream& operator<<(std::ostream& out, PDA pda);
+
     virtual ~PDA();
 
 private:
@@ -328,5 +330,6 @@ private:
 
     std::stack<char> fStack;
 };
+
 
 #endif /* PDA_H_ */

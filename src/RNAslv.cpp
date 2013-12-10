@@ -23,28 +23,6 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-	PDAState Q("Q");
-
-	PDATransition t21(&Q, &Q, 'e', 'Z', POP);
-	PDATransition t22(&Q, &Q, 'i', 'Z', PUSH, 'Z');
-	PDATransition t23(&Q, &Q, 'i', 9, PUSH, 'Z');
-
-
-	std::set<char> alphabet = {'e', 'i'};
-	std::set<char> stackAlphabet = {'Z'};
-	PDAFinal pdaType = STACK;
-
-
-	PDA pda(alphabet, stackAlphabet, pdaType);
-
-	pda.addState(Q, true);
-
-	pda.addTransition(t21);
-	pda.addTransition(t22);
-	pda.addTransition(t23);
-
-
-	if(pda.process("ie") == true){
-		std::cout << "GELUKT!!" <<std::endl;
-	}
+	PDA Q("src/data/PDA.xml");
+	std::cout << Q << std::endl;
 }

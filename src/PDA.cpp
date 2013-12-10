@@ -227,7 +227,19 @@ PDA::PDA(const std::set<char>& alphabetPDA, const std::set<char>& alphabetStack,
 	this->fStack.push(9);
 }
 
+PDA::PDA(CFG cfg){
+	// First add a state q;
+	PDAState q("q");
+	this->addState(q, true);
+
+	// Add the alphabet
+	//cfg.
+}
+
+
 PDA::PDA(const std::string& fileName){
+	// Load from XML: time for some fancy stuff woop woop woop
+
     TiXmlDocument doc;
     std::string path = fileName;
     if(!doc.LoadFile(path.c_str())){
@@ -298,7 +310,7 @@ PDA::PDA(const std::string& fileName){
             	throw std::runtime_error("Error generating PDA from XML: the type should be STATE or STACK not something else");
             }
         }
-        if (stackAlphabet.size() && alphabet.size() && type) { //All arguments necessary to construct PDA found
+        if (stackAlphabet.size() && alphabet.size() && (type == STACK || type==STATE)) { //All arguments necessary to construct PDA found
             allFound = true;
             break;
         }
@@ -307,7 +319,9 @@ PDA::PDA(const std::string& fileName){
          throw std::runtime_error("Error generating PDA from XML: Alphabet, Stack Alphabet or Type symbol missing!");
     }
 
-    PDA pda(alphabet, stackAlphabet, type);
+    this->fAlphabet = alphabet;
+    this->fStackAlphabet = stackAlphabet;
+    this->fPDAtype = type;
 
     std::list<PDAState> states;
 
@@ -359,9 +373,6 @@ PDA::PDA(const std::string& fileName){
                             if(text == NULL)
                                 continue;
                             std::string t = text->Value();
-                            if(t.size() != 1){
-                            	throw std::runtime_error("Error generating PDA from XML: input must be only one character by transition");
-                            }
                             if(t == "yes"){
                             	starting = true;
                             }else if(t == "no"){
@@ -374,8 +385,12 @@ PDA::PDA(const std::string& fileName){
 
                     if (name.size()){
                     	PDAState state(name, accepting);
-                    	pda.addState(state, starting);
-                    	states.push_back(state);
+                    	if(this->addState(state, starting) == true){
+                    		states.push_back(state);
+                    		if(starting == true){
+                    			this->fStartState = &(this->fStates.back());
+                    		}
+                    	}
                     }else{
                          throw std::runtime_error("Error generating PDA from XML: Incomplete state definition");
                     }
@@ -504,7 +519,7 @@ PDA::PDA(const std::string& fileName){
                     		throw std::runtime_error("Error generating PDA from XML: State in transition doesn't exists");
                     	}
                     	PDATransition transition(fromptr, toptr, input, stackTop, stackOperation, stackPush);
-                        pda.addTransition(transition);
+                        this->addTransition(transition);
                     }else{
                          throw std::runtime_error("Error generating PDA from XML: Incomplete transition");
                     }
@@ -769,6 +784,36 @@ bool PDA::process(std::string input){
 
 	// No path ended in a final state or empty stack
 	return false;
+}
+
+std::ostream& operator<<(std::ostream& out, PDA pda){
+	out << "PDA" << std::endl << "---" <<std::endl;
+
+	out << "Alphabet:" <<std::endl;
+	for(auto it = pda.fAlphabet.begin();it != pda.fAlphabet.end();it++){
+		std::cout << *it <<std::endl;
+	}
+
+	out << "Stack Alphabet:" <<std::endl;
+	for(auto it = pda.fStackAlphabet.begin();it != pda.fStackAlphabet.end();it++){
+		std::cout << *it <<std::endl;
+	}
+
+	out << "States:" <<std::endl;
+	for(auto it = pda.fStates.begin();it != pda.fStates.end();it++){
+		std::cout << *it <<std::endl;
+	}
+
+	if(pda.fStartState != nullptr){
+		out << "Start State:" << *(pda.fStartState) << std::endl;
+	}
+
+	out << "Transitions:" <<std::endl;
+	for(auto it = pda.fTransitions.begin();it != pda.fTransitions.end();it++){
+		std::cout << *it <<std::endl;
+	}
+
+	return out;
 }
 
 PDA::~PDA() {
