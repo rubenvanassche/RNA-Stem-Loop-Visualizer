@@ -125,7 +125,12 @@ bool PDATransition::operator==(const PDATransition& other){
 }
 
 std::ostream& operator<<(std::ostream& out, PDATransition transition){
-	out << "Transition " << transition.fFrom->getName() << " -> " << transition.fTo->getName() << " (" << transition.fInputSymbol << ")" << std::endl;
+	out << "Transition " << transition.fFrom->getName() << " -> " << transition.fTo->getName() << " (";
+	if(transition.fInputSymbol != 0){
+		out << transition.fInputSymbol << ")" << std::endl;
+	}else{
+		out << "[e]" << ")" << std::endl;
+	}
 	if(transition.fPushStack.size() == 0){
 		// nothing should happen
 		out << "when top stack is: " << transition.fTopStack << " nothing happens" << std::endl;
@@ -205,11 +210,14 @@ std::ostream& operator<<(std::ostream& out, PDAID id){
 	out << "PDA ID(" << id.fInput << ", " << id.fState->getName() << ", ";
 	std::cout << temp.size() << ": ";
 	for(unsigned int i = 0; i <= temp.size(); i++){
-		if(temp.top() != 9){
-			out << temp.top();
+		if(temp.top() == 9){
+			out << "[Z0]";
+			temp.pop();
+		}else if(temp.top() == 0){
+			out << "[e]";
 			temp.pop();
 		}else{
-			out << "[Z0]";
+			out << temp.top();
 			temp.pop();
 		}
 	}
@@ -272,6 +280,7 @@ PDA::PDA(CFG cfg){
 		}
 
 		PDATransition transition(from, to, input, stacktop, operation, push);
+		std::cout << transition << std::endl;
 		this->addTransition(transition);
 	}
 
