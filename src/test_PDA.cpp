@@ -147,18 +147,18 @@ TEST_CASE("PDA 1", "[PDA]"){
 	CHECK(pda.process("001") == false);
 }
 
-/*
+
 TEST_CASE("PDA 2", "[PDA]"){
 	PDAState P("P");
 	PDAState Q("Q");
-	PDAState R("R", false);
+	PDAState R("R", true);
 
-	PDATransition t11(&P, &Q, 0, 9, PUSH, 'X');
+	PDATransition t11(&P, &Q, 0, 9, PUSH, 'Z');
 
 	PDATransition t21(&Q, &Q, 'e', 'Z', POP);
 	PDATransition t22(&Q, &Q, 'i', 'Z', PUSH, 'Z');
 
-	//PDATransition t31(&Q, &R, 5, 'X', POP);
+	PDATransition t31(&Q, &R, 5, 9, POP);
 
 
 	std::set<char> alphabet = {'e', 'i'};
@@ -175,12 +175,17 @@ TEST_CASE("PDA 2", "[PDA]"){
 	pda.addTransition(t11);
 	pda.addTransition(t21);
 	pda.addTransition(t22);
-	//pda.addTransition(t31);
+	pda.addTransition(t31);
 
-	//CHECK(pda.process("iiee") == true);
+	CHECK(pda.process("") == false);
+	CHECK(pda.process("e") == true);
+	CHECK(pda.process("ie") == false);
+	CHECK(pda.process("iee") == true);
+	CHECK(pda.process("iiee") == false);
+	CHECK(pda.process("ieieieie") == false);
 
 }
-*/
+
 
 TEST_CASE("PDA 3", "[PDA]"){
 	PDAState Q("Q");

@@ -79,7 +79,7 @@ set(PDASRC
     )
 
 # Set flags
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++11 -g")
 
 # Target to build all the tests
 add_executable(Tests ${TESTSRC} ${SRC})

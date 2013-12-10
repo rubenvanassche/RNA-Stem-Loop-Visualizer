@@ -26,97 +26,97 @@
     </States>
     <Transitions>
             <transition>
-                    <from>Q0</from>
-                    <to>Q0</to>
-                    <input>0</input>
-                    <stacktop>Z0</stacktop>
-                    <stackoperation>PUSH</stackoperation>
-                    <push>0</push>
+                <from>Q0</from>
+                <to>Q0</to>
+                <input>0</input>
+                <stacktop>Z0</stacktop>
+                <operation>PUSH</operation>
+                <push>0</push>
             </transition>
             <transition>
-                    <from>Q0</from>
-                    <to>Q0</to>
-                    <input>1</input>
-                    <stacktop>Z0</stacktop>
-                    <stackoperation>PUSH</stackoperation>
-                    <push>1</push>
+                <from>Q0</from>
+                <to>Q0</to>
+                <input>1</input>
+                <stacktop>Z0</stacktop>
+                <operation>PUSH</operation>
+                <push>1</push>
             </transition>
             <transition>
-                    <from>Q0</from>
-                    <to>Q0</to>
-                    <input>0</input>
-                    <stacktop>0</stacktop>
-                    <stackoperation>PUSH</stackoperation>
-                    <push>0</push>
+                <from>Q0</from>
+                <to>Q0</to>
+                <input>0</input>
+                <stacktop>0</stacktop>
+                <operation>PUSH</operation>
+                <push>0</push>
             </transition>
             <transition>
-                    <from>Q0</from>
-                    <to>Q0</to>
-                    <input>0</input>
-                    <stacktop>1</stacktop>
-                    <stackoperation>PUSH</stackoperation>
-                    <push>0</push>
+                <from>Q0</from>
+                <to>Q0</to>
+                <input>0</input>
+                <stacktop>1</stacktop>
+                <operation>PUSH</operation>
+                <push>0</push>
             </transition>
             <transition>
-                    <from>Q0</from>
-                    <to>Q0</to>
-                    <input>1</input>
-                    <stacktop>1</stacktop>
-                    <stackoperation>PUSH</stackoperation>
-                    <push>1</push>
+                <from>Q0</from>
+                <to>Q0</to>
+                <input>1</input>
+                <stacktop>1</stacktop>
+                <operation>PUSH</operation>
+                <push>1</push>
             </transition>
             <transition>
-                    <from>Q0</from>
-                    <to>Q0</to>
-                    <input>1</input>
-                    <stacktop>0</stacktop>
-                    <stackoperation>PUSH</stackoperation>
-                    <push>1</push>
-            </transition>
-
-            <transition>
-                    <from>Q0</from>
-                    <to>Q1</to>
-                    <input>c</input>
-                    <stacktop>Z0</stacktop>
-                    <stackoperation>STAY</stackoperation>
-            </transition>
-            <transition>
-                    <from>Q0</from>
-                    <to>Q1</to>
-                    <input>c</input>
-                    <stacktop>0</stacktop>
-                    <stackoperation>STAY</stackoperation>
-            </transition>
-            <transition>
-                    <from>Q0</from>
-                    <to>Q1</to>
-                    <input>c</input>
-                    <stacktop>1</stacktop>
-                    <stackoperation>STAY</stackoperation>
+                <from>Q0</from>
+                <to>Q0</to>
+                <input>1</input>
+                <stacktop>0</stacktop>
+                <operation>PUSH</operation>
+                <push>1</push>
             </transition>
 
             <transition>
-                    <from>Q1</from>
-                    <to>Q1</to>
-                    <input>0</input>
-                    <stacktop>0</stacktop>
-                    <stackoperation>POP</stackoperation>
+                <from>Q0</from>
+                <to>Q1</to>
+                <input>c</input>
+                <stacktop>Z0</stacktop>
+                <operation>STAY</operation>
             </transition>
             <transition>
-                    <from>Q1</from>
-                    <to>Q1</to>
-                    <input>1</input>
-                    <stacktop>1</stacktop>
-                    <stackoperation>POP</stackoperation>
+                <from>Q0</from>
+                <to>Q1</to>
+                <input>c</input>
+                <stacktop>0</stacktop>
+                <operation>STAY</operation>
+            </transition>
+            <transition>
+                <from>Q0</from>
+                <to>Q1</to>
+                <input>c</input>
+                <stacktop>1</stacktop>
+                <operation>STAY</operation>
             </transition>
 
             <transition>
-                    <from>Q1</from>
-                    <to>Q2</to>
-                    <input>epsilon</input>
-                    <stacktop>Z0</stacktop>
-                    <stackoperation>STAY</stackoperation>
+                <from>Q1</from>
+                <to>Q1</to>
+                <input>0</input>
+                <stacktop>0</stacktop>
+                <operation>POP</operation>
+            </transition>
+            <transition>
+                <from>Q1</from>
+                <to>Q1</to>
+                <input>1</input>
+                <stacktop>1</stacktop>
+                <operation>POP</operation>
+            </transition>
+
+            <transition>
+                <from>Q1</from>
+                <to>Q2</to>
+                <input>empty</input>
+                <stacktop>Z0</stacktop>
+                <operation>STAY</operation>
             </transition>
     </Transitions>
 </PDA>

@@ -192,17 +192,18 @@ std::ostream& operator<<(std::ostream& out, PDAID id){
 	std::stack<char> temp = id.fStack;
 
 	out << "PDA ID(" << id.fInput << ", " << id.fState->getName() << ", ";
-	std::cout << temp.size() << ": ";
-	for(unsigned int i = 0; i <= temp.size(); i++){
-		if(temp.top() == 9){
-			out << "[Z0]";
-			temp.pop();
-		}else if(temp.top() == 0){
-			out << "[e]";
-			temp.pop();
-		}else{
-			out << temp.top();
-			temp.pop();
+	if(temp.size() != 0){
+		for(unsigned int i = 0; i <= temp.size(); i++){
+			if(temp.top() == 9){
+				out << "[Z0]";
+				temp.pop();
+			}else if(temp.top() == 0){
+				out << "[e]";
+				temp.pop();
+			}else{
+				out << temp.top();
+				temp.pop();
+			}
 		}
 	}
 	out << ")";
@@ -455,8 +456,8 @@ PDA::PDA(const std::string& fileName){
                 if (elemOfDeltaName == "transition") {
                     std::string from = "";
                     std::string to = "";
-                    char input = '\0';
-                    char stackTop = '\0';
+                    char input = 3;
+                    char stackTop = 3;
                     PDAStackOperation stackOperation;
                     std::vector<char> stackPush;
                     for(TiXmlElement* elemOfTransition = elemOfDelta->FirstChildElement(); elemOfTransition != NULL; elemOfTransition = elemOfTransition->NextSiblingElement()) {
@@ -492,9 +493,12 @@ PDA::PDA(const std::string& fileName){
                             if(text == NULL)
                                 continue;
                             std::string t = text->Value();
+                            std::cout << "input " << t << std::endl;
                             if(t.size() != 1){
                             	if(t == "epsilon"){
                             		input = 0;
+                            	}else if(t == "empty"){
+                            		input = 5;
                             	}else{
                             		throw std::runtime_error("Error generating PDA from XML: input must be only one character by transition");
                             	}
@@ -545,40 +549,57 @@ PDA::PDA(const std::string& fileName){
                             std::string t = text->Value();
                             if(t == "PUSH"){
                             	stackOperation = PUSH;
-                            }if(t == "POP"){
+                            }else if(t == "POP"){
                             	stackOperation = POP;
-                            }if(t == "STAY"){
+                            }else if(t == "STAY"){
                             	stackOperation = STAY;
-                            }if(t == "EMPTY"){
+                            }else if(t == "EMPTY"){
                             	stackOperation = EMPTY;
                             }else{
                             	throw std::runtime_error("Error generating PDA from XML: operation should in transition should be POP, PUSH, EMPTY or STAY");
                             }
                         }
-
                     }
 
-                    if (from.size() && to.size() && input != '\0' && stackTop != '\0' && stackOperation){
-                    	// Let's find those states
-                    	PDAState *fromptr = nullptr;
-                    	PDAState *toptr = nullptr;
-                    	for(auto it = states.begin();it != states.end();it++){
-                    		if(it->getName() == from){
-                    			fromptr = &(*it);
-                    		}
-                    		if(it->getName() == to){
-								toptr = &(*it);
-							}
-                    	}
-
-                    	if(fromptr == nullptr or toptr == nullptr){
-                    		throw std::runtime_error("Error generating PDA from XML: State in transition doesn't exists");
-                    	}
-                    	PDATransition transition(fromptr, toptr, input, stackTop, stackOperation, stackPush);
-                        this->addTransition(transition);
-                    }else{
-                         throw std::runtime_error("Error generating PDA from XML: Incomplete transition");
+                    if(from.size() == 0){
+                    	throw std::runtime_error("Error generating PDA from XML: Incomplete transition due to no from given");
                     }
+
+                    if(to.size() == 0){
+						throw std::runtime_error("Error generating PDA from XML: Incomplete transition due to no to given");
+					}
+
+                    if(stackOperation != PUSH || stackOperation != POP || stackOperation != STAY || stackOperation != EMPTY){
+                    	//throw std::runtime_error("Error generating PDA from XML: Incomplete transition due to no operation given");
+                    }
+
+                    if(input == 3){
+                    	std::cout << input <<std::endl;
+						throw std::runtime_error("Error generating PDA from XML: Incomplete transition due to no input given");
+					}
+
+                    if(stackTop == 3){
+                    	std::cout << input <<std::endl;
+						throw std::runtime_error("Error generating PDA from XML: Incomplete transition due to no stacktop given");
+					}
+
+					// Let's find those states
+					PDAState *fromptr = nullptr;
+					PDAState *toptr = nullptr;
+					for(auto it = states.begin();it != states.end();it++){
+						if(it->getName() == from){
+							fromptr = &(*it);
+						}
+						if(it->getName() == to){
+							toptr = &(*it);
+						}
+					}
+
+					if(fromptr == nullptr or toptr == nullptr){
+						throw std::runtime_error("Error generating PDA from XML: State in transition doesn't exists");
+					}
+					PDATransition transition(fromptr, toptr, input, stackTop, stackOperation, stackPush);
+					this->addTransition(transition);
                 }
             }
 
@@ -628,7 +649,7 @@ bool PDA::addState(const PDAState& state){
 bool PDA::addTransition(PDATransition transition){
 	// now let's check if the transition is legal
 	if(std::find(this->fAlphabet.begin(), this->fAlphabet.end(), transition.fInputSymbol) == this->fAlphabet.end()){
-		if(transition.fInputSymbol != 0 or transition.fInputSymbol != 5){
+		if(transition.fInputSymbol != 0 and transition.fInputSymbol != 5){
 			throw std::runtime_error("The transition symbol isn't in the alphabet");
 			return false;
 		}
@@ -706,6 +727,13 @@ std::vector<PDATransition> PDA::getTransitions(std::string input, char stackTopS
 
 		// Now add the epsilon transitions
 		if(transitionIt->fInputSymbol == 0){
+			if(transitionIt->fTopStack == stackTopSymbol and transitionIt->fFrom == from){
+				selectedTransitions.push_back(*transitionIt);
+			}
+		}
+
+		// Now add the empty transitions
+		if(transitionIt->fInputSymbol == 5 and input.size() == 0){
 			if(transitionIt->fTopStack == stackTopSymbol and transitionIt->fFrom == from){
 				selectedTransitions.push_back(*transitionIt);
 			}
