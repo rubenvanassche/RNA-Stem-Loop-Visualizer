@@ -46,7 +46,18 @@ Three examples are provided, each with different structure/syntaxes:
 
 PDA (Ruben Van Assche)
 ----------------------
-To be cont'd
+    INPUT 
+Provide the name of a PDA in .xml-format (including the ".xml" 
+suffix) as a command line argument. When prompted, enter an input string
+
+    OUTPUT
+"String accepted" or "String not accepted" for every input string entered 
+(or an exception message)
+
+    EXAMPLES
+One ODA in .xml format is provided as example:
+
+    - PDAInput1.xml is a PDA accpeting all the palindromes of the form : [0+1]*c[0+1]*
 
 
 LLParser (Pieter Lauwers)

@@ -90,6 +90,7 @@ private:
 enum PDAStackOperation{
     PUSH,
     POP,
+    POPPUSH,
     STAY,
     EMPTY
 };
@@ -319,6 +320,8 @@ private:
     std::set<char> fAlphabet;
 
     std::stack<char> fStack;
+
+    bool fBasedUponCFG = false; // So we do not spend computer time at running in loops
 };
 
 

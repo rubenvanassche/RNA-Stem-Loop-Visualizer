@@ -6,6 +6,7 @@
  */
 #include "Catch.h"
 #include "PDA.h"
+#include "CFG.h"
 #include <exception>
 
 TEST_CASE("Stack Operation","[PDA]"){
@@ -218,6 +219,48 @@ TEST_CASE("PDA 3", "[PDA]"){
 	CHECK(pda.process("iiee") == true);
 	CHECK(pda.process("iieiieeiee") == true);
 	CHECK(pda.process("iieiieeie") == false);
+}
+
+TEST_CASE("CFGPDA 1","[PDA]"){
+    const std::set<char> terminals = {'a', 'b'};
+    const std::set<char> variables = {'A', 'B', 'C'};
+
+    const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'A', "ABB"},
+                                                        {'A', ""},
+                                                        {'B', "a"}
+                                                        };
+    CFG c0(terminals, variables, productions, 'A');
+    PDA pda(c0);
+
+    CHECK(pda.process("") == true);
+    CHECK(pda.process("a") == false);
+    CHECK(pda.process("aa") == true);
+    CHECK(pda.process("aaa") == false);
+    CHECK(pda.process("aaaa") == true);
+}
+
+TEST_CASE("CFGPDA 2","[PDA]"){
+    const std::set<char> terminals = {'0', '1'};
+    const std::set<char> variables = {'A'};
+
+    const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'A', "0A1"},
+                                                        {'A', "0"},
+                                                        {'A', "1"}
+                                                        };
+    CFG c0(terminals, variables, productions, 'A');
+    PDA pda(c0);
+
+    /*
+    CHECK(pda.process("001") == true);
+    CHECK(pda.process("01") == false);
+    CHECK(pda.process("1") == false);
+    CHECK(pda.process("011") == true);
+    CHECK(pda.process("00111") == true);
+    */
 }
 
 
