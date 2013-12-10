@@ -34,6 +34,8 @@
 #include <stdexcept>
 #include <algorithm>
 #include <queue>
+#include "CFG.h"
+#include "TinyXML/tinyxml.h"
 
 /**
  * @brief Class representing a state from a PDA
@@ -88,7 +90,8 @@ private:
 enum PDAStackOperation{
     PUSH,
     POP,
-    STAY
+    STAY,
+    EMPTY
 };
 
 /**
@@ -202,6 +205,15 @@ public:
      */
     void step(const std::string& input, PDAState* currentState, const std::stack<char> stack);
 
+    /**
+	 * @brief Check if this ID will be accepted by the PDA
+	 *
+	 * @param pdaType Type of PDA(State or Stack)
+	 *
+	 * @return bool telling if the ID is accepted
+	 */
+    bool isAccepted(PDAFinal pdaType);
+
     friend std::ostream& operator<<(std::ostream& out, PDAID id);
 
     std::string fInput;
@@ -226,6 +238,21 @@ public:
         const std::set<char>& alphabetStack, 
         const PDAFinal& PDAending
         );
+
+
+    /**
+    * @brief Constructor
+    *
+    * @param cfg A Context Free Grammar to be transformed to a PDA
+    */
+    PDA(CFG cfg);
+
+    /**
+     * @brief Constructor
+     *
+     * @param fileName A XML file containing info about the PDA
+     */
+    PDA(const std::string& fileName);
 
      /**
      * @brief Add a new state to the PDA
@@ -264,13 +291,22 @@ public:
      */
     bool process(std::string input);
 
+    friend std::ostream& operator<<(std::ostream& out, PDA pda);
+
     virtual ~PDA();
 
 private:
-
+    /**
+     * @brief Get transitions based upon an input, stackTopsymbol and state
+     *
+     * @param input Which string should be processed by the state
+     * @param stackTopSymbol The symbol on the top of the stack at the moment this function is called
+     * @param from A PDAState from where the transitions should start
+     *
+     * @return A vector<PDATransition> giving you all the transitions starting from the specified state
+     */
     std::vector<PDATransition> getTransitions(std::string input, char stackTopSymbol, PDAState* from);
 
-    std::pair<bool, bool> isFinalDead(const std::string& input, PDAState* to, const std::stack<char> stack);
 
     std::list<PDATransition> fTransitions;
     std::list<PDAState> fStates;
@@ -284,5 +320,6 @@ private:
 
     std::stack<char> fStack;
 };
+
 
 #endif /* PDA_H_ */
