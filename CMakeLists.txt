@@ -69,6 +69,15 @@ set(CYKSRC
     src/TinyXML/tinystr.cpp
     )
 
+# Lists only CYK related files
+set(PDASRC
+    src/PDA.cpp
+    src/TinyXML/tinyxml.cpp 
+    src/TinyXML/tinyxmlparser.cpp 
+    src/TinyXML/tinyxmlerror.cpp 
+    src/TinyXML/tinystr.cpp
+    )
+
 # Set flags
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
@@ -84,5 +93,8 @@ add_executable(RunTuring src/runTuringInput.cpp ${TURINGSRC})
 # Target to build the CYK algorithm
 add_executable(RunCYK src/runCYK.cpp ${CYKSRC})
 
+# Target to build the PDA  test
+add_executable(RunPDA src/runPDAInput.cpp ${PDASRC})
+
 # Install all executables into the bin directory.
-install(TARGETS Tests RNAslv RunTuring RunCYK DESTINATION ${PROJECT_SOURCE_DIR}/bin)
+install(TARGETS Tests RNAslv RunTuring RunCYK RunPDA DESTINATION ${PROJECT_SOURCE_DIR}/bin)
