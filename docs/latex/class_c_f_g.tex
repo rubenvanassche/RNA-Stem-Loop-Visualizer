@@ -1,0 +1,280 @@
+\hypertarget{class_c_f_g}{\section{C\-F\-G Class Reference}
+\label{class_c_f_g}\index{C\-F\-G@{C\-F\-G}}
+}
+
+
+Class representing a context free grammar.  
+
+
+
+
+{\ttfamily \#include $<$C\-F\-G.\-h$>$}
+
+Inheritance diagram for C\-F\-G\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_c_f_g}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_c_f_g_a74681f6f1a182d0e754e5db0e9545f5b}{C\-F\-G} (const std\-::set$<$ char $>$ \&terminals, const std\-::set$<$ char $>$ \&variables, const std\-::multimap$<$ char, Symbol\-String $>$ \&productions, const char \&startsymbol)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_c_f_g_a7a9e0feb406099038faea4c67ef31786}{virtual \hyperlink{class_c_f_g_a7a9e0feb406099038faea4c67ef31786}{$\sim$\-C\-F\-G} ()}\label{class_c_f_g_a7a9e0feb406099038faea4c67ef31786}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+std\-::set$<$ Symbol\-String $>$ \hyperlink{class_c_f_g_a391a7d2b5ef8145dff4c4b1d2c1dfe78}{bodies} (const char \&v) const 
+\begin{DoxyCompactList}\small\item\em Get the set of bodies with the passed variable as head. For example if there are productions of the form A -\/$>$ \char`\"{}a\char`\"{} and A -\/$>$ \char`\"{}a\-A\char`\"{}, then this will returns \{\char`\"{}a\char`\"{}, \char`\"{}a\-A\char`\"{}\}. \end{DoxyCompactList}\item 
+std\-::set$<$ char $>$ \hyperlink{class_c_f_g_a5df6f5e5f972ede1a2f1eb210a5e33d6}{nullable} () const 
+\begin{DoxyCompactList}\small\item\em Get all the nullable variables. \end{DoxyCompactList}\item 
+void \hyperlink{class_c_f_g_ac849b4a92eea2311a9626061b3e193b8}{eleminate\-Epsilon\-Productions} ()
+\begin{DoxyCompactList}\small\item\em Eleminate epsilon productions. That is, eleminate productions of the form A -\/$>$ ε, but doing so that the \hyperlink{class_c_f_g}{C\-F\-G} still accepts the same language with epsilon (empty string excluded). \end{DoxyCompactList}\item 
+std\-::set$<$ std\-::pair$<$ char, char $>$ $>$ \hyperlink{class_c_f_g_afe7d63958621b57a80d334827b9c6ceb}{units} () const 
+\begin{DoxyCompactList}\small\item\em Get all the unit pairs of this \hyperlink{class_c_f_g}{C\-F\-G}. \end{DoxyCompactList}\item 
+void \hyperlink{class_c_f_g_a61a4e75db20b0c39e0288c8f5146a8a6}{eleminate\-Unit\-Productions} ()
+\begin{DoxyCompactList}\small\item\em Eleminate unit productions. That is, eleminate productions of the form A -\/$>$ B. But doing so that it does not affect the language of this \hyperlink{class_c_f_g}{C\-F\-G}. \end{DoxyCompactList}\item 
+std\-::set$<$ char $>$ \hyperlink{class_c_f_g_ac6b8b908c8af9211ebecab911d5cd5ea}{generating} () const 
+\begin{DoxyCompactList}\small\item\em Get all the generating symbols. \end{DoxyCompactList}\item 
+std\-::set$<$ char $>$ \hyperlink{class_c_f_g_a41fd806703a8f2187abbefaa72a5cb5c}{reachable} () const 
+\begin{DoxyCompactList}\small\item\em Get all the reachable symbols. \end{DoxyCompactList}\item 
+void \hyperlink{class_c_f_g_a08b46d11fa9ce0670c1218d5231c20cb}{eleminate\-Useless\-Symbols} ()
+\begin{DoxyCompactList}\small\item\em Eleminate useless symbols. But doing so that is does not affect the language of this \hyperlink{class_c_f_g}{C\-F\-G}. \end{DoxyCompactList}\item 
+void \hyperlink{class_c_f_g_ab9999f6e214b05d9dfb0536b8b680e10}{clean\-Up} ()
+\begin{DoxyCompactList}\small\item\em Clean up \hyperlink{class_c_f_g}{C\-F\-G}, that is, eleminate epsilon productions, useless symbols and unit productions I\-N S\-A\-F\-E O\-R\-D\-E\-R. This comes in handy for converting to \hyperlink{class_c_n_f}{C\-N\-F} (Chomsky Normal Form). Also\-: removes all variables which don't have any production rules at all. \end{DoxyCompactList}\item 
+\hypertarget{class_c_f_g_a49b4255577be81ace0b957bd05ffcc4e}{std\-::set$<$ char $>$ {\bfseries get\-Terminals} ()}\label{class_c_f_g_a49b4255577be81ace0b957bd05ffcc4e}
+
+\item 
+\hypertarget{class_c_f_g_a93e29d2502f3189e7f7a9808d3871537}{std\-::set$<$ char $>$ {\bfseries get\-Variables} ()}\label{class_c_f_g_a93e29d2502f3189e7f7a9808d3871537}
+
+\item 
+\hypertarget{class_c_f_g_aa3831e04435bec5137fbf8ec99342d53}{std\-::multimap$<$ char, Symbol\-String $>$ {\bfseries get\-Productions} ()}\label{class_c_f_g_aa3831e04435bec5137fbf8ec99342d53}
+
+\item 
+\hypertarget{class_c_f_g_a7f285339723a8cbe79dcf3fc4eb1c551}{char {\bfseries get\-Startsymbol} ()}\label{class_c_f_g_a7f285339723a8cbe79dcf3fc4eb1c551}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_c_f_g_ac016cd234680353c2335233b9e46cb47}{std\-::set$<$ char $>$ \hyperlink{class_c_f_g_ac016cd234680353c2335233b9e46cb47}{f\-Terminals}}\label{class_c_f_g_ac016cd234680353c2335233b9e46cb47}
+
+\begin{DoxyCompactList}\small\item\em The set of terminal symbols. \end{DoxyCompactList}\item 
+\hypertarget{class_c_f_g_a2782ff517d0b17f6ae3853dae83ed144}{std\-::set$<$ char $>$ \hyperlink{class_c_f_g_a2782ff517d0b17f6ae3853dae83ed144}{f\-Variables}}\label{class_c_f_g_a2782ff517d0b17f6ae3853dae83ed144}
+
+\begin{DoxyCompactList}\small\item\em The set of variables. \end{DoxyCompactList}\item 
+\hypertarget{class_c_f_g_acead5f2b9238ec9bbc56d9e1de16f44f}{std\-::multimap$<$ char, Symbol\-String $>$ \hyperlink{class_c_f_g_acead5f2b9238ec9bbc56d9e1de16f44f}{f\-Productions}}\label{class_c_f_g_acead5f2b9238ec9bbc56d9e1de16f44f}
+
+\begin{DoxyCompactList}\small\item\em The set of production rules. \end{DoxyCompactList}\item 
+\hypertarget{class_c_f_g_acb92bc7a21984ef4a6d6a86b2e2e1b53}{char {\bfseries f\-Start\-Symbol}}\label{class_c_f_g_acb92bc7a21984ef4a6d6a86b2e2e1b53}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class representing a context free grammar. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_c_f_g_a74681f6f1a182d0e754e5db0e9545f5b}{\index{C\-F\-G@{C\-F\-G}!C\-F\-G@{C\-F\-G}}
+\index{C\-F\-G@{C\-F\-G}!CFG@{C\-F\-G}}
+\subsubsection[{C\-F\-G}]{\setlength{\rightskip}{0pt plus 5cm}C\-F\-G\-::\-C\-F\-G (
+\begin{DoxyParamCaption}
+\item[{const std\-::set$<$ char $>$ \&}]{terminals, }
+\item[{const std\-::set$<$ char $>$ \&}]{variables, }
+\item[{const std\-::multimap$<$ char, Symbol\-String $>$ \&}]{productions, }
+\item[{const char \&}]{startsymbol}
+\end{DoxyParamCaption}
+)}}\label{class_c_f_g_a74681f6f1a182d0e754e5db0e9545f5b}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em terminals} & A set containing the terminals of the \hyperlink{class_c_f_g}{C\-F\-G}. \\
+\hline
+{\em variables} & A set containing the variables of the \hyperlink{class_c_f_g}{C\-F\-G}. \\
+\hline
+{\em productions} & A multimap that maps any symbol from the set of variables to a (possibly empty) Symbol\-String (which contains symbols from either the set of terminals or either the set of variables. \\
+\hline
+{\em startsymbol} & The startsymbol for the \hyperlink{class_c_f_g}{C\-F\-G}.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+
+\begin{DoxyItemize}
+\item The set of variables and the set of terminals are disjoints.
+\item The production rule is valid\-: the head consist of exactly one symbol that is in the set of the variables and the body must be empty or consisting of symbols that is either in the set of variables or in the set of terminals.
+\item The starting symbol must be a member of the set of variables.
+\end{DoxyItemize}
+\end{DoxyPrecond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & One of the preconditions were not met. \\
+\hline
+\end{DoxyExceptions}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_c_f_g_a391a7d2b5ef8145dff4c4b1d2c1dfe78}{\index{C\-F\-G@{C\-F\-G}!bodies@{bodies}}
+\index{bodies@{bodies}!CFG@{C\-F\-G}}
+\subsubsection[{bodies}]{\setlength{\rightskip}{0pt plus 5cm}std\-::set$<$ Symbol\-String $>$ C\-F\-G\-::bodies (
+\begin{DoxyParamCaption}
+\item[{const char \&}]{v}
+\end{DoxyParamCaption}
+) const}}\label{class_c_f_g_a391a7d2b5ef8145dff4c4b1d2c1dfe78}
+
+
+Get the set of bodies with the passed variable as head. For example if there are productions of the form A -\/$>$ \char`\"{}a\char`\"{} and A -\/$>$ \char`\"{}a\-A\char`\"{}, then this will returns \{\char`\"{}a\char`\"{}, \char`\"{}a\-A\char`\"{}\}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em v} & The variable representing the head of the production rules.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The set of Symbol\-String representing the body of the production rules whose head is the passed variable.
+\end{DoxyReturn}
+\begin{DoxyPrecond}{Precondition}
+
+\begin{DoxyItemize}
+\item The passed variable must be in the set of the variables.
+\end{DoxyItemize}
+\end{DoxyPrecond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::invalid\-\_\-argument} & The precondition were not satisfied. \\
+\hline
+\end{DoxyExceptions}
+\hypertarget{class_c_f_g_ab9999f6e214b05d9dfb0536b8b680e10}{\index{C\-F\-G@{C\-F\-G}!clean\-Up@{clean\-Up}}
+\index{clean\-Up@{clean\-Up}!CFG@{C\-F\-G}}
+\subsubsection[{clean\-Up}]{\setlength{\rightskip}{0pt plus 5cm}void C\-F\-G\-::clean\-Up (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{class_c_f_g_ab9999f6e214b05d9dfb0536b8b680e10}
+
+
+Clean up \hyperlink{class_c_f_g}{C\-F\-G}, that is, eleminate epsilon productions, useless symbols and unit productions I\-N S\-A\-F\-E O\-R\-D\-E\-R. This comes in handy for converting to \hyperlink{class_c_n_f}{C\-N\-F} (Chomsky Normal Form). Also\-: removes all variables which don't have any production rules at all. 
+
+\begin{DoxyPostcond}{Postcondition}
+The production rules doesn't contain any nullable symbols. 
+
+The production rules doesn't contain any useless symbols. 
+
+The \hyperlink{class_c_f_g}{C\-F\-G} has only unit pairs of the form (A, A) for each A is a variable. 
+\end{DoxyPostcond}
+\hypertarget{class_c_f_g_ac849b4a92eea2311a9626061b3e193b8}{\index{C\-F\-G@{C\-F\-G}!eleminate\-Epsilon\-Productions@{eleminate\-Epsilon\-Productions}}
+\index{eleminate\-Epsilon\-Productions@{eleminate\-Epsilon\-Productions}!CFG@{C\-F\-G}}
+\subsubsection[{eleminate\-Epsilon\-Productions}]{\setlength{\rightskip}{0pt plus 5cm}void C\-F\-G\-::eleminate\-Epsilon\-Productions (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{class_c_f_g_ac849b4a92eea2311a9626061b3e193b8}
+
+
+Eleminate epsilon productions. That is, eleminate productions of the form A -\/$>$ ε, but doing so that the \hyperlink{class_c_f_g}{C\-F\-G} still accepts the same language with epsilon (empty string excluded). 
+
+\begin{DoxyPostcond}{Postcondition}
+The production rules doesn't contain any nullable symbols. 
+\end{DoxyPostcond}
+\hypertarget{class_c_f_g_a61a4e75db20b0c39e0288c8f5146a8a6}{\index{C\-F\-G@{C\-F\-G}!eleminate\-Unit\-Productions@{eleminate\-Unit\-Productions}}
+\index{eleminate\-Unit\-Productions@{eleminate\-Unit\-Productions}!CFG@{C\-F\-G}}
+\subsubsection[{eleminate\-Unit\-Productions}]{\setlength{\rightskip}{0pt plus 5cm}void C\-F\-G\-::eleminate\-Unit\-Productions (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{class_c_f_g_a61a4e75db20b0c39e0288c8f5146a8a6}
+
+
+Eleminate unit productions. That is, eleminate productions of the form A -\/$>$ B. But doing so that it does not affect the language of this \hyperlink{class_c_f_g}{C\-F\-G}. 
+
+\begin{DoxyNote}{Note}
+The algorithm only works if there is no cycle of unit productions. That is, unit pairs of the form A -\/$>$ B, B -\/$>$ C and C -\/$>$ A. If that's the case, an exception will be thrown.
+\end{DoxyNote}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em std\-::logic\-\_\-error} & This \hyperlink{class_c_f_g}{C\-F\-G} has a cycle of unit pairs. T\-O\-D\-O\\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyPostcond}{Postcondition}
+The \hyperlink{class_c_f_g}{C\-F\-G} has only unit pairs of the form (A, A) for each A is a variable. 
+\end{DoxyPostcond}
+\hypertarget{class_c_f_g_a08b46d11fa9ce0670c1218d5231c20cb}{\index{C\-F\-G@{C\-F\-G}!eleminate\-Useless\-Symbols@{eleminate\-Useless\-Symbols}}
+\index{eleminate\-Useless\-Symbols@{eleminate\-Useless\-Symbols}!CFG@{C\-F\-G}}
+\subsubsection[{eleminate\-Useless\-Symbols}]{\setlength{\rightskip}{0pt plus 5cm}void C\-F\-G\-::eleminate\-Useless\-Symbols (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{class_c_f_g_a08b46d11fa9ce0670c1218d5231c20cb}
+
+
+Eleminate useless symbols. But doing so that is does not affect the language of this \hyperlink{class_c_f_g}{C\-F\-G}. 
+
+\begin{DoxyPostcond}{Postcondition}
+The production rules doesn't contain any useless symbols. 
+
+The \hyperlink{class_c_f_g}{C\-F\-G} still accepts the same language. 
+\end{DoxyPostcond}
+\hypertarget{class_c_f_g_ac6b8b908c8af9211ebecab911d5cd5ea}{\index{C\-F\-G@{C\-F\-G}!generating@{generating}}
+\index{generating@{generating}!CFG@{C\-F\-G}}
+\subsubsection[{generating}]{\setlength{\rightskip}{0pt plus 5cm}std\-::set$<$ char $>$ C\-F\-G\-::generating (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{class_c_f_g_ac6b8b908c8af9211ebecab911d5cd5ea}
+
+
+Get all the generating symbols. 
+
+\begin{DoxyReturn}{Returns}
+The set of generating symbols. 
+\end{DoxyReturn}
+\hypertarget{class_c_f_g_a5df6f5e5f972ede1a2f1eb210a5e33d6}{\index{C\-F\-G@{C\-F\-G}!nullable@{nullable}}
+\index{nullable@{nullable}!CFG@{C\-F\-G}}
+\subsubsection[{nullable}]{\setlength{\rightskip}{0pt plus 5cm}std\-::set$<$ char $>$ C\-F\-G\-::nullable (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{class_c_f_g_a5df6f5e5f972ede1a2f1eb210a5e33d6}
+
+
+Get all the nullable variables. 
+
+\begin{DoxyReturn}{Returns}
+The set of all nullable variables. 
+\end{DoxyReturn}
+\hypertarget{class_c_f_g_a41fd806703a8f2187abbefaa72a5cb5c}{\index{C\-F\-G@{C\-F\-G}!reachable@{reachable}}
+\index{reachable@{reachable}!CFG@{C\-F\-G}}
+\subsubsection[{reachable}]{\setlength{\rightskip}{0pt plus 5cm}std\-::set$<$ char $>$ C\-F\-G\-::reachable (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{class_c_f_g_a41fd806703a8f2187abbefaa72a5cb5c}
+
+
+Get all the reachable symbols. 
+
+\begin{DoxyReturn}{Returns}
+The set of all reachable symbols. 
+\end{DoxyReturn}
+\hypertarget{class_c_f_g_afe7d63958621b57a80d334827b9c6ceb}{\index{C\-F\-G@{C\-F\-G}!units@{units}}
+\index{units@{units}!CFG@{C\-F\-G}}
+\subsubsection[{units}]{\setlength{\rightskip}{0pt plus 5cm}std\-::set$<$ std\-::pair$<$ char, char $>$ $>$ C\-F\-G\-::units (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{class_c_f_g_afe7d63958621b57a80d334827b9c6ceb}
+
+
+Get all the unit pairs of this \hyperlink{class_c_f_g}{C\-F\-G}. 
+
+\begin{DoxyReturn}{Returns}
+The set of all unit pairs. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+C\-F\-G.\-h\item 
+C\-F\-G.\-cpp\end{DoxyCompactItemize}

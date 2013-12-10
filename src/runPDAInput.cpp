@@ -21,8 +21,11 @@ int main(int argc, char* argv[]) {
         std::string input;
         std::cin >> input;
         bool answer;
-        if (input == "quit")
+        if (input == "quit"){
+        	delete pda;
             return 0;
+        }
+
         try {
             answer = pda->process(input);
         }
@@ -35,4 +38,6 @@ int main(int argc, char* argv[]) {
         else
             std::cout << "String " << input << " NOT accepted!" << std::endl;
     }
+    delete pda;
+    return 0;
 }

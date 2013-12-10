@@ -79,6 +79,9 @@ public:
 		 */
 		bool operator==(const PDAState& other);
 
+	    /**
+		 * @brief << overloading
+		 */
 		friend std::ostream& operator<<(std::ostream& out, PDAState state);
 
         virtual ~PDAState();
@@ -164,10 +167,74 @@ public:
 	 */
 	bool operator==(const PDATransition& other);
 
+	/**
+	 * @brief Change a stack based upon the data in the transition
+	 *
+	 * @param in A stack with chars representing the stack in the PDA. Be careful! The stack is given by reference
+	 */
     void stackOperation(std::stack<char>& in);
 
+    /**
+	 * @brief << overloading
+	 */
     friend std::ostream& operator<<(std::ostream& out, PDATransition transition);
 
+    /*
+	* @brief get the from state of the transition
+	*
+	* @return PDAState pointer
+	*/
+    PDAState* getFrom(){ return this->fFrom;};
+
+    /*
+	* @brief get the to state of the transition
+	*
+	* @return PDAState pointer
+	*/
+	PDAState* getTo(){ return this->fTo;};
+
+	/*
+	* @brief get the input symbol of the transition
+	*
+	* @return char
+	*/
+	char getInputSymbol(){ return this->fInputSymbol;};
+
+	/*
+	* @brief get the symbol on the top of the stack in this transition
+	*
+	* @return char
+	*/
+	char getTopStack(){ return this->fTopStack;};
+
+	/*
+	* @brief get the stack operation of the transition
+	*
+	* @return PDAStackOperation
+	*/
+	PDAStackOperation getStackOperation(){ return this->fStackOperation;};
+
+	/*
+	* @brief get the characters which are popped on the stack during a push operation
+	*
+	* @return vector with chars
+	*/
+	std::vector<char> getPushStack(){ return this->fPushStack;};
+
+	/*
+	* @brief change the from state in the transition
+	*
+	* @param from PDAState pointer to the state
+	*/
+	void setFrom(PDAState* from){ this->fFrom = from;};
+
+	/*
+	* @brief change the to state in the transition
+	*
+	* @param from PDAState pointer to the state
+	*/
+	void setTo(PDAState* to){ this->fTo = to;};
+private:
     PDAState *fFrom;
     PDAState *fTo;
     char fInputSymbol;
@@ -215,8 +282,33 @@ public:
 	 */
     bool isAccepted(PDAFinal pdaType);
 
+    /**
+	 * @brief << overloading
+	 */
     friend std::ostream& operator<<(std::ostream& out, PDAID id);
 
+    /*
+     * @brief get the input of the ID
+     *
+     * @return string
+     */
+    std::string getInput(){ return this->fInput;};
+
+    /*
+	 * @brief get the state of the ID
+	 *
+	 * @return PDAState pointer
+	 */
+    PDAState* getState(){ return this->fState;};
+
+    /*
+	 * @brief get the stack of the ID
+	 *
+	 * @return stack with chars
+	 */
+    std::stack<char> getStack(){ return this->fStack;};
+
+private:
     std::string fInput;
     PDAState* fState;
     std::stack<char> fStack;
@@ -292,6 +384,9 @@ public:
      */
     bool process(std::string input);
 
+    /**
+	 * @brief << overloading
+	 */
     friend std::ostream& operator<<(std::ostream& out, PDA pda);
 
     virtual ~PDA();

@@ -1,0 +1,114 @@
+\hypertarget{class_p_d_a_i_d}{\section{P\-D\-A\-I\-D Class Reference}
+\label{class_p_d_a_i_d}\index{P\-D\-A\-I\-D@{P\-D\-A\-I\-D}}
+}
+
+
+Class representing a \hyperlink{class_p_d_a}{P\-D\-A} Instantenious Description.  
+
+
+
+
+{\ttfamily \#include $<$P\-D\-A.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_p_d_a_i_d_a2771c16218559b027029c12a0135353a}{P\-D\-A\-I\-D} (const std\-::string \&input, \hyperlink{class_p_d_a_state}{P\-D\-A\-State} $\ast$current\-State, const std\-::stack$<$ char $>$ stack)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+void \hyperlink{class_p_d_a_i_d_aa5ffd9bde5a3a86648ffedfd3932070b}{step} (const std\-::string \&input, \hyperlink{class_p_d_a_state}{P\-D\-A\-State} $\ast$current\-State, const std\-::stack$<$ char $>$ stack)
+\begin{DoxyCompactList}\small\item\em Process the I\-D according to one transition for one step. \end{DoxyCompactList}\item 
+bool \hyperlink{class_p_d_a_i_d_a85f6765dd9c0244f07dc44822c223d46}{is\-Accepted} (P\-D\-A\-Final pda\-Type)
+\begin{DoxyCompactList}\small\item\em Check if this I\-D will be accepted by the \hyperlink{class_p_d_a}{P\-D\-A}. \end{DoxyCompactList}\item 
+\hypertarget{class_p_d_a_i_d_a55955e1bb7212989f671863f2f628f79}{std\-::string {\bfseries get\-Input} ()}\label{class_p_d_a_i_d_a55955e1bb7212989f671863f2f628f79}
+
+\item 
+\hypertarget{class_p_d_a_i_d_a87dbd8ad4bec917fbf17959e87b74884}{\hyperlink{class_p_d_a_state}{P\-D\-A\-State} $\ast$ {\bfseries get\-State} ()}\label{class_p_d_a_i_d_a87dbd8ad4bec917fbf17959e87b74884}
+
+\item 
+\hypertarget{class_p_d_a_i_d_acde6beb96c3f71a8f2e287828a7ab66d}{std\-::stack$<$ char $>$ {\bfseries get\-Stack} ()}\label{class_p_d_a_i_d_acde6beb96c3f71a8f2e287828a7ab66d}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_p_d_a_i_d_a0747801e76043464e9ed4f9e8b749e27}{std\-::ostream \& \hyperlink{class_p_d_a_i_d_a0747801e76043464e9ed4f9e8b749e27}{operator$<$$<$} (std\-::ostream \&out, \hyperlink{class_p_d_a_i_d}{P\-D\-A\-I\-D} id)}\label{class_p_d_a_i_d_a0747801e76043464e9ed4f9e8b749e27}
+
+\begin{DoxyCompactList}\small\item\em $<$$<$ overloading \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class representing a \hyperlink{class_p_d_a}{P\-D\-A} Instantenious Description. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_p_d_a_i_d_a2771c16218559b027029c12a0135353a}{\index{P\-D\-A\-I\-D@{P\-D\-A\-I\-D}!P\-D\-A\-I\-D@{P\-D\-A\-I\-D}}
+\index{P\-D\-A\-I\-D@{P\-D\-A\-I\-D}!PDAID@{P\-D\-A\-I\-D}}
+\subsubsection[{P\-D\-A\-I\-D}]{\setlength{\rightskip}{0pt plus 5cm}P\-D\-A\-I\-D\-::\-P\-D\-A\-I\-D (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{input, }
+\item[{{\bf P\-D\-A\-State} $\ast$}]{current\-State, }
+\item[{const std\-::stack$<$ char $>$}]{stack}
+\end{DoxyParamCaption}
+)}}\label{class_p_d_a_i_d_a2771c16218559b027029c12a0135353a}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em input} & The input string \\
+\hline
+{\em current\-State} & The pointer to state where the I\-D starts \\
+\hline
+{\em stack} & The stack at this moment \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_p_d_a_i_d_a85f6765dd9c0244f07dc44822c223d46}{\index{P\-D\-A\-I\-D@{P\-D\-A\-I\-D}!is\-Accepted@{is\-Accepted}}
+\index{is\-Accepted@{is\-Accepted}!PDAID@{P\-D\-A\-I\-D}}
+\subsubsection[{is\-Accepted}]{\setlength{\rightskip}{0pt plus 5cm}bool P\-D\-A\-I\-D\-::is\-Accepted (
+\begin{DoxyParamCaption}
+\item[{P\-D\-A\-Final}]{pda\-Type}
+\end{DoxyParamCaption}
+)}}\label{class_p_d_a_i_d_a85f6765dd9c0244f07dc44822c223d46}
+
+
+Check if this I\-D will be accepted by the \hyperlink{class_p_d_a}{P\-D\-A}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pda\-Type} & Type of P\-D\-A(\-State or Stack)\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool telling if the I\-D is accepted 
+\end{DoxyReturn}
+\hypertarget{class_p_d_a_i_d_aa5ffd9bde5a3a86648ffedfd3932070b}{\index{P\-D\-A\-I\-D@{P\-D\-A\-I\-D}!step@{step}}
+\index{step@{step}!PDAID@{P\-D\-A\-I\-D}}
+\subsubsection[{step}]{\setlength{\rightskip}{0pt plus 5cm}void P\-D\-A\-I\-D\-::step (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{input, }
+\item[{{\bf P\-D\-A\-State} $\ast$}]{current\-State, }
+\item[{const std\-::stack$<$ char $>$}]{stack}
+\end{DoxyParamCaption}
+)}}\label{class_p_d_a_i_d_aa5ffd9bde5a3a86648ffedfd3932070b}
+
+
+Process the I\-D according to one transition for one step. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em to} & Pointer to next state \\
+\hline
+{\em input\-Symbol} & Character accompanied with this transition \\
+\hline
+{\em top\-Stack} & Character that should be at the top of the stack after the transition \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+P\-D\-A.\-h\item 
+P\-D\-A.\-cpp\end{DoxyCompactItemize}

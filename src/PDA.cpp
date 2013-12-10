@@ -664,14 +664,14 @@ bool PDA::addState(const PDAState& state){
 
 bool PDA::addTransition(PDATransition transition){
 	// now let's check if the transition is legal
-	if(std::find(this->fAlphabet.begin(), this->fAlphabet.end(), transition.fInputSymbol) == this->fAlphabet.end()){
-		if(transition.fInputSymbol != 0 and transition.fInputSymbol != 5){
+	if(std::find(this->fAlphabet.begin(), this->fAlphabet.end(), transition.getInputSymbol()) == this->fAlphabet.end()){
+		if(transition.getInputSymbol() != 0 and transition.getInputSymbol() != 5){
 			throw std::runtime_error("The transition symbol isn't in the alphabet");
 			return false;
 		}
 	}
 
-	for(auto pushStackIt = transition.fPushStack.begin();pushStackIt != transition.fPushStack.end();pushStackIt++){
+	for(auto pushStackIt = transition.getPushStack().begin();pushStackIt != transition.getPushStack().end();pushStackIt++){
 		if(std::find(this->fStackAlphabet.begin(), this->fStackAlphabet.end(), *pushStackIt) == this->fStackAlphabet.end()){
 			if(*pushStackIt != 0){
 				throw std::runtime_error("The transition symbol from the push on stack vector isn't in the alphabet");
@@ -680,8 +680,8 @@ bool PDA::addTransition(PDATransition transition){
 		}
 	}
 
-	if(std::find(this->fStackAlphabet.begin(), this->fStackAlphabet.end(), transition.fTopStack) == this->fStackAlphabet.end()){
-		if(transition.fTopStack != 9){
+	if(std::find(this->fStackAlphabet.begin(), this->fStackAlphabet.end(), transition.getTopStack()) == this->fStackAlphabet.end()){
+		if(transition.getTopStack() != 9){
 			throw std::runtime_error("The top of the stack symbol isn't in the stack alphabet");
 			return false;
 		}
@@ -691,10 +691,10 @@ bool PDA::addTransition(PDATransition transition){
 	PDAState* newFrom = nullptr;
 	PDAState* newTo = nullptr;
 	for(auto statesIt = this->fStates.begin();statesIt != this->fStates.end();statesIt++){
-		if(transition.fFrom->getName() == statesIt->getName()){
+		if(transition.getFrom()->getName() == statesIt->getName()){
 			newFrom = &(*statesIt);
 		}
-		if(transition.fTo->getName() == statesIt->getName()){
+		if(transition.getTo()->getName() == statesIt->getName()){
 			newTo = &(*statesIt);
 		}
 	}
@@ -709,8 +709,8 @@ bool PDA::addTransition(PDATransition transition){
 		return false;
 	}
 
-	transition.fFrom = newFrom;
-	transition.fTo = newTo;
+	transition.setFrom(newFrom);
+	transition.setTo(newTo);
 
 	if(std::find(this->fTransitions.begin(), this->fTransitions.end(), transition) == this->fTransitions.end()){
 		// Transition is not yet in fTransitions list
@@ -729,11 +729,11 @@ std::vector<PDATransition> PDA::getTransitions(std::string input, char stackTopS
 	for(auto transitionIt = fTransitions.begin(); transitionIt != fTransitions.end();transitionIt++){
 		if(input.size() != 0){
 			// only if there are characters, take the first character
-			if(transitionIt->fInputSymbol == input.at(0)){
+			if(transitionIt->getInputSymbol() == input.at(0)){
 				// This transition corresponds to the symbol from input we're reading now
-				if(transitionIt->fFrom == from){
+				if(transitionIt->getFrom() == from){
 					// This transition has the same from as given in the parameter list
-					if(transitionIt->fTopStack == stackTopSymbol){
+					if(transitionIt->getTopStack() == stackTopSymbol){
 						// Top of the PDA stack is equal to what the top of the stack should be in this transition
 						selectedTransitions.push_back(*transitionIt);
 					}
@@ -742,15 +742,15 @@ std::vector<PDATransition> PDA::getTransitions(std::string input, char stackTopS
 		}
 
 		// Now add the epsilon transitions
-		if(transitionIt->fInputSymbol == 0){
-			if(transitionIt->fTopStack == stackTopSymbol and transitionIt->fFrom == from){
+		if(transitionIt->getInputSymbol() == 0){
+			if(transitionIt->getTopStack() == stackTopSymbol and transitionIt->getFrom() == from){
 				selectedTransitions.push_back(*transitionIt);
 			}
 		}
 
 		// Now add the empty transitions
-		if(transitionIt->fInputSymbol == 5 and input.size() == 0){
-			if(transitionIt->fTopStack == stackTopSymbol and transitionIt->fFrom == from){
+		if(transitionIt->getInputSymbol() == 5 and input.size() == 0){
+			if(transitionIt->getTopStack() == stackTopSymbol and transitionIt->getFrom() == from){
 				selectedTransitions.push_back(*transitionIt);
 			}
 		}
@@ -778,7 +778,7 @@ bool PDA::process(std::string input){
 	for(auto transitionsIt = selectedTransitions.begin();transitionsIt != selectedTransitions.end();transitionsIt++){
 		// add the initial ID's
 		std::string newInput = input;
-		if(transitionsIt->fInputSymbol != 0){
+		if(transitionsIt->getInputSymbol() != 0){
 			// If the input symbol is not zero we need to remove a character from the input string
 			newInput.erase(0, 1);
 		}
@@ -786,7 +786,7 @@ bool PDA::process(std::string input){
 		std::stack<char> tempStack = this->fStack;
 		transitionsIt->stackOperation(tempStack);
 
-		PDAID newID(newInput, transitionsIt->fTo, tempStack);
+		PDAID newID(newInput, transitionsIt->getTo(), tempStack);
 
 		if(newID.isAccepted(this->fPDAtype) == true){
 			//std::cout << "Final in first stage with " << newID << std::endl;
@@ -829,11 +829,11 @@ bool PDA::process(std::string input){
 
 		// get the transitions corresponding with the character and the top of the stack
 		char stackTopSymbol = 9;
-		if(ids.front().fStack.size() != 0){
-			stackTopSymbol = ids.front().fStack.top();
+		if(ids.front().getStack().size() != 0){
+			stackTopSymbol = ids.front().getStack().top();
 		}
 
-		selectedTransitions = this->getTransitions(ids.front().fInput, stackTopSymbol, ids.front().fState);
+		selectedTransitions = this->getTransitions(ids.front().getInput(), stackTopSymbol, ids.front().getState());
 		//std::cout << selectedTransitions.size() <<  "Transitions found for " << ids.front() <<std::endl;
 
 		if(selectedTransitions.size() == 0){
@@ -843,21 +843,21 @@ bool PDA::process(std::string input){
 		}else{
 			// there are multiple transitions possible so also multiple ID's
 			// Get the essential data from the current ID
-			std::stack<char> tempStack(ids.front().fStack);
+			std::stack<char> tempStack(ids.front().getStack());
 
 			//std::cout << "Change ID:" << ids.front() << std::endl;
 
 			// Now we're gonna add new ID's for each transition
 			for(auto transitionsIt = selectedTransitions.begin();transitionsIt != selectedTransitions.end();transitionsIt++){
-				std::string newInput = ids.front().fInput;
-				if(transitionsIt->fInputSymbol != 0){
+				std::string newInput = ids.front().getInput();
+				if(transitionsIt->getInputSymbol() != 0){
 					// If the input symbol is not zero we need to remove a character from the input string
 					newInput.erase(0, 1);
 				}
 				std::stack<char> newStack(tempStack);
 				transitionsIt->stackOperation(newStack);
 
-				PDAID newID(newInput, transitionsIt->fTo, newStack);
+				PDAID newID(newInput, transitionsIt->getTo(), newStack);
 
 				// check whether we are final or death
 				if(newID.isAccepted(this->fPDAtype) == true){
@@ -866,7 +866,7 @@ bool PDA::process(std::string input){
 				}
 
 				// We're not death of final yet so add the ID
-				if(this->fBasedUponCFG == true and newID.fStack.size() > newID.fInput.size() + 5){
+				if(this->fBasedUponCFG == true and newID.getStack().size() > newID.getInput().size() + 5){
 					// We're not going to add endless id's with the same production e.g. A->AA from a CFG, if the stack size > input size we stop
 					continue;
 				}

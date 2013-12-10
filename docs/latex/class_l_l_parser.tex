@@ -1,0 +1,145 @@
+\hypertarget{class_l_l_parser}{\section{L\-L\-Parser Class Reference}
+\label{class_l_l_parser}\index{L\-L\-Parser@{L\-L\-Parser}}
+}
+
+
+Class representing an L\-L Parser.  
+
+
+
+
+{\ttfamily \#include $<$L\-L\-Parser.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_l_l_parser_afcc6a86b5054cedcdab1e682885103cb}{L\-L\-Parser} (const std\-::set$<$ char $>$ \&C\-F\-G\-Terminals, const std\-::set$<$ char $>$ \&C\-F\-G\-Variables, const std\-::multimap$<$ char, Symbol\-String $>$ \&C\-F\-G\-Productions, const char \&C\-F\-G\-Startsymbol, const unsigned int lookahead)
+\begin{DoxyCompactList}\small\item\em Constructor, constructs an L\-L Parser from the given elements of a context free grammar. \end{DoxyCompactList}\item 
+\hyperlink{class_l_l_parser_ac1f82371afde6215cdb47226317f8a64}{L\-L\-Parser} (const \hyperlink{class_c_f_g}{C\-F\-G} \&grammar, const unsigned int lookahead)
+\begin{DoxyCompactList}\small\item\em Constructor, constructs an L\-L Parser for the given context free grammar. \end{DoxyCompactList}\item 
+bool \hyperlink{class_l_l_parser_a3c849d307e60f966469d21c76f7ddc58}{process} (const std\-::string \&input) const 
+\begin{DoxyCompactList}\small\item\em Process an input string through the L\-L Parser. \end{DoxyCompactList}\item 
+\hypertarget{class_l_l_parser_afcc3d3e47b886797f852c50c705ffb5d}{virtual \hyperlink{class_l_l_parser_afcc3d3e47b886797f852c50c705ffb5d}{$\sim$\-L\-L\-Parser} ()}\label{class_l_l_parser_afcc3d3e47b886797f852c50c705ffb5d}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\-::ostream \& \hyperlink{class_l_l_parser_adc9e5a8ce5b04aeca440293c75fdff75}{operator$<$$<$} (std\-::ostream \&stream, const \hyperlink{class_l_l_parser}{L\-L\-Parser} \&obj)
+\begin{DoxyCompactList}\small\item\em Prints the parse table to the given output stream. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class representing an L\-L Parser. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_l_l_parser_afcc6a86b5054cedcdab1e682885103cb}{\index{L\-L\-Parser@{L\-L\-Parser}!L\-L\-Parser@{L\-L\-Parser}}
+\index{L\-L\-Parser@{L\-L\-Parser}!LLParser@{L\-L\-Parser}}
+\subsubsection[{L\-L\-Parser}]{\setlength{\rightskip}{0pt plus 5cm}L\-L\-Parser\-::\-L\-L\-Parser (
+\begin{DoxyParamCaption}
+\item[{const std\-::set$<$ char $>$ \&}]{C\-F\-G\-Terminals, }
+\item[{const std\-::set$<$ char $>$ \&}]{C\-F\-G\-Variables, }
+\item[{const std\-::multimap$<$ char, Symbol\-String $>$ \&}]{C\-F\-G\-Productions, }
+\item[{const char \&}]{C\-F\-G\-Startsymbol, }
+\item[{const unsigned int}]{lookahead}
+\end{DoxyParamCaption}
+)}}\label{class_l_l_parser_afcc6a86b5054cedcdab1e682885103cb}
+
+
+Constructor, constructs an L\-L Parser from the given elements of a context free grammar. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em C\-F\-G\-Terminals} & A set containing the terminals of the \hyperlink{class_c_f_g}{C\-F\-G} \\
+\hline
+{\em C\-F\-G\-Variables} & A set containing the variables of the \hyperlink{class_c_f_g}{C\-F\-G} \\
+\hline
+{\em C\-F\-G\-Productions} & A multimap that maps a variable to an symbol\-String \\
+\hline
+{\em C\-F\-G\-Startsymbol} & The startsymbol for the \hyperlink{class_c_f_g}{C\-F\-G} \\
+\hline
+{\em lookahead} & The size of the lookahead (k)\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em invalid\-\_\-argument} & Throws this exception when the Parser can't be contructed \\
+\hline
+\end{DoxyExceptions}
+\hypertarget{class_l_l_parser_ac1f82371afde6215cdb47226317f8a64}{\index{L\-L\-Parser@{L\-L\-Parser}!L\-L\-Parser@{L\-L\-Parser}}
+\index{L\-L\-Parser@{L\-L\-Parser}!LLParser@{L\-L\-Parser}}
+\subsubsection[{L\-L\-Parser}]{\setlength{\rightskip}{0pt plus 5cm}L\-L\-Parser\-::\-L\-L\-Parser (
+\begin{DoxyParamCaption}
+\item[{const {\bf C\-F\-G} \&}]{grammar, }
+\item[{const unsigned int}]{lookahead}
+\end{DoxyParamCaption}
+)}}\label{class_l_l_parser_ac1f82371afde6215cdb47226317f8a64}
+
+
+Constructor, constructs an L\-L Parser for the given context free grammar. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em grammar} & A context free grammar as a base for this L\-L Parser \\
+\hline
+{\em lookahead} & The size of the lookahead (k)\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em invalid\-\_\-argument} & Throws this exception when the Parser can't be contructed \\
+\hline
+\end{DoxyExceptions}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_l_l_parser_a3c849d307e60f966469d21c76f7ddc58}{\index{L\-L\-Parser@{L\-L\-Parser}!process@{process}}
+\index{process@{process}!LLParser@{L\-L\-Parser}}
+\subsubsection[{process}]{\setlength{\rightskip}{0pt plus 5cm}bool L\-L\-Parser\-::process (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{input}
+\end{DoxyParamCaption}
+) const}}\label{class_l_l_parser_a3c849d307e60f966469d21c76f7ddc58}
+
+
+Process an input string through the L\-L Parser. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em input} & The string to be processed by the L\-L Parser\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A bool telling if the Parser accepted 
+\end{DoxyReturn}
+
+
+\subsection{Friends And Related Function Documentation}
+\hypertarget{class_l_l_parser_adc9e5a8ce5b04aeca440293c75fdff75}{\index{L\-L\-Parser@{L\-L\-Parser}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!LLParser@{L\-L\-Parser}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}std\-::ostream\& operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{std\-::ostream \&}]{stream, }
+\item[{const {\bf L\-L\-Parser} \&}]{obj}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [friend]}}}\label{class_l_l_parser_adc9e5a8ce5b04aeca440293c75fdff75}
+
+
+Prints the parse table to the given output stream. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em stream} & The output stream \\
+\hline
+{\em obj} & The parser\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The output stream. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+L\-L\-Parser.\-h\item 
+L\-L\-Parser.\-cpp\end{DoxyCompactItemize}

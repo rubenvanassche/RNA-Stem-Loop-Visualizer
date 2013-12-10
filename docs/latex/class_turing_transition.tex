@@ -1,0 +1,149 @@
+\hypertarget{class_turing_transition}{\section{Turing\-Transition Class Reference}
+\label{class_turing_transition}\index{Turing\-Transition@{Turing\-Transition}}
+}
+
+
+Class representing a transition of a Turing Machine.  
+
+
+
+
+{\ttfamily \#include $<$Turing.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_turing_transition_a60df5eef7134bdcc7409358f4f4a8e4e}{Turing\-Transition} (State\-Ptr from, State\-Ptr to, const std\-::vector$<$ char $>$ \&read, const std\-::vector$<$ char $>$ \&write, Direction dir)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+bool \hyperlink{class_turing_transition_a3abcfe319f73bc78ac9d010007f922b2}{match} (State\-Ptr state, const std\-::vector$<$ char $>$ \&symbols) const 
+\begin{DoxyCompactList}\small\item\em Checks if transition is for given state and tape symbol. \end{DoxyCompactList}\item 
+std\-::tuple$<$ State\-Ptr, \\*
+std\-::vector$<$ char $>$, Direction $>$ \hyperlink{class_turing_transition_a7f3ad7a3bfa9386e5607fdb108f36dae}{get\-Transition} () const 
+\begin{DoxyCompactList}\small\item\em Gets next state, symbol(s) to write and direction. \end{DoxyCompactList}\item 
+bool \hyperlink{class_turing_transition_aa94e95235a7c4140d4c23cb252185900}{is\-This\-Transition} (State\-Ptr from, State\-Ptr to, const std\-::vector$<$ char $>$ \&read, const std\-::vector$<$ char $>$ \&write, Direction dir) const 
+\begin{DoxyCompactList}\small\item\em Checks if all of the given arguments are also the transition's. \end{DoxyCompactList}\item 
+virtual \hyperlink{class_turing_transition_a864a90c01b40bfa7cdcf545980d0f546}{$\sim$\-Turing\-Transition} ()
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_turing_transition_a6a15e70d46d002175fcd9d0d60c9577c}{std\-::ostream \& \hyperlink{class_turing_transition_a6a15e70d46d002175fcd9d0d60c9577c}{operator$<$$<$} (std\-::ostream \&output, const \hyperlink{class_turing_transition}{Turing\-Transition} \&T\-T)}\label{class_turing_transition_a6a15e70d46d002175fcd9d0d60c9577c}
+
+\begin{DoxyCompactList}\small\item\em output overload \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class representing a transition of a Turing Machine. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_turing_transition_a60df5eef7134bdcc7409358f4f4a8e4e}{\index{Turing\-Transition@{Turing\-Transition}!Turing\-Transition@{Turing\-Transition}}
+\index{Turing\-Transition@{Turing\-Transition}!TuringTransition@{Turing\-Transition}}
+\subsubsection[{Turing\-Transition}]{\setlength{\rightskip}{0pt plus 5cm}Turing\-Transition\-::\-Turing\-Transition (
+\begin{DoxyParamCaption}
+\item[{State\-Ptr}]{from, }
+\item[{State\-Ptr}]{to, }
+\item[{const std\-::vector$<$ char $>$ \&}]{read, }
+\item[{const std\-::vector$<$ char $>$ \&}]{write, }
+\item[{Direction}]{dir}
+\end{DoxyParamCaption}
+)}}\label{class_turing_transition_a60df5eef7134bdcc7409358f4f4a8e4e}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em from} & A pointer to the \hyperlink{class_turing_state}{Turing\-State} where this transition is coming from \\
+\hline
+{\em to} & A pointer to the \hyperlink{class_turing_state}{Turing\-State} where this transition is going to \\
+\hline
+{\em read} & The read symbol(s) on the tape (in a vector) \\
+\hline
+{\em write} & The symbol(s) to be written to the tape (in a vector) \\
+\hline
+{\em dir} & Direction in which to move head \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_turing_transition_a864a90c01b40bfa7cdcf545980d0f546}{\index{Turing\-Transition@{Turing\-Transition}!$\sim$\-Turing\-Transition@{$\sim$\-Turing\-Transition}}
+\index{$\sim$\-Turing\-Transition@{$\sim$\-Turing\-Transition}!TuringTransition@{Turing\-Transition}}
+\subsubsection[{$\sim$\-Turing\-Transition}]{\setlength{\rightskip}{0pt plus 5cm}Turing\-Transition\-::$\sim$\-Turing\-Transition (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_turing_transition_a864a90c01b40bfa7cdcf545980d0f546}
+Destructor 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_turing_transition_a7f3ad7a3bfa9386e5607fdb108f36dae}{\index{Turing\-Transition@{Turing\-Transition}!get\-Transition@{get\-Transition}}
+\index{get\-Transition@{get\-Transition}!TuringTransition@{Turing\-Transition}}
+\subsubsection[{get\-Transition}]{\setlength{\rightskip}{0pt plus 5cm}std\-::tuple$<$ State\-Ptr, std\-::vector$<$ char $>$, Direction $>$ Turing\-Transition\-::get\-Transition (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{class_turing_transition_a7f3ad7a3bfa9386e5607fdb108f36dae}
+
+
+Gets next state, symbol(s) to write and direction. 
+
+\begin{DoxyReturn}{Returns}
+Tuple of next state, symbol(s) to write and direction to move in 
+\end{DoxyReturn}
+\hypertarget{class_turing_transition_aa94e95235a7c4140d4c23cb252185900}{\index{Turing\-Transition@{Turing\-Transition}!is\-This\-Transition@{is\-This\-Transition}}
+\index{is\-This\-Transition@{is\-This\-Transition}!TuringTransition@{Turing\-Transition}}
+\subsubsection[{is\-This\-Transition}]{\setlength{\rightskip}{0pt plus 5cm}bool Turing\-Transition\-::is\-This\-Transition (
+\begin{DoxyParamCaption}
+\item[{State\-Ptr}]{from, }
+\item[{State\-Ptr}]{to, }
+\item[{const std\-::vector$<$ char $>$ \&}]{read, }
+\item[{const std\-::vector$<$ char $>$ \&}]{write, }
+\item[{Direction}]{dir}
+\end{DoxyParamCaption}
+) const}}\label{class_turing_transition_aa94e95235a7c4140d4c23cb252185900}
+
+
+Checks if all of the given arguments are also the transition's. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em from} & From pointer to check \\
+\hline
+{\em to} & To pointer to check \\
+\hline
+{\em read} & Read symbol(s) to check \\
+\hline
+{\em write} & Write symbol(s) to check \\
+\hline
+{\em dir} & Direction to check\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the same 
+\end{DoxyReturn}
+\hypertarget{class_turing_transition_a3abcfe319f73bc78ac9d010007f922b2}{\index{Turing\-Transition@{Turing\-Transition}!match@{match}}
+\index{match@{match}!TuringTransition@{Turing\-Transition}}
+\subsubsection[{match}]{\setlength{\rightskip}{0pt plus 5cm}bool Turing\-Transition\-::match (
+\begin{DoxyParamCaption}
+\item[{State\-Ptr}]{state, }
+\item[{const std\-::vector$<$ char $>$ \&}]{symbols}
+\end{DoxyParamCaption}
+) const}}\label{class_turing_transition_a3abcfe319f73bc78ac9d010007f922b2}
+
+
+Checks if transition is for given state and tape symbol. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em state} & State from which transition should start \\
+\hline
+{\em symbols} & Symbol(s) that should be under head on tape\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if matching transition 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Turing.\-h\item 
+Turing.\-cpp\end{DoxyCompactItemize}
