@@ -671,8 +671,10 @@ bool PDA::addTransition(PDATransition transition){
 		}
 	}
 
-	for(auto pushStackIt = transition.getPushStack().begin();pushStackIt != transition.getPushStack().end();pushStackIt++){
+	std::vector<char> pushStack = transition.getPushStack();
+	for(auto pushStackIt = pushStack.begin();pushStackIt != pushStack.end();pushStackIt++){
 		if(std::find(this->fStackAlphabet.begin(), this->fStackAlphabet.end(), *pushStackIt) == this->fStackAlphabet.end()){
+			std::cout << "try to check push on stack " << *pushStackIt << std::endl;
 			if(*pushStackIt != 0){
 				throw std::runtime_error("The transition symbol from the push on stack vector isn't in the alphabet");
 				return false;
