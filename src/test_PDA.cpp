@@ -157,7 +157,7 @@ TEST_CASE("PDA 2", "[PDA]"){
 	PDATransition t21(&Q, &Q, 'e', 'Z', POP);
 	PDATransition t22(&Q, &Q, 'i', 'Z', PUSH, 'Z');
 
-	PDATransition t31(&Q, &R, 5, 'X', POP);
+	//PDATransition t31(&Q, &R, 5, 'X', POP);
 
 
 	std::set<char> alphabet = {'e', 'i'};
@@ -174,7 +174,7 @@ TEST_CASE("PDA 2", "[PDA]"){
 	pda.addTransition(t11);
 	pda.addTransition(t21);
 	pda.addTransition(t22);
-	pda.addTransition(t31);
+	//pda.addTransition(t31);
 
 	//CHECK(pda.process("iiee") == true);
 
