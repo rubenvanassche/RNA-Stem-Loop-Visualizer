@@ -29,6 +29,12 @@ build/
 .project
 .cproject
 
+#ignoring doxygen generated docs
+docs/
+
+#ignoring doxygen generated docs
+docs/
+
 src/Tests
 
 src/RNAslv
