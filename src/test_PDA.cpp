@@ -289,6 +289,65 @@ TEST_CASE("CFGPDA 3","[PDA]"){
     CHECK(pda.process("000111") == false);
 }
 
+TEST_CASE("CFGPDA 4","[PDA]"){
+    const std::set<char> terminals = {'x', 'y'};
+    const std::set<char> variables = {'S', 'Q', 'R'};
+
+    const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'S', "QR"},
+                                                        {'Q', "xQy"},
+                                                        {'Q', "xy"},
+                                                        {'R', "xxRy"},
+                                                        {'R', "xxy"}
+                                                        };
+    CFG c0(terminals, variables, productions, 'S');
+    PDA pda(c0);
+
+    CHECK(pda.process("xyxxy") == true);
+    CHECK(pda.process("xxyyxxxxyy") == true);
+    CHECK(pda.process("xy") == false);
+    CHECK(pda.process("xyxy") == false);
+}
+
+
+TEST_CASE("CFGPDA 5","[PDA]"){
+    const std::set<char> terminals = {'0', '1', '(', ')', '+', '*'};
+    const std::set<char> variables = {'P'};
+
+    const std::multimap<char, SymbolString> empty;
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'P', ""},
+                                                        {'P', "0"},
+                                                        {'P', "1"},
+                                                        {'P', "(P)"},
+                                                        {'P', "P*"},
+                                                        {'P', "P+P"},
+                                                        {'P', "PP"}
+                                                        };
+    CFG c0(terminals, variables, productions, 'P');
+    PDA pda(c0);
+
+    CHECK(pda.process("0+1") == true);
+    try{
+    	REQUIRE_THROWS(pda.process("2+1"));
+    	pda.process("2+1");
+    } catch(std::runtime_error& e){
+    	std::string error(e.what());
+    	CHECK(error == "There is a symbol in the input string which is not in the PDA's alphabet");
+    }
+    CHECK(pda.process("(0+1)*") == true);
+    //CHECK(pda.process("(0)+1+0*+(0+1)") == true);
+    //CHECK(pda.process("00+11") == true);
+    try{
+		REQUIRE_THROWS(pda.process("[0]"));
+		pda.process("[0]");
+	} catch(std::runtime_error& e){
+		std::string error(e.what());
+		CHECK(error == "There is a symbol in the input string which is not in the PDA's alphabet");
+	}
+}
+
 
 
 

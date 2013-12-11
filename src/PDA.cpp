@@ -772,6 +772,13 @@ std::vector<PDATransition> PDA::getTransitions(std::string input, char stackTopS
 }
 
 bool PDA::process(std::string input){
+	for(auto i : input) {
+		if(std::find(this->fAlphabet.begin(), this->fAlphabet.end(), i) == this->fAlphabet.end()){
+			throw std::runtime_error("There is a symbol in the input string which is not in the PDA's alphabet");
+			return false;
+		}
+	}
+
 	if(this->fStartState == nullptr){
 		throw std::runtime_error("Please define a  start state before processing a string");
 		return false;
