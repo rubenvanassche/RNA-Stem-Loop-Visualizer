@@ -25,6 +25,8 @@
 #include <iterator>
 #include <stack>
 
+#include <iostream>
+
 /**
  * @brief Recursive implementation to get all the subsets of a given set.
  *
@@ -246,29 +248,39 @@ void CFG::eleminateEpsilonProductions() {
 std::set< std::pair<char, char> > CFG::units() const {
     std::set< std::pair<char, char> > units;
 
+    unsigned int size_before = units.size();
+
+    std::map<char, std::set<char> > found_units;;
+
     // first the base case, (A, A) for A is all variable is an unit pair
     for (char v : fVariables) {
         units.insert( std::pair<char, char>(v, v) );
+
+        std::set<char> s = {v};
+        found_units.insert( std::pair<char, std::set<char> >(v, s) );
     } // end for
 
-    // now, inductive part
-    for (char v : fVariables) {
-        for (SymbolString body : this->bodies(v)) {
-            // if the body is of length 1 and it's a variable, then we have
-            // an unit pair
-            try {
-                char c = body.at(0);
+    unsigned int size_after = units.size();
 
-                if (body.size() == 1 && fVariables.find(c) != fVariables.end())
-                    units.insert(std::pair<char, char>(v, body.at(0)) );
-            } catch (const std::out_of_range& oor) {
-                // ignore this error (occurs only in empty bodies
-                // but that's not interesting for finding unit pairs
-                // anyway...
-                continue;
-            } // end try-catch
+    while (size_before != size_after) {
+        size_before = units.size();
+
+        for (auto& p : found_units) {
+            for (const char& v : p.second) {
+                for (const auto& b : this->bodies(v)) {
+                    if (b.size() == 1 && fVariables.find(b.at(0)) != fVariables.end()) {
+                        units.insert(std::pair<char, char>(p.first, b.at(0)));
+
+                        p.second.insert(b.at(0));
+                    } else {
+                        continue;
+                    } // end if-else
+                } // end for
+            } // end for
         } // end for
-    } // end for
+                
+        size_after = units.size();
+    } // end while
 
     return units;
 }
