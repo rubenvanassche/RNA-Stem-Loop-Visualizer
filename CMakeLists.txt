@@ -66,6 +66,7 @@ set(LLPARSERSRC
 # Lists all test files (no main)
 set(TESTSRC
     src/test_CFG.cpp
+    src/test_CNF.cpp
     src/test_Turing.cpp
     src/test_PDA.cpp
     )
@@ -74,7 +75,7 @@ set(TESTSRC
 add_executable(RNA-Stem-Loop-Visualizer src/RNAslv.cpp)
 
 # build all the tests
-add_executable(Tests src/Tests.cpp ${TINYXMLSRC} ${TURINGSRC} ${CNFSRC} ${PDASRC})
+add_executable(Tests src/Tests.cpp ${TINYXMLSRC} ${TURINGSRC} ${CNFSRC} ${PDASRC} ${TESTSRC})
 
 # build the Turing workshop
 add_executable(RunTuring src/runTuringInput.cpp ${TINYXMLSRC} ${TURINGSRC})
