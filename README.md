@@ -53,7 +53,98 @@ we'll extend it to using a LL or LR parser or Turing Machine instead).
 ```
 
 ## Installing
-Hey, we haven't even started the project yet!
+```sh
+# assuming you are now in the project root directory
+$ mkdir build/ && cd build/
+$ cmake ../
+$ make && make install
+```
+
+Now you'll get the following executables in the `bin/` directory:
+
+### Executables
+
+- `RNAslv` [Placeholder executable for phase II, does currently nothing]
+- `Tests` Runs all the tests using the [Catch](https://github.com/philsquared/Catch) 
+  testing environment.
+
+### Workshop
+There are also some executables and sample files that was provided during the 
+workshop sessions in University of Antwerp:
+
+(sample files are put in the `workshop` folder)
+
+#### `RunTuring` - Turing Machines (Jakob Struye)
+```
+    INPUT 
+Provide the name of a Turing Machine in .xml-format (including the ".xml" 
+suffix) as a command line argument. When prompted, enter an input string
+
+    OUTPUT
+"String accepted" or "String not accepted" for every input string entered 
+(or an exception message)
+
+    EXAMPLES
+Two Turing Machines in .xml format are provided as examples:
+
+    - TMInput1.xml shows the basic structure of the .xml file
+    - TMInput2.xml is a fully functional TM using both storage in states 
+      and multitrack and accepts all strings wcw (w being any string 
+      consisting of 0s and 1s of at least length 1)
+```
+
+#### `RunCYK` - CFG / CNF / CYK-algorithm (Stijn Wouters)
+```
+    INPUT
+An CFG or CNF (at your choice) in .xml-format (including the ".xml" suffix)
+and a string as a command line argument.
+
+    OUTPUT
+A fancy, green colored "YES!" when the passed string is in the language of
+the CFG/CNF defined from the xml-file, otherwise you'll get an (also fancy)
+red colored "NO!". In case of an invalid CFG/CNF construction you'll get an 
+error message.
+
+    NOTE
+If you choose a CFG as input, then keep in mind that it will be converted
+to an CNF first before the program will actually run the CYK algorithm.
+
+    EXAMPLE
+Three examples are provided, each with different structure/syntaxes:
+
+    - CYK_SampleInput0.xml is a CFG accepting all strings with even a's or
+      even b's.
+    - CYK_SampleInput1.xml is a CFG accepting strings with odd a's or b's.
+    - CYK_SampleInput2.xml is a CFG recognizing palindrome-like strings.
+```
+
+#### `RunPDA` - PDA (Ruben Van Assche)
+```
+    INPUT 
+Provide the name of a PDA in .xml-format (including the ".xml" 
+suffix) as a command line argument. When prompted, enter an input string
+
+    OUTPUT
+"String accepted" or "String not accepted" for every input string entered 
+(or an exception message)
+
+    EXAMPLES
+One ODA in .xml format is provided as example:
+
+    - PDAInput1.xml is a PDA accpeting all the palindromes of the form : [0+1]*c[0+1]*
+```
+
+#### LLParser (Pieter Lauwers)
+```
+    INPUT
+Provide a grammar in the form of the given example file.
+
+    OUTPUT
+The parse table for the provided grammar.
+
+    EXAMPLES
+LLParserInput.txt results in LLParserOutput.txt
+```
 
 ## Usage
 Hey, we haven't implemented this yet!
