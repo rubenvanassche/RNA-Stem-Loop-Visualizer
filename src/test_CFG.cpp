@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 18 November 2013
- * By: Stijn Wouters
+ * Last modified: 11 December 2013.
+ * By: Stijn Wouters.
  */
 #include "Catch.h"
 #include "CFG.h"
@@ -215,6 +215,11 @@ TEST_CASE("Unit pairs", "[CFG]") {
                                                         {'B', "A"},
                                                         {'B', "a"}
                                                         };
+    const std::multimap<char, SymbolString> cyclic_productions = {
+                                                        {'A', "B"},
+                                                        {'B', "C"},
+                                                        {'C', "A"},
+                                                        };
 
     try {
         std::set<std::pair<char, char>> empty_units = { 
@@ -233,6 +238,9 @@ TEST_CASE("Unit pairs", "[CFG]") {
                                                         };
         const CFG c1(terminals, variables, productions, 'A');
         CHECK(c1.units() == productions_units);
+
+        const CFG c2(terminals, variables, cyclic_productions, 'A');
+        CHECK_THROWS_AS(c2.units(), std::runtime_error);
     } catch (const std::invalid_argument& e) {
         FAIL("Could not construct CFG's: " << e.what());
     } // end try-catch
@@ -247,6 +255,11 @@ TEST_CASE("Eleminating unit productions", "[CFG]") {
                                                         {'A', "AB"},
                                                         {'B', "A"},
                                                         {'B', "a"}
+                                                        };
+    const std::multimap<char, SymbolString> cyclic_productions = {
+                                                        {'A', "B"},
+                                                        {'B', "C"},
+                                                        {'C', "A"},
                                                         };
 
     try {
@@ -285,6 +298,9 @@ TEST_CASE("Eleminating unit productions", "[CFG]") {
         CHECK(c1.bodies('A') == A_bodies);
         CHECK(c1.bodies('B') == B_bodies_no_units);
         CHECK(c1.bodies('C').empty());
+
+        CFG c2(terminals, variables, cyclic_productions, 'A');
+        CHECK_THROWS_AS(c2.eleminateUnitProductions(), std::runtime_error);
     } catch (const std::invalid_argument& e) {
         FAIL("Could not construct CFG's: " << e.what());
     } // end try-catch

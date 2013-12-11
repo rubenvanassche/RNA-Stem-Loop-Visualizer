@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 27 November 2013
- * By: Stijn Wouters
+ * Last modified: 11 December 2013.
+ * By: Stijn Wouters.
  */
 
 #ifndef CFG_H_
@@ -107,6 +107,8 @@ public:
      * @brief Get all the unit pairs of this CFG.
      *
      * @return The set of all unit pairs.
+     *
+     * @throw std::runtime_error When there are cyclic unit pairs.
      */
     std::set< std::pair<char, char> > units() const;
 
@@ -119,7 +121,7 @@ public:
      * That is, unit pairs of the form A -> B, B -> C and C -> A. If that's the
      * case, an exception will be thrown.
      *
-     * @throw std::logic_error This CFG has a cycle of unit pairs. TODO
+     * @throw std::runtime_error When there are cyclic unit pairs.
      *
      * @post The CFG has only unit pairs of the form (A, A) for each A is a
      * variable.

@@ -273,6 +273,10 @@ std::set< std::pair<char, char> > CFG::units() const {
                             b.size() == 1 
                             && fVariables.find(b.at(0)) != fVariables.end()
                         ) {
+                        // check whether this is not the original variable
+                        if (b.at(0) == p.first)
+                            throw std::runtime_error("Cyclic unit pairs detected.");
+
                         units.insert(std::pair<char, char>(p.first, b.at(0)));
 
                         p.second.insert(b.at(0));
@@ -292,9 +296,6 @@ std::set< std::pair<char, char> > CFG::units() const {
 void CFG::eleminateUnitProductions() {
     // first, get all unit pairs
     std::set< std::pair<char, char> > units = this->units();
-
-    // check whether there are no circular unit pairs
-    // TODO
 
     // the new set of production rules
     std::multimap<char, SymbolString> newProductions;
