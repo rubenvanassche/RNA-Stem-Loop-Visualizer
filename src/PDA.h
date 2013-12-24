@@ -34,6 +34,8 @@
 #include <stdexcept>
 #include <algorithm>
 #include <queue>
+#include "CFG.h"
+#include "TinyXML/tinyxml.h"
 
 /**
  * @brief Class representing a state from a PDA
@@ -77,6 +79,9 @@ public:
 		 */
 		bool operator==(const PDAState& other);
 
+	    /**
+		 * @brief << overloading
+		 */
 		friend std::ostream& operator<<(std::ostream& out, PDAState state);
 
         virtual ~PDAState();
@@ -88,7 +93,9 @@ private:
 enum PDAStackOperation{
     PUSH,
     POP,
-    STAY
+    POPPUSH,
+    STAY,
+    EMPTY
 };
 
 /**
@@ -160,10 +167,74 @@ public:
 	 */
 	bool operator==(const PDATransition& other);
 
+	/**
+	 * @brief Change a stack based upon the data in the transition
+	 *
+	 * @param in A stack with chars representing the stack in the PDA. Be careful! The stack is given by reference
+	 */
     void stackOperation(std::stack<char>& in);
 
+    /**
+	 * @brief << overloading
+	 */
     friend std::ostream& operator<<(std::ostream& out, PDATransition transition);
 
+    /*
+	* @brief get the from state of the transition
+	*
+	* @return PDAState pointer
+	*/
+    PDAState* getFrom(){ return this->fFrom;};
+
+    /*
+	* @brief get the to state of the transition
+	*
+	* @return PDAState pointer
+	*/
+	PDAState* getTo(){ return this->fTo;};
+
+	/*
+	* @brief get the input symbol of the transition
+	*
+	* @return char
+	*/
+	char getInputSymbol(){ return this->fInputSymbol;};
+
+	/*
+	* @brief get the symbol on the top of the stack in this transition
+	*
+	* @return char
+	*/
+	char getTopStack(){ return this->fTopStack;};
+
+	/*
+	* @brief get the stack operation of the transition
+	*
+	* @return PDAStackOperation
+	*/
+	PDAStackOperation getStackOperation(){ return this->fStackOperation;};
+
+	/*
+	* @brief get the characters which are popped on the stack during a push operation
+	*
+	* @return vector with chars
+	*/
+	std::vector<char> getPushStack(){ return this->fPushStack;};
+
+	/*
+	* @brief change the from state in the transition
+	*
+	* @param from PDAState pointer to the state
+	*/
+	void setFrom(PDAState* from){ this->fFrom = from;};
+
+	/*
+	* @brief change the to state in the transition
+	*
+	* @param from PDAState pointer to the state
+	*/
+	void setTo(PDAState* to){ this->fTo = to;};
+private:
     PDAState *fFrom;
     PDAState *fTo;
     char fInputSymbol;
@@ -202,8 +273,42 @@ public:
      */
     void step(const std::string& input, PDAState* currentState, const std::stack<char> stack);
 
+    /**
+	 * @brief Check if this ID will be accepted by the PDA
+	 *
+	 * @param pdaType Type of PDA(State or Stack)
+	 *
+	 * @return bool telling if the ID is accepted
+	 */
+    bool isAccepted(PDAFinal pdaType);
+
+    /**
+	 * @brief << overloading
+	 */
     friend std::ostream& operator<<(std::ostream& out, PDAID id);
 
+    /*
+     * @brief get the input of the ID
+     *
+     * @return string
+     */
+    std::string getInput(){ return this->fInput;};
+
+    /*
+	 * @brief get the state of the ID
+	 *
+	 * @return PDAState pointer
+	 */
+    PDAState* getState(){ return this->fState;};
+
+    /*
+	 * @brief get the stack of the ID
+	 *
+	 * @return stack with chars
+	 */
+    std::stack<char> getStack(){ return this->fStack;};
+
+private:
     std::string fInput;
     PDAState* fState;
     std::stack<char> fStack;
@@ -226,6 +331,21 @@ public:
         const std::set<char>& alphabetStack, 
         const PDAFinal& PDAending
         );
+
+
+    /**
+    * @brief Constructor
+    *
+    * @param cfg A Context Free Grammar to be transformed to a PDA
+    */
+    PDA(CFG cfg);
+
+    /**
+     * @brief Constructor
+     *
+     * @param fileName A XML file containing info about the PDA
+     */
+    PDA(const std::string& fileName);
 
      /**
      * @brief Add a new state to the PDA
@@ -264,13 +384,25 @@ public:
      */
     bool process(std::string input);
 
+    /**
+	 * @brief << overloading
+	 */
+    friend std::ostream& operator<<(std::ostream& out, PDA pda);
+
     virtual ~PDA();
 
 private:
-
+    /**
+     * @brief Get transitions based upon an input, stackTopsymbol and state
+     *
+     * @param input Which string should be processed by the state
+     * @param stackTopSymbol The symbol on the top of the stack at the moment this function is called
+     * @param from A PDAState from where the transitions should start
+     *
+     * @return A vector<PDATransition> giving you all the transitions starting from the specified state
+     */
     std::vector<PDATransition> getTransitions(std::string input, char stackTopSymbol, PDAState* from);
 
-    std::pair<bool, bool> isFinalDead(const std::string& input, PDAState* to, const std::stack<char> stack);
 
     std::list<PDATransition> fTransitions;
     std::list<PDAState> fStates;
@@ -283,6 +415,9 @@ private:
     std::set<char> fAlphabet;
 
     std::stack<char> fStack;
+
+    bool fBasedUponCFG = false; // So we do not spend computer time at running in loops
 };
+
 
 #endif /* PDA_H_ */

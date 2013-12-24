@@ -29,6 +29,9 @@ build/
 .project
 .cproject
 
+#ignoring doxygen generated docs
+docs/
+
 src/Tests
 
 src/RNAslv
@@ -37,3 +40,9 @@ src/RNAslv
 RNAslv
 
 Tests
+
+RunPDA
+
+RunCYK
+
+RunTuring

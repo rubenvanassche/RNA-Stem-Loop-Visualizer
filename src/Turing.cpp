@@ -149,10 +149,13 @@ void Tape::moveHead(Direction dir) {
 
 std::ostream& operator<<(std::ostream& output, const Tape& T) {
     output << "Tape: ";
-    for (std::vector<char> i : T.fTape)
-        for (auto j : i)
-            std::cout << j;
-    std::cout << " Head at position: " << T.fHead;
+    for (int j=0; j < T.fTrackCount; j++) {
+        for (std::vector<char> i : T.fTape)
+            if (i[0] != T.fBlank) //todo: delete
+                std::cout << i[j];
+        std::cout << std::endl << "      ";
+    }
+    std::cout << "Head at position: " << T.fHead;
     return output;
 }
 
@@ -176,7 +179,7 @@ void TMID::step(StatePtr to, const std::vector<char>& write, Direction dir) {
 
 
 std::ostream& operator<<(std::ostream& output, const TMID& ID) {
-    output << ID.fTape << " ";
+    output << ID.fTape << std::endl;
     output << (*ID.fState);
     return output;
 }
@@ -344,8 +347,10 @@ bool TuringMachine::process(const std::string& input) const {
             std::pair<StatePtr, std::vector<char>> IDpair = currentID.getStateAndSymbols();    //Current state and read symbol on tape
             if (i.match(IDpair.first, IDpair.second)) {                                    //Transition for current state and symbol found
                 std::tuple<StatePtr, std::vector<char>, Direction> trans = i.getTransition();    //Fetch next state, symbol to write and direction to move tape head
-                if (fAccepting.find(std::get<0>(trans)) != fAccepting.end())              //Next state accepting --> immediately accept input
+                if (fAccepting.find(std::get<0>(trans)) != fAccepting.end()) {             //Next state accepting --> immediately accept input
+                    std::cout << currentID << std::endl; //delete
                     return 1;
+                }
                 TMID newID = currentID;                                                   //copy current ID (through default copy constructor, which does the job in this case)
                 newID.step(std::get<0>(trans), std::get<1>(trans), std::get<2>(trans));   //Apply transition to copied ID
                 fIDs.push(newID);                                                         //And finally add to the queue
@@ -360,7 +365,7 @@ bool TuringMachine::process(const std::string& input) const {
 TuringMachine::~TuringMachine() {}
 
 
-TuringMachine* generateTM(const std::string& fileName) {
+TuringPtr generateTM(const std::string& fileName) {
     TiXmlDocument doc;
     std::string path = DATADIR + fileName;
     if(!doc.LoadFile(path.c_str()))
@@ -436,7 +441,7 @@ TuringMachine* generateTM(const std::string& fileName) {
          throw std::runtime_error("Error generating TM from XML: Alphabet, tape alphabet or blank symbol missing!");
         return nullptr;
     }
-    TuringMachine* TM = new TuringMachine(alphabet, tapeAlphabet, blank);
+    TuringPtr TM(new TuringMachine(alphabet, tapeAlphabet, blank));
 
     for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()) {  //find  alphabets and blank symbol
         std::string elemName = elem->Value();

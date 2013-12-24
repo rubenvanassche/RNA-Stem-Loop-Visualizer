@@ -16,8 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Last modified: 27 November 2013
-# By: Stijn Wouters
+# Last modified: 11 December 2013.
+# By: Stijn Wouters.
 cmake_minimum_required(VERSION 2.6)
 project("RNA Stem Loop Visualizer")
 
@@ -28,37 +28,70 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    SET (CMAKE_CXX_COMPILER "/usr/bin/clang++")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-
 # define DATADIR for tests that need input files
 add_definitions(-DDATADIR="${CMAKE_SOURCE_DIR}/data/")
 
-# Lists all sourcefiles (no testfiles and no main)
-set(SRC 
-    src/CFG.cpp 
-    src/CNF.cpp 
-    src/PDA.cpp 
-    src/Turing.cpp 
+# Set flags
+set(CMAKE_CXX_FLAGS "-std=c++11 -g -pedantic -Wall -Wextra")
+
+# Lists TinyXML related files (no main)
+set(TINYXMLSRC
     src/TinyXML/tinyxml.cpp 
     src/TinyXML/tinyxmlparser.cpp 
     src/TinyXML/tinyxmlerror.cpp 
-    src/TinyXML/tinystr.cpp)
+    src/TinyXML/tinystr.cpp
+    )
 
-# Lists all testfiles, DO NOT remove Tests.cpp
-set(TESTSRC 
-    src/Tests.cpp 
-    src/test_CFG.cpp 
+# Lists Turing related files (no main)
+set(TURINGSRC
+    src/Turing.cpp
+    )
+
+# Lists CNF related files (no main)
+set(CNFSRC
+    src/CFG.cpp
+    src/CNF.cpp
+    )
+
+# Lists PDA related files (no main)
+set(PDASRC
+    src/PDA.cpp
+    )
+
+# Lists LLParser related files (no main)
+set(LLPARSERSRC
+    src/LLParser.cpp
+    )
+
+# Lists all test files (no main)
+set(TESTSRC
+    src/test_CFG.cpp
+    src/test_CNF.cpp
     src/test_Turing.cpp
-    src/test_PDA.cpp)
+    src/test_PDA.cpp
+    )
 
+# build the main program
+add_executable(RNA-Stem-Loop-Visualizer src/RNAslv.cpp)
 
-# Set flags
-set(CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -std=c++11")
+# build all the tests
+add_executable(Tests src/Tests.cpp ${TINYXMLSRC} ${TURINGSRC} ${CNFSRC} ${PDASRC} ${TESTSRC})
 
-# Target to build all the tests
-add_executable(Tests ${TESTSRC} ${SRC})
+# build the Turing workshop
+add_executable(RunTuring src/runTuringInput.cpp ${TINYXMLSRC} ${TURINGSRC})
 
-# Target to build the main program
-add_executable(RNAslv src/RNAslv.cpp ${SRC})
+# build the CYK workshop
+add_executable(RunCYK src/runCYK.cpp ${TINYXMLSRC} ${CNFSRC})
+
+# build the PDA workshop
+add_executable(RunPDA src/runPDAInput.cpp ${TINYXMLSRC} ${PDASRC})
 
 # Install all executables into the bin directory.
-install(TARGETS Tests RNAslv DESTINATION ${PROJECT_SOURCE_DIR}/bin)
+install(TARGETS 
+    RNA-Stem-Loop-Visualizer 
+    Tests 
+    RunTuring 
+    RunCYK 
+    RunPDA 
+    DESTINATION ${PROJECT_SOURCE_DIR}/bin
+    )

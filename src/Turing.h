@@ -46,8 +46,9 @@
 
 enum Direction {L, R, U}; //left, right, or undefined
 class TuringState;
+class TuringMachine;
 typedef std::shared_ptr<const TuringState> StatePtr;
-
+typedef std::shared_ptr<TuringMachine> TuringPtr;
 
 /**
  * @brief Class representing a state of a Turing Machine
@@ -430,6 +431,6 @@ private:
  *
  * @return TM Pointer to the generated Turing Machine
  */
-TuringMachine* generateTM(const std::string& fileName);
+TuringPtr generateTM(const std::string& fileName);
 
 #endif /*TURING_H*/

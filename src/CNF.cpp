@@ -16,14 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 27 November 2013
- * By: Stijn Wouters
+ * Last modified: 11 December 2013.
+ * By: Stijn Wouters.
  */
 #include "CNF.h"
 #include <map>
 #include <stdexcept>
-
-#include <iostream>
 
 CNF::CNF(
     const std::set<char>& terminals,
@@ -45,7 +43,7 @@ CNF::CNF(
     std::map<char, char> terms; // which terminals belong to which variable
 
     // generate productions of the form A --> a for a is each terminal
-    for (char t : fTerminals) {
+    for (const char& t : fTerminals) {
         // introduce a new variable
         fVariables.insert(c);
 
@@ -61,13 +59,13 @@ CNF::CNF(
     // now we can actually remove the terminals in the bodies of size > 1
     std::multimap<char, SymbolString> newProductions;
 
-    for (char v : fVariables) {
-        for (SymbolString body : this->bodies(v)) {
+    for (const char& v : fVariables) {
+        for (const SymbolString& body : this->bodies(v)) {
             if (body.size() > 1) {
                 // replace all terminals by the corresponding variables
                 SymbolString newBody;
 
-                for (char s : body) {
+                for (const char& s : body) {
                     if (fTerminals.find(s) == fTerminals.end()) {
                         // you may append variables
                         newBody += s;
@@ -96,8 +94,8 @@ CNF::CNF(
         // the new set of production rules
         std::multimap<char, SymbolString> newProductions;
 
-        for (char v : fVariables) {
-            for (SymbolString body : this->bodies(v)) {
+        for (const char& v : fVariables) {
+            for (const SymbolString& body : this->bodies(v)) {
                 if (body.size() <= 2) {
                     // this rule is already in Chomsky Normal Form
                     newProductions.insert(std::pair<char, SymbolString>(v, body));
@@ -130,7 +128,7 @@ CNF::CNF(
 
 bool CNF::CYK(const std::string& terminalstring) const {
     // first, check whether the terminalstring is valid
-    for (char t : terminalstring) {
+    for (const char& t : terminalstring) {
         if (fTerminals.find(t) == fTerminals.end())
             throw std::invalid_argument("Invalid terminal string.");
     } // end for
@@ -139,8 +137,8 @@ bool CNF::CYK(const std::string& terminalstring) const {
     std::multimap<char, char> baseProductions;
     std::multimap<SymbolString, char> inductiveProductions;
 
-    for (char v : fVariables) {
-        for (SymbolString body : this->bodies(v)) {
+    for (const char& v : fVariables) {
+        for (const SymbolString& body : this->bodies(v)) {
             if (body.size() > 1) {
                 // inductive production rule
                 inductiveProductions.insert(std::pair<SymbolString, char>(body, v));
@@ -172,13 +170,13 @@ bool CNF::CYK(const std::string& terminalstring) const {
     unsigned int j = j_init;
 
     // keep going until you reached row 1 column == size of the terminalstring
-    while( !(i==1 && j == terminalstring.size()+1) ) {
+    while( !(i == 1 && j == terminalstring.size()+1) ) {
         // the set of variables producing this X(ij)
         std::set<char> vset;
 
         for (unsigned int k = i; k < j; ++k) {
-            for (char v0 : table.find(std::pair<int, int>(i, k))->second) {
-                for (char v1 : table.find(std::pair<int, int>(k+1, j))->second) {
+            for (const char& v0 : table.find(std::pair<int, int>(i, k))->second) {
+                for (const char& v1 : table.find(std::pair<int, int>(k+1, j))->second) {
                     SymbolString body;
                     body += std::string(1, v0);
                     body += std::string(1, v1);

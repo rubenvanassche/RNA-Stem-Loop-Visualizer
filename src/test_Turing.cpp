@@ -636,7 +636,7 @@ TEST_CASE("Transition Adding", "[TM]") {
 TEST_CASE("XML", "[TM]") {
     SECTION("Turing Machine without storage or multitrack (0^n1^n for n at least 1)") {
         std::string fileName = "TM1.xml";
-        TuringMachine* TM1 = generateTM(fileName);
+        TuringPtr TM1 (generateTM(fileName));
         std::string input;
         input = "00001111";
         CHECK(TM1->process(input));
@@ -664,7 +664,7 @@ TEST_CASE("XML", "[TM]") {
     }
     SECTION("Turing Machine with storage") {
         std::string fileName = "TM2.xml";
-        TuringMachine* TM2 = generateTM(fileName);
+        TuringPtr TM2(generateTM(fileName));
         std::string input2;
         input2 = "01111";
         CHECK(TM2->process(input2));
@@ -688,7 +688,7 @@ TEST_CASE("XML", "[TM]") {
     }
     SECTION("Turing Machine with storage and multitrack") {
         std::string fileName = "TM3.xml";
-        TuringMachine* TM3 = generateTM(fileName);
+        TuringPtr TM3(generateTM(fileName));
         std::string input3;
         input3 = "010c010";
         CHECK(TM3->process(input3));
@@ -711,6 +711,8 @@ TEST_CASE("XML", "[TM]") {
         input3 = "";
         CHECK_FALSE(TM3->process(input3));
         input3 = "0c1";
+        CHECK_FALSE(TM3->process(input3));
+        input3 = "c";
         CHECK_FALSE(TM3->process(input3));
         try {
             input3 = "abc";
