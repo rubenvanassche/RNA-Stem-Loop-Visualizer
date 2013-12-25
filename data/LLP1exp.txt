@@ -1,0 +1,6 @@
+Start symbol: S
+Parse table: 
+	| x	| y	| z	|  
+--------+-------+-------+-------+------
+S	| xSz	| ySz	| e	| e
+

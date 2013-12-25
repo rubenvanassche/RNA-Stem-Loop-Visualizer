@@ -1,0 +1,21 @@
+Start symbol: A
+Parse table: 
+	| x	|  
+--------+-------+------
+A	| error	| error
+B	| error	| error
+C	| error	| error
+D	| error	| error
+E	| error	| error
+F	| error	| error
+G	| error	| error
+H	| error	| error
+I	| error	| error
+J	| error	| error
+K	| error	| error
+L	| error	| error
+M	| error	| error
+N	| error	| error
+O	| error	| error
+P	| e	| e
+

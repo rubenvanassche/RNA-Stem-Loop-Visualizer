@@ -1,0 +1,10 @@
+Start symbol: W
+Parse table: 
+	| x	| y	| z	|  
+--------+-------+-------+-------+------
+S	| xSz	| ySz	| e	| e
+T	| error	| error	| error	| error
+U	| error	| error	| error	| error
+V	| error	| error	| error	| error
+W	| error	| error	| error	| error
+

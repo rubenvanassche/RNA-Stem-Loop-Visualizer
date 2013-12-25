@@ -24,6 +24,8 @@
  #include <sstream>
  #include <iostream>
 
+namespace LLP {
+    
 // Implementation of the LLParser methods:
 LLParser::LLParser(
         const std::set<char>& CFGTerminals, 
@@ -31,7 +33,7 @@ LLParser::LLParser(
         const std::multimap<char, SymbolString>& CFGProductions, 
         const char& CFGStartsymbol, 
         const unsigned int lookahead
-        ) : parseTable(CFGTerminals, CFGVariables, CFGProductions, lookahead),
+        ) : parseTable(CFGTerminals, CFGVariables, CFGProductions, lookahead),      
             startsymbol(CFGStartsymbol),
             CFGTerminals(CFGTerminals),
             CFGVariables(CFGVariables) {     
@@ -110,11 +112,11 @@ std::map<SymbolString, SymbolString> LLTable::generateRow(
     std::map<SymbolString, SymbolString> result;
 
     for (auto terminals_it = terminalCombinations.begin(); terminals_it != terminalCombinations.end(); terminals_it++) {
-        std::cout << *terminals_it << " (" << (*terminals_it).length() << ")" << std::endl;
+        if(DEBUG) std::cout << *terminals_it << " (" << (*terminals_it).length() << ")" << std::endl;
         // find the matching production rule
         bool epsilon_transition;
         for (auto production_it = CFGProductions.lower_bound(variable); production_it != CFGProductions.upper_bound(variable); production_it++) {
-            std::cout << "\t" << std::get<1>(*production_it) << std::endl;
+            if(DEBUG) std::cout << "\t" << std::get<1>(*production_it) << std::endl;
             epsilon_transition = false;
             if (std::get<1>(*production_it).compare(0, (*terminals_it).length(), *terminals_it) == 0)
             {
@@ -202,18 +204,18 @@ std::string LLTable::toString(const std::set<char>& CFGTerminals, const std::set
     }
     unsigned int table_length = stream.str().length();
 
-    stream << std::endl << "-";
+    stream << std::endl << H;
     for (unsigned int i = 0; i < table_length; i += 5) {
-        stream << "-------+";
+        stream << H << H << H << H << H << H << H << C;
     }
-    stream << "-------" << std::endl;
+    stream << H << H << H << H << H << H << std::endl;
 
     // print rows
     for (auto variable = CFGVariables.begin(); variable != CFGVariables.end(); variable++) {
         stream << *variable;
 
         for (auto head = terminalCombinations.begin(); head != terminalCombinations.end(); head++) {
-            stream << '\t' << '|' << ' ';
+            stream << '\t' << V << ' ';
             try {
                 stream << get_transition(*variable, *head);
             }
@@ -230,3 +232,4 @@ std::string LLTable::toString(const std::set<char>& CFGTerminals, const std::set
 SymbolString LLTable::get_transition(char variable, SymbolString lookahead) const {
     return (table.at(variable)).at(lookahead);
 }
+};

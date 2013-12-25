@@ -28,6 +28,10 @@
 #include <vector>
 #include <iostream>   
 
+#define DEBUG false
+
+namespace LLP {
+
 /**
  * @brief Symbol for representing the end of string.
  */
@@ -245,10 +249,11 @@ public:
     friend std::ostream& operator<<(std::ostream& stream, const LLParser& obj);
 
 private:
-    const char startsymbol;
     const LLTable parseTable;
+    const char startsymbol;
     const std::set<char> CFGTerminals;
     const std::set<char> CFGVariables;
+};
 };
 
 #endif /*LLPARSER_H*/

@@ -16,8 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Last modified: 11 December 2013.
-# By: Stijn Wouters.
+# Last modified: 24 December 2013.
+# By: Pieter Lauwers.
 cmake_minimum_required(VERSION 2.6)
 project("RNA Stem Loop Visualizer")
 
@@ -61,6 +61,7 @@ set(PDASRC
 # Lists LLParser related files (no main)
 set(LLPARSERSRC
     src/LLParser.cpp
+    src/LLParserInputOutput.cpp
     )
 
 # Lists all test files (no main)
@@ -69,13 +70,14 @@ set(TESTSRC
     src/test_CNF.cpp
     src/test_Turing.cpp
     src/test_PDA.cpp
+    src/test_LLParser.cpp   
     )
 
 # build the main program
 add_executable(RNA-Stem-Loop-Visualizer src/RNAslv.cpp)
 
 # build all the tests
-add_executable(Tests src/Tests.cpp ${TINYXMLSRC} ${TURINGSRC} ${CNFSRC} ${PDASRC} ${TESTSRC})
+add_executable(Tests src/Tests.cpp ${TINYXMLSRC} ${TURINGSRC} ${CNFSRC} ${PDASRC} ${LLPARSERSRC} ${TESTSRC})
 
 # build the Turing workshop
 add_executable(RunTuring src/runTuringInput.cpp ${TINYXMLSRC} ${TURINGSRC})
@@ -86,6 +88,9 @@ add_executable(RunCYK src/runCYK.cpp ${TINYXMLSRC} ${CNFSRC})
 # build the PDA workshop
 add_executable(RunPDA src/runPDAInput.cpp ${TINYXMLSRC} ${PDASRC})
 
+# build the LLParser workshop
+add_executable(RunLLParser src/runLLParserInput.cpp ${LLPARSERSRC})
+
 # Install all executables into the bin directory.
 install(TARGETS 
     RNA-Stem-Loop-Visualizer 
@@ -93,5 +98,6 @@ install(TARGETS
     RunTuring 
     RunCYK 
     RunPDA 
+    RunLLParser
     DESTINATION ${PROJECT_SOURCE_DIR}/bin
     )
