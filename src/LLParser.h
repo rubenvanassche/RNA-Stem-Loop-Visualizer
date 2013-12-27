@@ -28,6 +28,10 @@
 #include <vector>
 #include <iostream>   
 
+#define DEBUG false
+
+namespace LLP {
+
 /**
  * @brief Symbol for representing the end of string.
  */
@@ -93,15 +97,6 @@ public:
     virtual ~LLTable();
 
     /**
-     * @brief Enumerates all possible combinations of the given terminals 
-     *
-     * @param result Container for all combinations
-     * @param terminals All terminals that can be used in a combination
-     * @param length The desired length of the combinations
-     */
-    static void enumerate(std::vector<SymbolString>& result, std::vector<SymbolString>& terminals, unsigned int length);
-
-    /**
      * @brief Returns a string representation of the parse table.
      *
      * @param CFGTerminals A set containing the terminals of the CFG
@@ -134,15 +129,62 @@ private:
      *
      * @param variable The variable for this row
      * @param terminalCombinations A vector with all combinations of the terminals of the CFG
+     * @param CFGVariables A set containing the variables of the CFG
      * @param CFGProductions A multimap that maps a variable to an symbolString
      *
      * @return The generated row.
      */
     static std::map<SymbolString, SymbolString> generateRow(
         const char variable,
-        const std::vector<SymbolString>& terminalCombinations,           
+        const std::vector<SymbolString>& terminalCombinations, 
+        const std::set<char>& CFGVariables,          
         const std::multimap<char, SymbolString>& CFGProductions 
         );
+
+    /**
+     * @brief Returns the matching production rule to fill the cell
+     *        described by the head of the row ('variable') 
+     *        and the head of the collumn ('terminalCombination').
+     *
+     * @param CFGVariables A set containing the variables of the CFG
+     * @param CFGProductions A multimap that maps a variable to an symbolString
+     * @param variable Head of the row
+     * @param terminalCombination Head of the collumn
+     *
+     * @return The generated row.
+     */
+    static SymbolString findRule(
+        const std::set<char>& CFGVariables,
+        const std::multimap<char, SymbolString>& CFGProductions,
+        const char variable,
+        const SymbolString& terminalCombination
+        );
+
+    /**
+     * @brief Searches for all variables that can be reached with one or more direct transitions (of the form: X -> Y).
+     *
+     * @param variable Start variable
+     * @param CFGVariables A set containing the variables of the CFG
+     * @param CFGProductions A multimap that maps a variable to an symbolString
+     * @param directVariables A set of already found direct variables.
+     *
+     * @return The generated row.
+     */
+    static void getDirectVariables(
+        const char variable,
+        const std::set<char>& CFGVariables,
+        const std::multimap<char, SymbolString>& CFGProductions,
+        std::set<char>& directVariables
+        );
+
+    /**
+     * @brief Enumerates all possible combinations of the given terminals 
+     *
+     * @param result Container for all combinations
+     * @param terminals All terminals that can be used in a combination
+     * @param length The desired length of the combinations
+     */
+    static void enumerate(std::vector<SymbolString>& result, std::vector<SymbolString>& terminals, unsigned int length);
 
     /**
      * @brief Generates a vector with all combinations of the given terminals.
@@ -166,7 +208,7 @@ private:
      *
      * @return A vector with the combinations of terminals.
      */
-    SymbolString get_transition(char variable, SymbolString lookahead) const;
+    SymbolString get_transition(const char& variable, const SymbolString& lookahead) const;
 
     const unsigned int dimension;
 
@@ -200,7 +242,7 @@ public:
      * @exception invalid_argument Throws this exception when the Parser can't be contructed
      */
     LLParser(
-        const std::set<char>& CFGTerminals,             // need getters and setters, inheritance of CFG stores redundant information (productions, variables, terminals)
+        const std::set<char>& CFGTerminals,
         const std::set<char>& CFGVariables,
         const std::multimap<char, SymbolString>& CFGProductions, 
         const char& CFGStartsymbol,
@@ -245,10 +287,20 @@ public:
     friend std::ostream& operator<<(std::ostream& stream, const LLParser& obj);
 
 private:
-    const char startsymbol;
+    /**
+     * @brief Checks if the given character is a variable.
+     *
+     * @param e Character to check
+     *
+     * @return True if 'e' is a variable, else False
+     */
+    bool isVariable(char e) const;
+
     const LLTable parseTable;
+    const char startsymbol;
     const std::set<char> CFGTerminals;
     const std::set<char> CFGVariables;
+};
 };
 
 #endif /*LLPARSER_H*/

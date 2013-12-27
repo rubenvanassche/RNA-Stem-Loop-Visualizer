@@ -1,0 +1,23 @@
+# Terminals #
+a
+b
+c
+
+# Variables #
+S
+X
+Y
+
+# Startsymbol #
+S
+
+# Productions #
+S:aXbY
+X:aY
+X:bY
+X:e
+Y:X
+Y:c
+
+# Lookahead #
+1
