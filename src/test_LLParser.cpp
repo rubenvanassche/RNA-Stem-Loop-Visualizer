@@ -21,6 +21,7 @@
  */
 
 #include "Catch.h"
+#define private public
 #include "LLParserInputOutput.h"
 
 using namespace LLP;
@@ -115,6 +116,33 @@ TEST_CASE("Enumeration of terminals", "[LLParser]") {
     }
 }
 
+TEST_CASE("Direct variables", "[LLParser]") {
+    std::set<char> CFGVariables ({'S', 'X', 'Y', 'Z'});
+
+    std::multimap<char, SymbolString> CFGProductions;
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "X"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "Y"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', EPSILON));
+    CFGProductions.insert(std::pair<char, SymbolString>('X', "Z"));
+    CFGProductions.insert(std::pair<char, SymbolString>('Y', "S"));
+
+    std::set<char> directVariables1 ({'S'});
+    LLTable::getDirectVariables('S', CFGVariables, CFGProductions, directVariables1);
+    CHECK(directVariables1 == std::set<char> ({'S', 'X', 'Y', 'Z'}));
+
+    std::set<char> directVariables2 ({'X'});
+    LLTable::getDirectVariables('X', CFGVariables, CFGProductions, directVariables2);
+    CHECK(directVariables2 == std::set<char> ({'X', 'Z'}));
+
+    std::set<char> directVariables3 ({'Y'});
+    LLTable::getDirectVariables('Y', CFGVariables, CFGProductions, directVariables3);
+    CHECK(directVariables3 == std::set<char> ({'Y', 'S', 'X', 'Z'}));
+
+    std::set<char> directVariables4 ({'Z'});
+    LLTable::getDirectVariables('Z', CFGVariables, CFGProductions, directVariables4);
+    CHECK(directVariables4 == std::set<char> ({'Z'}));
+}
+
 bool compare_files(std::string resultFile, std::string expectedFile) {
     std::ifstream result (resultFile, std::ifstream::in);
     std::ifstream expected (expectedFile, std::ifstream::in);
@@ -152,4 +180,68 @@ TEST_CASE("Generating LLParsetables", "[LLParser]") {
         }}
     }
     compare_files("../data/LLP1in.txt", "../data/LLP1out");
+}
+
+TEST_CASE("Parsing input", "[LLParser]") {
+    std::vector<LLParser*> parsers;
+    std::vector<std::vector<std::string>* > correctInput;
+    std::vector<std::vector<std::string>* > wrongInput;
+
+    // Parser 1
+    std::set<char> CFGTerminals1 ({'x', 'y', 'z'});
+
+    std::set<char> CFGVariables1 ({'S'});
+
+    std::multimap<char, SymbolString> CFGProductions1;
+    CFGProductions1.insert(std::pair<char, SymbolString>('S', "xSz"));
+    CFGProductions1.insert(std::pair<char, SymbolString>('S', "ySz"));
+    CFGProductions1.insert(std::pair<char, SymbolString>('S', EPSILON));
+
+    char CFGStartsymbol1 = 'S'; 
+
+    unsigned int lookahead1 = 1;
+
+    LLParser parser1 = LLParser(CFGTerminals1, CFGVariables1, CFGProductions1, CFGStartsymbol1, lookahead1);
+    parsers.push_back(&parser1);
+
+    std::vector<std::string> correctInput1 ({"xz", "", "yz", "xxyzzz", "yyyyyyyyyyzzzzzzzzzz"});
+    correctInput.push_back(&correctInput1);
+    std::vector<std::string> wrongInput1 ({"xzz", " ", "z", "y", "x", "xxxxxxxxzzzzzzzzzzzzzzz"});
+    wrongInput.push_back(&wrongInput1);
+
+    // Parser 2
+    std::set<char> CFGTerminals2 ({'a', 'b'});
+
+    std::set<char> CFGVariables2 ({'S', 'X'});
+
+    std::multimap<char, SymbolString> CFGProductions2;
+    CFGProductions2.insert(std::pair<char, SymbolString>('S', "aX"));
+    CFGProductions2.insert(std::pair<char, SymbolString>('X', "ab"));
+    CFGProductions2.insert(std::pair<char, SymbolString>('X', "bb"));
+
+    char CFGStartsymbol2 = 'S'; 
+
+    unsigned int lookahead2 = 2;
+
+    LLParser parser2 = LLParser(CFGTerminals2, CFGVariables2, CFGProductions2, CFGStartsymbol2, lookahead2);
+    parsers.push_back(&parser2);
+
+    std::vector<std::string> correctInput2 ({"abb", "aab"});
+    correctInput.push_back(&correctInput2);
+    std::vector<std::string> wrongInput2 ({"abbb", "a", "b", ""});
+    wrongInput.push_back(&wrongInput2);
+
+    // Testing
+    for (unsigned int i = 0; i != 2; i++) {
+        // Correct input:
+        for (unsigned int j = 0; j != correctInput[i]->size(); j++)
+        {
+            CHECK(parsers[i]->process(correctInput[i]->at(j)));
+        }
+        // Wrong input:
+        for (unsigned int j = 0; j != wrongInput[i]->size(); j++)
+        {
+            CHECK(not parsers[i]->process(wrongInput[i]->at(j)));
+        }
+    }
 }

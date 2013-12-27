@@ -137,7 +137,7 @@ One ODA in .xml format is provided as example:
 #### LLParser (Pieter Lauwers)
 ```
     INPUT
-Provide a grammar in the form of the given example file.
+Provide a grammar in the form of the given example file. The grammar has to be a legal LL(k) grammar. 
 
     OUTPUT
 The parse table for the provided grammar.

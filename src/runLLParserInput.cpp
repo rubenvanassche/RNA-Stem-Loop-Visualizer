@@ -24,23 +24,7 @@
 
 using namespace LLP;
 
-void test1() {
-    // Tests enumeration of terminals
-    std::cout << "Enumeration of terminals:" << std::endl;
-    std::vector<SymbolString> result;
-    std::vector<SymbolString> symbols;
-    symbols.push_back("a");
-    symbols.push_back("b");
-    symbols.push_back(" ");
-
-    LLTable::enumerate(result, symbols, 3);
-
-    for (unsigned int i = 0; i != result.size(); i++) {
-        std::cout << result[i] << std::endl;
-    }
-}
-
-void test2() {
+void test() {
     // Tests the generating of the parse table
     std::cout << "Generating parse table:" << std::endl;
     std::set<char> CFGTerminals;
@@ -69,8 +53,7 @@ int main(int argc, char const *argv[]) {
         std::cout << "* Testing LLParser:" << std::endl;
 
         // Tests:
-        test1();
-        test2();
+        test();
 
         std::cout << "* Done testing." << std::endl;
     }
