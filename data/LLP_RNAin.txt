@@ -7,6 +7,7 @@ x
 
 # Variables #
 S
+T
 
 # Startsymbol #
 S
@@ -16,8 +17,9 @@ S:cSg
 S:gSc
 S:uSa
 S:aSu
-S:xS
-S:e
+S:T
+T:xT
+T:e
 
 # Lookahead #
 1

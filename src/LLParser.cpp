@@ -20,81 +20,71 @@
  * By: Pieter Lauwers
  */
 
- #include "LLParser.h"
- #include <sstream>
- #include <iostream>
- #include <algorithm> 
- #include <stack>
+#include "LLParser.h"
+#include <sstream>
+#include <iostream>
+#include <algorithm> 
+#include <stack>
+#include "stackOutput.h"
 
-////////////////
-#include <queue>
-#include <ostream>
-
-template <class Container, class Stream>
-Stream& printOneValueContainer
-    (Stream& outputstream, const Container& container)
-{
-    typename Container::const_iterator beg = container.begin();
-
-    outputstream << "[";
-
-    while(beg != container.end())
-    {
-        outputstream << " " << *beg++;
-    }
-
-    outputstream << " ]";
-
-    return outputstream;
-}
-
-template < class Type, class Container >
-const Container& container
-    (const std::stack<Type, Container>& stack)
-{
-    struct HackedStack : private std::stack<Type, Container>
-    {
-        static const Container& container
-            (const std::stack<Type, Container>& stack)
-        {
-            return stack.*&HackedStack::c;
-        }
-    };
-
-    return HackedStack::container(stack);
-}
-
-template < class Type, class Container >
-const Container& container
-    (const std::queue<Type, Container>& queue)
-{
-    struct HackedQueue : private std::queue<Type, Container>
-    {
-        static const Container& container
-            (const std::queue<Type, Container>& queue)
-        {
-            return queue.*&HackedQueue::c;
-        }
-    };
-
-    return HackedQueue::container(queue);
-}
-
-template
-    < class Type
-    , template <class Typ, class Container = std::deque<Type> > class Adapter
-    , class Stream
-    >
-Stream& operator<<
-    (Stream& outputstream, const Adapter<Type>& adapter)
-{
-    return printOneValueContainer(outputstream, container(adapter));
-}
-//////////////////////////
 
 namespace LLP {
+/***********************
+ *      RNAParser      *
+ ***********************/
+const LLParser RNAParser::parser = createParser();
+
+bool RNAParser::parse(std::string input, unsigned int stemSize) {
+    if (stemSize > input.length() / 2) return false;
+
+    // change all elements of the loop to 'x'
+    for (unsigned int i = stemSize; i < input.length() - stemSize; i++) {
+        if (not isElement(input[i])) return false;
+        input[i] = 'x';
+    }
+    return parser.process(input);
+}
+
+unsigned int RNAParser::parse(const std::string& input) {
+    unsigned int stemSize = 0;
+    for (unsigned int i = 1; i <= input.length() / 2; i++) {
+        if (parse(input, i)) stemSize = i;
+    }
+
+    return stemSize;
+}
+
+bool RNAParser::isElement(char c) {
+    std::set<char> elements ({'g', 'u', 'a', 'c'});
+    return elements.find(c) != elements.end();
+}
+
+LLParser RNAParser::createParser() {
+    std::set<char> CFGTerminals ({'g', 'u', 'a', 'c', 'x'});
+
+    std::set<char> CFGVariables ({'S', 'T'});
+
+    std::multimap<char, SymbolString> CFGProductions;
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "cSg"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "gSc"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "uSa"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "aSu"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "T"));
+    CFGProductions.insert(std::pair<char, SymbolString>('T', "xT"));
+    CFGProductions.insert(std::pair<char, SymbolString>('T', EPSILON));
+
+    char CFGStartsymbol = 'S'; 
+
+    unsigned int lookahead = 1;
+
+    LLParser parser = LLParser(CFGTerminals, CFGVariables, CFGProductions, CFGStartsymbol, lookahead);
+
+    return parser;
+}
     
-// Implementation of the LLParser methods:
+/***********************
+ *       LLParser      *
+ ***********************/
 LLParser::LLParser(
         const std::set<char>& CFGTerminals, 
         const std::set<char>& CFGVariables, 
@@ -109,7 +99,7 @@ LLParser::LLParser(
 }
 
 /*
-LLParser::LLParser(const CFG& grammar, unsigned int lookahead) {        // TODO: need getters from CFG
+LLParser::LLParser(const CFG& grammar, unsigned int lookahead) {
 
 }
 */
@@ -168,8 +158,9 @@ bool LLParser::isVariable(char e) const {
     return false;
 }
 
-
-// Implementation of the LLTable methods:
+/***********************
+ *       LLTable       *
+ ***********************/
 LLTable::LLTable(
         const std::set<char>& CFGTerminals,            
         const std::set<char>& CFGVariables,
@@ -180,7 +171,7 @@ LLTable::LLTable(
 }
 
 /*
-LLTable::LLTable(const CFG& grammar, unsigned int dimension) {          // TODO: need getters from CFG
+LLTable::LLTable(const CFG& grammar, unsigned int dimension) {          
 
 }
 */
