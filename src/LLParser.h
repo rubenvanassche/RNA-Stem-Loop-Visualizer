@@ -301,6 +301,45 @@ private:
     const std::set<char> CFGTerminals;
     const std::set<char> CFGVariables;
 };
+
+
+/**
+ * @brief Class representing an RNA Parser based on an LLParser
+ */
+class RNAParser {
+public:
+    /**
+     * @brief Parses the given string.
+     *
+     * @param input RNA string
+     * @param stemSize The size of the stem 
+     *
+     * @return True if 'input' is a vallid RNA string with stem of size 'stemSize'
+     */ 
+    static bool parse(std::string input, unsigned int stemSize);
+
+    /**
+     * @brief Parses the given string.
+     *
+     * @param input RNA string
+     *
+     * @return If vallid the stemsize of the RNA-string, else 0
+     */ 
+    static unsigned int parse(const std::string& input);
+
+    /**
+     * @brief Indicates whether the given character is a vallid RNA-element.
+     *
+     * @param c Possible RNA-element
+     *
+     * @return True if 'c' is a vallid RNA-element
+     */ 
+    static bool isElement(char c);
+
+private:
+    static LLParser createParser();
+    static const LLParser parser;
+};
 };
 
 #endif /*LLPARSER_H*/
