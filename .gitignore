@@ -49,3 +49,9 @@ RunPDA
 RunCYK
 
 RunTuring
+
+RunLLParser
+
+RNAStemLoop
+
+RNA-Stem-Loop-Visualizer

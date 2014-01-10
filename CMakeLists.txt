@@ -72,6 +72,20 @@ set(TESTSRC
     src/test_PDA.cpp
     src/test_LLParser.cpp   
     )
+    
+# Lists All the files for the GUI
+SET(UI_SOURCES src/UI/main.cpp src/UI/mainwindow.cpp)
+SET(UI_HEADERS src/UI/mainwindow.h)
+SET(UI_FORMS src/UI/mainwindow.ui)
+
+# Some QT stuff
+FIND_PACKAGE(Qt4 REQUIRED)
+QT4_WRAP_CPP(UI_HEADERS_MOC ${UI_HEADERS})
+QT4_WRAP_UI(UI_FORMS_HEADERS ${UI_FORMS})
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+ADD_EXECUTABLE(RNAStemLoop ${UI_SOURCES} ${UI_HEADERS_MOC} ${UI_FORMS_HEADERS})
+TARGET_LINK_LIBRARIES(RNAStemLoop ${QT_LIBRARIES})
 
 # build the main program
 add_executable(RNA-Stem-Loop-Visualizer src/RNAslv.cpp)
