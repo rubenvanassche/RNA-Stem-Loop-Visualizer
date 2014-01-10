@@ -1,0 +1,6 @@
+Start symbol: S
+Parse table: 
+	|   	| yx	| yy	| y 	| xx	| xy	| x 
+--------+-------+-------+-------+-------+-------+-------+------
+S	| error	| error	| error	| error	| xSy	| xy	| xSy
+

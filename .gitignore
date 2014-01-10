@@ -29,6 +29,9 @@ build/
 .project
 .cproject
 
+# LLParser outputfiles
+LLP*out.txt
+
 #ignoring doxygen generated docs
 docs/
 

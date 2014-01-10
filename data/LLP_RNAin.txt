@@ -1,0 +1,25 @@
+# Terminals #
+g
+u
+a
+c
+x
+
+# Variables #
+S
+T
+
+# Startsymbol #
+S
+
+# Productions #
+S:cSg
+S:gSc
+S:uSa
+S:aSu
+S:T
+T:xT
+T:e
+
+# Lookahead #
+1

@@ -20,18 +20,78 @@
  * By: Pieter Lauwers
  */
 
- #include "LLParser.h"
- #include <sstream>
- #include <iostream>
+#include "LLParser.h"
+#include <sstream>
+#include <iostream>
+#include <algorithm> 
+#include <stack>
+#include "stackOutput.h"
 
-// Implementation of the LLParser methods:
+
+namespace LLP {
+/***********************
+ *      RNAParser      *
+ ***********************/
+const LLParser RNAParser::parser = createParser();
+
+bool RNAParser::parse(std::string input, unsigned int stemSize) {
+    if (stemSize > input.length() / 2) return false;
+
+    // change all elements of the loop to 'x'
+    for (unsigned int i = stemSize; i < input.length() - stemSize; i++) {
+        if (not isElement(input[i])) return false;
+        input[i] = 'x';
+    }
+    return parser.process(input);
+}
+
+unsigned int RNAParser::parse(const std::string& input) {
+    unsigned int stemSize = 0;
+    for (unsigned int i = 1; i <= input.length() / 2; i++) {
+        if (parse(input, i)) stemSize = i;
+    }
+
+    return stemSize;
+}
+
+bool RNAParser::isElement(char c) {
+    std::set<char> elements ({'g', 'u', 'a', 'c'});
+    return elements.find(c) != elements.end();
+}
+
+LLParser RNAParser::createParser() {
+    std::set<char> CFGTerminals ({'g', 'u', 'a', 'c', 'x'});
+
+    std::set<char> CFGVariables ({'S', 'T'});
+
+    std::multimap<char, SymbolString> CFGProductions;
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "cSg"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "gSc"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "uSa"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "aSu"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "T"));
+    CFGProductions.insert(std::pair<char, SymbolString>('T', "xT"));
+    CFGProductions.insert(std::pair<char, SymbolString>('T', EPSILON));
+
+    char CFGStartsymbol = 'S'; 
+
+    unsigned int lookahead = 1;
+
+    LLParser parser = LLParser(CFGTerminals, CFGVariables, CFGProductions, CFGStartsymbol, lookahead);
+
+    return parser;
+}
+    
+/***********************
+ *       LLParser      *
+ ***********************/
 LLParser::LLParser(
         const std::set<char>& CFGTerminals, 
         const std::set<char>& CFGVariables, 
         const std::multimap<char, SymbolString>& CFGProductions, 
         const char& CFGStartsymbol, 
         const unsigned int lookahead
-        ) : parseTable(CFGTerminals, CFGVariables, CFGProductions, lookahead),
+        ) : parseTable(CFGTerminals, CFGVariables, CFGProductions, lookahead),      
             startsymbol(CFGStartsymbol),
             CFGTerminals(CFGTerminals),
             CFGVariables(CFGVariables) {     
@@ -39,13 +99,44 @@ LLParser::LLParser(
 }
 
 /*
-LLParser::LLParser(const CFG& grammar, unsigned int lookahead) {        // TODO: need getters from CFG
+LLParser::LLParser(const CFG& grammar, unsigned int lookahead) {
 
 }
 */
 
 bool LLParser::process(const std::string& input) const {
-    return false;
+    std::stack<char> stack;
+    stack.emplace(startsymbol);
+    SymbolString remainingInput(input);
+
+    while (not stack.empty()) {
+        if(DEBUG) std::cout << "remaining input: " << remainingInput << '\t';
+        if(DEBUG) std::cout << "stack: " << stack << " with top = " << stack.top() << std::endl;
+
+        if (stack.top() == EPSILON[0]) stack.pop();
+        else if (not isVariable(stack.top())) {
+            if (not remainingInput.empty() and stack.top() == remainingInput[0]) {
+                stack.pop();
+                remainingInput.erase(0, 1);
+            }
+            else return false;
+        }
+        else {
+            if (not isVariable(stack.top())) return false;
+            SymbolString rule;
+            try {
+                rule = parseTable.process(stack.top(), remainingInput);
+            }
+            catch (const std::out_of_range& oor) {
+                return false; // hit 'error' in the table
+            }
+            stack.pop();
+
+            // push the rule backwards down to the stack
+            for (int i = rule.length() - 1; i >= 0; i--) stack.push(rule[i]);
+        }
+    }
+    return remainingInput.empty();
 }
 
 LLParser::~LLParser() {
@@ -59,8 +150,17 @@ std::ostream& operator<<(std::ostream& stream, const LLParser& obj) {
     return stream;
 }
 
+bool LLParser::isVariable(char e) const {
+    for (auto it = CFGVariables.begin(); it != CFGVariables.end(); it++) {
+        if (e == *it) return true;
+    }
 
-// Implementation of the LLTable methods:
+    return false;
+}
+
+/***********************
+ *       LLTable       *
+ ***********************/
 LLTable::LLTable(
         const std::set<char>& CFGTerminals,            
         const std::set<char>& CFGVariables,
@@ -71,13 +171,20 @@ LLTable::LLTable(
 }
 
 /*
-LLTable::LLTable(const CFG& grammar, unsigned int dimension) {          // TODO: need getters from CFG
+LLTable::LLTable(const CFG& grammar, unsigned int dimension) {          
 
 }
 */
 
-SymbolString process(const char& topStack, const SymbolString& remainingInput) {
-    return SymbolString();
+SymbolString LLTable::process(const char& topStack, const SymbolString& remainingInput) const {
+    // calculate the length of the lookahead = min(k, remainingInput.length())
+    unsigned int length = remainingInput.length() < dimension ? remainingInput.length() : dimension;
+    SymbolString lookahead = remainingInput.substr(0, length);
+
+    // add space if lookahead is smaller than k
+    while (lookahead.length() < dimension) lookahead += " ";
+
+    return get_transition(topStack, lookahead);
 }
 
 LLTable::~LLTable() {
@@ -96,7 +203,8 @@ std::map<char, std::map<SymbolString, SymbolString> > LLTable::generateTable(
     // create a "row" for every variable
     for (auto it = CFGVariables.begin(); it != CFGVariables.end(); it++) {
         // for each variable: create an entry for every combination for non-terminals that don't lead to "error"
-        table.insert(std::pair<char, std::map<SymbolString, SymbolString> > (*it, generateRow(*it, terminalCombinations, CFGProductions)));
+        if(DEBUG) std::cout << *it << std::endl;
+        table.insert(std::pair<char, std::map<SymbolString, SymbolString> > (*it, generateRow(*it, terminalCombinations, CFGVariables, CFGProductions)));
     }
 
     return table;
@@ -104,38 +212,103 @@ std::map<char, std::map<SymbolString, SymbolString> > LLTable::generateTable(
 
 std::map<SymbolString, SymbolString> LLTable::generateRow(
         const char variable,
-        const std::vector<SymbolString>& terminalCombinations,           
+        const std::vector<SymbolString>& terminalCombinations,
+        const std::set<char>& CFGVariables,           
         const std::multimap<char, SymbolString>& CFGProductions
         ) {
+    // find all variables that can be reached with one or more direct transitions (of the form: X -> Y)
+    std::set<char> directVariables;
+    directVariables.insert(variable);
+    getDirectVariables(variable, CFGVariables, CFGProductions, directVariables);
+
+    // generate the row for the given variable
     std::map<SymbolString, SymbolString> result;
 
+    // iterate over all combinations of k terminals (the collumns) and then find the matching production rule to fill the cell with
     for (auto terminals_it = terminalCombinations.begin(); terminals_it != terminalCombinations.end(); terminals_it++) {
-        std::cout << *terminals_it << " (" << (*terminals_it).length() << ")" << std::endl;
-        // find the matching production rule
-        bool epsilon_transition;
-        for (auto production_it = CFGProductions.lower_bound(variable); production_it != CFGProductions.upper_bound(variable); production_it++) {
-            std::cout << "\t" << std::get<1>(*production_it) << std::endl;
-            epsilon_transition = false;
-            if (std::get<1>(*production_it).compare(0, (*terminals_it).length(), *terminals_it) == 0)
-            {
-                // The current production rule matches the lookahead symbols
-                result.emplace(*terminals_it, std::get<1>(*production_it));
-                break;                                                  // TODO: wat if match occures multiple time? Increase dimension of the table?
+        if(DEBUG) std::cout << "\t" << *terminals_it << " (" << (*terminals_it).length() << ")" << std::endl;
+
+        SymbolString cell = findRule(CFGVariables, CFGProductions, variable, *terminals_it);
+        for (auto directVar_it = directVariables.begin(); cell == "" and directVar_it != directVariables.end(); directVar_it++) {
+            //std::cout << *directVar_it << std::endl;
+            if (findRule(CFGVariables, CFGProductions, *directVar_it, *terminals_it) != ""){ 
+                cell = *directVar_it;
+                if(DEBUG) std::cout << "\t\t" << cell << " (direct)" << std::endl;
+                break;
             }
-            if (std::get<1>(*production_it).compare(EPSILON) == 0)
-            {
-                epsilon_transition = true;
-            }
-            if (epsilon_transition and std::next(production_it) == CFGProductions.upper_bound(variable))
-            {
-                // The current production rule matches the lookahead symbols
-                result.emplace(*terminals_it, EPSILON);
-                break;                                                  
-            }
-        }   
+        }
+        
+        if (cell != "") result.emplace(*terminals_it, cell);
+        else if(DEBUG) std::cout << "\t\t" << "error" << std::endl;  
     }
 
     return result;
+}
+
+SymbolString LLTable::findRule(
+        const std::set<char>& CFGVariables,
+        const std::multimap<char, SymbolString>& CFGProductions,
+        const char variable,
+        const SymbolString& terminalCombination
+        ) {
+    // determines the range of all productions that have 'variable' as left side of the productionrule
+    auto productionsStart = CFGProductions.lower_bound(variable);
+    auto productionsEnd = CFGProductions.upper_bound(variable);
+
+    // indicates whether their is an epsilon transition for 'variable'
+    bool epsilon_transition = false;
+
+    for (auto production_it = productionsStart; production_it != productionsEnd and !epsilon_transition; production_it++) {
+        epsilon_transition = std::get<1>(*production_it).compare(EPSILON) == 0; // 0 means they compare equal
+    }
+
+    SymbolString result;
+
+    for (unsigned int i = 0; i != terminalCombination.length(); i++) {
+        for (auto production_it = productionsStart; production_it != productionsEnd; production_it++) {
+            SymbolString rule = std::get<1>(*production_it);
+            if(DEBUG) std::cout << "\t\t" << rule << std::endl;
+            if (i > 0) {
+                // check if productionrule contains a variable
+                bool var = false;
+                for (unsigned int j = 0; !var and j != rule.length(); j++) {
+                    var = (CFGVariables.find(rule[j]) != CFGVariables.end());
+                }
+                if (!var) break;
+            }
+            if (std::get<1>(*production_it).compare(0, terminalCombination.length() - i, terminalCombination.substr(0, terminalCombination.length() - i)) == 0)
+            {
+                // The current production rule matches the lookahead symbols
+                return std::get<1>(*production_it);   // TODO: wat if match occures multiple time? Increase dimension of the table?
+            }
+        } 
+    }
+    if (epsilon_transition) return EPSILON;
+    return "";                                       
+}
+
+void LLTable::getDirectVariables(
+        const char variable,
+        const std::set<char>& CFGVariables,
+        const std::multimap<char, SymbolString>& CFGProductions,
+        std::set<char>& directVariables
+        ) {
+    // find all variables that can be reached with one or more direct transitions (of the form: X -> Y)
+    for (auto production_it = CFGProductions.lower_bound(variable); production_it != CFGProductions.upper_bound(variable); production_it++) {
+        // check if right side contains only one element
+        if (std::get<1>(*production_it).length() == 1) {
+            char e = std::get<1>(*production_it)[0]; 
+            if (
+                // check if element is a variable
+                CFGVariables.find(e) != CFGVariables.end() and
+                // check if the element doesn't already occur in 'directVariables'
+                directVariables.find(e) == directVariables.end()
+            ) {
+                directVariables.insert(e);
+                getDirectVariables(e, CFGVariables, CFGProductions, directVariables);
+            }
+        }
+    }
 }
 
 std::vector<SymbolString> LLTable::getTerminalCombinations(
@@ -202,18 +375,18 @@ std::string LLTable::toString(const std::set<char>& CFGTerminals, const std::set
     }
     unsigned int table_length = stream.str().length();
 
-    stream << std::endl << "-";
+    stream << std::endl << H;
     for (unsigned int i = 0; i < table_length; i += 5) {
-        stream << "-------+";
+        stream << H << H << H << H << H << H << H << C;
     }
-    stream << "-------" << std::endl;
+    stream << H << H << H << H << H << H << std::endl;
 
     // print rows
     for (auto variable = CFGVariables.begin(); variable != CFGVariables.end(); variable++) {
         stream << *variable;
 
         for (auto head = terminalCombinations.begin(); head != terminalCombinations.end(); head++) {
-            stream << '\t' << '|' << ' ';
+            stream << '\t' << V << ' ';
             try {
                 stream << get_transition(*variable, *head);
             }
@@ -227,6 +400,7 @@ std::string LLTable::toString(const std::set<char>& CFGTerminals, const std::set
     return stream.str();
 }
 
-SymbolString LLTable::get_transition(char variable, SymbolString lookahead) const {
+SymbolString LLTable::get_transition(const char& variable, const SymbolString& lookahead) const {
     return (table.at(variable)).at(lookahead);
 }
+};

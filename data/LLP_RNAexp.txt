@@ -1,0 +1,7 @@
+Start symbol: S
+Parse table: 
+	| a	| c	| g	| u	| x	|  
+--------+-------+-------+-------+-------+------
+S	| aSu	| cSg	| gSc	| uSa	| T	| T
+T	| e	| e	| e	| e	| xT	| e
+
