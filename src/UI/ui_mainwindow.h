@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Fri Jan 10 14:52:24 2014
+** Created: Fri Jan 10 17:00:54 2014
 **      by: Qt User Interface Compiler version 4.8.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -15,13 +15,13 @@
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QComboBox>
+#include <QtGui/QGridLayout>
 #include <QtGui/QHeaderView>
+#include <QtGui/QLabel>
 #include <QtGui/QMainWindow>
 #include <QtGui/QMenuBar>
 #include <QtGui/QPlainTextEdit>
 #include <QtGui/QPushButton>
-#include <QtGui/QStatusBar>
-#include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -30,47 +30,73 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralWidget;
-    QVBoxLayout *verticalLayout;
-    QPlainTextEdit *Input;
+    QGridLayout *gridLayout;
+    QPushButton *OpenAlgoWindowButton;
+    QLabel *label;
+    QPushButton *pushButton;
     QPushButton *AnalyzeButton;
+    QPlainTextEdit *Input;
+    QLabel *label_2;
     QComboBox *AnalyzeTypeSelect;
     QMenuBar *menuBar;
-    QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(400, 300);
+        MainWindow->resize(397, 384);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
-        verticalLayout = new QVBoxLayout(centralWidget);
-        verticalLayout->setSpacing(6);
-        verticalLayout->setContentsMargins(11, 11, 11, 11);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        Input = new QPlainTextEdit(centralWidget);
-        Input->setObjectName(QString::fromUtf8("Input"));
+        gridLayout = new QGridLayout(centralWidget);
+        gridLayout->setSpacing(6);
+        gridLayout->setContentsMargins(11, 11, 11, 11);
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        OpenAlgoWindowButton = new QPushButton(centralWidget);
+        OpenAlgoWindowButton->setObjectName(QString::fromUtf8("OpenAlgoWindowButton"));
 
-        verticalLayout->addWidget(Input);
+        gridLayout->addWidget(OpenAlgoWindowButton, 14, 2, 1, 1);
+
+        label = new QLabel(centralWidget);
+        label->setObjectName(QString::fromUtf8("label"));
+
+        gridLayout->addWidget(label, 1, 0, 1, 1);
+
+        pushButton = new QPushButton(centralWidget);
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setEnabled(false);
+
+        gridLayout->addWidget(pushButton, 14, 1, 1, 1);
 
         AnalyzeButton = new QPushButton(centralWidget);
         AnalyzeButton->setObjectName(QString::fromUtf8("AnalyzeButton"));
 
-        verticalLayout->addWidget(AnalyzeButton);
+        gridLayout->addWidget(AnalyzeButton, 14, 0, 1, 1);
+
+        Input = new QPlainTextEdit(centralWidget);
+        Input->setObjectName(QString::fromUtf8("Input"));
+
+        gridLayout->addWidget(Input, 3, 0, 1, 3);
+
+        label_2 = new QLabel(centralWidget);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+
+        gridLayout->addWidget(label_2, 0, 0, 1, 1);
 
         AnalyzeTypeSelect = new QComboBox(centralWidget);
+        AnalyzeTypeSelect->insertItems(0, QStringList()
+         << QString::fromUtf8("PDA")
+         << QString::fromUtf8("LLParser")
+         << QString::fromUtf8("Turing")
+        );
         AnalyzeTypeSelect->setObjectName(QString::fromUtf8("AnalyzeTypeSelect"));
 
-        verticalLayout->addWidget(AnalyzeTypeSelect);
+        gridLayout->addWidget(AnalyzeTypeSelect, 0, 2, 1, 1);
 
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 400, 22));
+        menuBar->setGeometry(QRect(0, 0, 397, 22));
         MainWindow->setMenuBar(menuBar);
-        statusBar = new QStatusBar(MainWindow);
-        statusBar->setObjectName(QString::fromUtf8("statusBar"));
-        MainWindow->setStatusBar(statusBar);
 
         retranslateUi(MainWindow);
 
@@ -80,14 +106,12 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "RNA Stem Loop Analyzer", 0, QApplication::UnicodeUTF8));
-        Input->setPlainText(QApplication::translate("MainWindow", "Blablabla", 0, QApplication::UnicodeUTF8));
+        OpenAlgoWindowButton->setText(QApplication::translate("MainWindow", "Algorithms", 0, QApplication::UnicodeUTF8));
+        label->setText(QApplication::translate("MainWindow", "RNA Stem Loop", 0, QApplication::UnicodeUTF8));
+        pushButton->setText(QApplication::translate("MainWindow", "Visual RSL", 0, QApplication::UnicodeUTF8));
         AnalyzeButton->setText(QApplication::translate("MainWindow", "Analyze", 0, QApplication::UnicodeUTF8));
-        AnalyzeTypeSelect->clear();
-        AnalyzeTypeSelect->insertItems(0, QStringList()
-         << QApplication::translate("MainWindow", "PDA", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MainWindow", "LLParser", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("MainWindow", "Turing", 0, QApplication::UnicodeUTF8)
-        );
+        Input->setPlainText(QString());
+        label_2->setText(QApplication::translate("MainWindow", "Algorithm to use:", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

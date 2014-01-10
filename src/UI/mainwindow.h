@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "algotest.h"
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +18,8 @@ public:
     
 private slots:
     void on_AnalyzeButton_clicked();
+
+    void on_OpenAlgoWindowButton_clicked();
 
 private:
     Ui::MainWindow *ui;
