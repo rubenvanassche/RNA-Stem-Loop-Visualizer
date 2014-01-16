@@ -51,6 +51,7 @@ void MainWindow::on_AnalyzeButton_clicked(){
         }
         catch (std::runtime_error& e) {
             //invalid string input
+            std::cout << e.what() << std::endl;
             RNALoopAdv = RNAString();
             accepted = false;
         }
