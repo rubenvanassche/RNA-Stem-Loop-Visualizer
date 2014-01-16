@@ -836,6 +836,7 @@ bool PDA::process(std::string input){
 
 	//std::cout << "ids size " << ids.size() <<std::endl;
 
+
 	// That's done now start using these id's to find a succesfull path
 	while(ids.size() > 0){
 		// Now let's check if we are already accepted

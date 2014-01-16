@@ -290,6 +290,7 @@ TEST_CASE("CFGPDA 3","[PDA]"){
 }
 
 TEST_CASE("CFGPDA 4","[PDA]"){
+	// x^i y^j x^k y^l waarbij i = j en k = 2l
     const std::set<char> terminals = {'x', 'y'};
     const std::set<char> variables = {'S', 'Q', 'R'};
 
@@ -337,6 +338,7 @@ TEST_CASE("CFGPDA 5","[PDA]"){
     	CHECK(error == "There is a symbol in the input string which is not in the PDA's alphabet");
     }
     CHECK(pda.process("(0+1)*") == true);
+    // Outcommented because calculating those is taking too much time they work but it takes some time
     //CHECK(pda.process("(0)+1+0*+(0+1)") == true);
     //CHECK(pda.process("00+11") == true);
     try{
@@ -348,6 +350,77 @@ TEST_CASE("CFGPDA 5","[PDA]"){
 	}
 }
 
+TEST_CASE("CFGPDA 6","[PDA]"){
+	// za^(n)za^(n)b^(m)zb^(m)z
+    const std::set<char> terminals = {'a', 'b', 'z'};
+    const std::set<char> variables = {'P', 'Q', 'R', 'S', 'T'};
+
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'P', "QS"},
+                                                        {'Q', "zz"},
+                                                        {'Q', "zR"},
+                                                        {'R', "aza"},
+                                                        {'R', "aRa"},
+                                                        {'S', "zz"},
+														{'S', "Tz"},
+														{'T', "bzb"},
+														{'T', "bTb"}
+                                                        };
+    CFG c0(terminals, variables, productions, 'P');
+    PDA pda(c0);
+
+    CHECK(pda.process("zaazaabzbz") == true);
+    CHECK(pda.process("zzzz") == true);
+    CHECK(pda.process("zazabzbz") == true);
+    CHECK(pda.process("zzbzbz") == true);
+    CHECK(pda.process("zazazz") == true);
+    CHECK(pda.process("zaaazaaabbbzbbbz") == true);
+
+    CHECK(pda.process("z") == false);
+    CHECK(pda.process("zz") == false);
+    CHECK(pda.process("zzz") == false);
+    CHECK(pda.process("aazaazbb") == false);
+    CHECK(pda.process("aazaazbbzb") == false);
+    CHECK(pda.process("azaazbbzb") == false);
+}
+
+TEST_CASE("CFGPDA 7","[PDA]"){
+	// a^(i)ec^(i)c^je of ea^(i)b^(j)ec^(j)
+    const std::set<char> terminals = {'a', 'b', 'c', 'e'};
+    const std::set<char> variables = {'S', 'Q', 'R', 'A', 'C'};
+
+    const std::multimap<char, SymbolString> productions = {
+                                                        {'S', "QC"},
+                                                        {'S', "AR"},
+                                                        {'Q', "aQc"},
+                                                        {'Q', "e"},
+                                                        {'R', "bRc"},
+                                                        {'R', "e"},
+														{'A', "Aa"},
+														{'A', "e"},
+														{'C', "Cc"},
+														{'C', "e"}
+                                                        };
+    CFG c0(terminals, variables, productions, 'S');
+    PDA pda(c0);
+
+    CHECK(pda.process("aece") == true);
+    CHECK(pda.process("aaecceccc") == true);
+    CHECK(pda.process("aaaeccce") == true);
+
+    CHECK(pda.process("eabec") == true);
+    CHECK(pda.process("eaabbecc") == true);
+    CHECK(pda.process("eabec") == true);
+
+
+    CHECK(pda.process("acec") == false);
+    CHECK(pda.process("aeceec") == false);
+    CHECK(pda.process("aaecccc") == false);
+
+    CHECK(pda.process("abec") == false);
+    CHECK(pda.process("eaabbcc") == false);
+    CHECK(pda.process("aebec") == false);
+}
 
 
 
