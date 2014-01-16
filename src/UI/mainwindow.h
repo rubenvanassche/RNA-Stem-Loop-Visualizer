@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "algotest.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <QMessageBox>
+#include <iostream>
 
 namespace Ui {
 class MainWindow;
@@ -18,11 +21,11 @@ public:
     
 private slots:
     void on_AnalyzeButton_clicked();
-
-    void on_OpenAlgoWindowButton_clicked();
+    void on_VisualizeButton_clicked();
 
 private:
     Ui::MainWindow *ui;
+    std::string fVisualizerLoop = "";
 };
 
 #endif // MAINWINDOW_H
