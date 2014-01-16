@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "../LLParser.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -38,7 +39,8 @@ void MainWindow::on_AnalyzeButton_clicked(){
 
 
     }else if(algoType == "LLParser"){
-
+        unsigned int stemsize = LLP::RNAParser::parse(RNALoop);
+        accepted = (stemsize != 0);
     }else if(algoType == "Turing"){
 
     }else{

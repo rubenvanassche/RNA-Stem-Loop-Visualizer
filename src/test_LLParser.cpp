@@ -261,12 +261,12 @@ TEST_CASE("RNA CFG", "[LLParser]") {
         LLParser parser (CFGTerminals, CFGVariables, CFGProductions, CFGStartsymbol, lookahead);
 
         std::vector<std::string> correctInput ({"acgxcgu", "axu", "gxxxxc", "guuuuucaxxxugaaaaac"});
-        for (unsigned int i = 0; i != correctInput.size(); i++) {
+        for (unsigned int i = 0; i != correctInput.size(); ++i) {
             CHECK(parser.process(correctInput[i]));
         }
 
         std::vector<std::string> wrongInput ({"acgcgu", "axc", "uxg", "axxxuc", "acgxxxxx"});
-        for (unsigned int i = 0; i != wrongInput.size(); i++) {
+        for (unsigned int i = 0; i != wrongInput.size(); ++i) {
             CHECK(not parser.process(wrongInput[i]));
         }
     }
@@ -274,33 +274,33 @@ TEST_CASE("RNA CFG", "[LLParser]") {
 
 TEST_CASE("RNAParser", "[LLParser]") {
     SECTION("correct input & correct stemsize") {
-        std::vector<std::string> input ({"acgacgu", "aau", "ggcauc", "guuuuucacgaugaaaaac"});
+        std::vector<std::string> input ({"ACGACGU", "AAU", "GGCAUC", "GUUUUUCACGAUGAAAAAC"});
         std::vector<unsigned int> stemSize ({3, 1, 1, 8});
-        for (unsigned int i = 0; i != input.size(); i++) {
+        for (unsigned int i = 0; i != input.size(); ++i) {
             CHECK(RNAParser::parse(input[i], stemSize[i]));
         }
     }
 
     SECTION("correct input & wrong stemsize") {
-        std::vector<std::string> input ({"aau", "ggcauc", "guuuuucacgaugaaaaac"});
+        std::vector<std::string> input ({"AAU", "GGCAUC", "GUUUUUCACGAUGAAAAAC"});
         std::vector<unsigned int> stemSize ({2, 2, 9});
-        for (unsigned int i = 0; i != input.size(); i++) {
+        for (unsigned int i = 0; i != input.size(); ++i) {
             CHECK(not RNAParser::parse(input[i], stemSize[i]));
         }
     }
 
     SECTION("wrong input & correct stemsize") {
-        std::vector<std::string> input ({"hidkkdlkeodkkd", "acgcgu", "uag", "acgcuc"});
+        std::vector<std::string> input ({"HIDKKDLKEODKKD", "ACGCGU", "UAG", "ACGCUC"});
         std::vector<unsigned int> stemSize ({3, 3, 1, 1});
-        for (unsigned int i = 0; i != input.size(); i++) {
+        for (unsigned int i = 0; i != input.size(); ++i) {
             CHECK(not RNAParser::parse(input[i], stemSize[i]));
         }
     }
 
     SECTION("calculate stemsize") {
-        std::vector<std::string> input ({"acgacgu", "aau", "ggcauc", "guuuuucacgaugaaaaac", "hidkkdlkeodkkd", "uag", "acgcuc"});
+        std::vector<std::string> input ({"ACGACGU", "AAU", "GGCAUC", "GUUUUUCACGAUGAAAAAC", "HIDKKDLKEODKKD", "UAG", "ACGCUC"});
         std::vector<unsigned int> stemSize ({3, 1, 1, 8, 0, 0, 0});
-        for (unsigned int i = 0; i != input.size(); i++) {
+        for (unsigned int i = 0; i != input.size(); ++i) {
             CHECK(RNAParser::parse(input[i]) == stemSize[i]);
         }
     }
