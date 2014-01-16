@@ -20,19 +20,21 @@
  * By: Stijn Wouters.
  */
 #include "RNAVisualizer.h"
+#include <iostream>
 
 int main(int argc, char* argv[]) {
-    if (argc != 5)
-        std::cout << "Usage: " << argv[0] << "<rnastring> <stemsize> <beginloop> <endloop>" << std::endl;
+    if (argc != 5) {
+        std::cout << "Usage: " << argv[0] << " <rnastring> <stemsize> <beginloop> <endloop>" << std::endl;
+    } else {
+        std::string rnaseq = argv[1];
+        int stemsize = std::atoi(argv[2]);
+        int beginloop = std::atoi(argv[3]);
+        int endloop = std::atoi(argv[4]);
 
-    std::string rnaseq = argv[1];
-    int stemsize = argv[2];
-    int beginloop = argv[3];
-    int endloop = argv[4];
+        RNAVisualizer rna_visualizer;
+        std::cout << stemsize << beginloop << endloop << std::endl;
 
-    RNAVisualizer rna_visualizer;
-
-    rna_visualizer.visualize(rnaseq, stemsize, beginloop, endloop);
-
+        rna_visualizer.visualize(rnaseq, stemsize, beginloop, endloop);
+    } // end if-else
     return 0;
 }

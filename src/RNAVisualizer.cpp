@@ -146,7 +146,7 @@ void RNAVisualizer::visualize(
                 fWindow.draw(binding, 4, sf::Lines);
 
                 y += 2 * fRadius;
-            } else if (index <= loopend) {
+            } else if (index < loopend) {
                 if ( (loopend - loopstart) / 2 == (index - loopstart) ) {
                     this->draw(sequence.at(index), 4 * fRadius, y);
 

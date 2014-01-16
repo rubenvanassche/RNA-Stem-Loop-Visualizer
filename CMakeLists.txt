@@ -108,7 +108,7 @@ find_package(SFML 2 COMPONENTS system window graphics)
 include_directories(${SFML_INCLUDE_DIR})
 
 # build the main program
-add_executable(RNA-Stem-Loop-Visualizer src/RNAslv.cpp src/RNAVisualizer.cpp src/LLParser.cpp)
+add_executable(RNA-Stem-Loop-Visualizer src/RNAslv.cpp src/RNAVisualizer.cpp)
 
 # build all the tests
 add_executable(Tests src/Tests.cpp ${TINYXMLSRC} ${TURINGSRC} ${CNFSRC} ${PDASRC} ${LLPARSERSRC} ${TESTSRC})
