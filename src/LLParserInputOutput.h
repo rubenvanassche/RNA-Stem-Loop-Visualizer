@@ -69,6 +69,6 @@ void writeOutput(const std::string outputFile, const LLParser& parser);
  */
 void processInput(std::string inputFile, std::string outputFile, bool output);
 
-};
+}
 
 #endif /*LLPARSERIO_H*/

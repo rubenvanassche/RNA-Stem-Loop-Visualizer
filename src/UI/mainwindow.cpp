@@ -35,7 +35,6 @@ void MainWindow::on_AnalyzeButton_clicked(){
     bool accepted = true; // Change this to true if the loop is accepted
     std::string visualizerLoop = ""; // Store the loop for visualizing here
     // That's it!
-    RNAString RNALoopAdv;
     int startIndex = 0;
     int endIndex = 0;
     int stemSize = 0;
@@ -47,6 +46,7 @@ void MainWindow::on_AnalyzeButton_clicked(){
         accepted = (stemsize != 0);
     }else if(algoType == "Turing"){
         try {
+            RNAString RNALoopAdv;
             TuringPtr tm = generateTM("TMRNA1.xml");
             std::tuple<bool, Tape> booltape = tm->processAndGetTape(RNALoop);
             accepted = std::get<0>(booltape);
@@ -89,7 +89,6 @@ void MainWindow::on_AnalyzeButton_clicked(){
         catch (std::runtime_error& e) {
             //invalid string input
             std::cout << e.what() << std::endl;
-            RNALoopAdv = RNAString();
             accepted = false;
         }
 
@@ -100,11 +99,12 @@ void MainWindow::on_AnalyzeButton_clicked(){
     if(accepted == true){
     	ui->VisualizeButton->setDisabled(false);
     	QMessageBox::information(NULL, "Accepted", "This loop was accepted.");
-    	if(algoType == "Turing"){
+    	/*if(algoType == "Turing"){  I commented this out as distinguishing is no longer necessary, delete if sure it's fine this way
     		this->fVisualizerLoop = RNALoopAdv.getString();
     	}else{
     		this->fVisualizerLoop = visualizerLoop;
-    	}
+    	}*/
+        this->fVisualizerLoop = visualizerLoop;
     }else{
     	QMessageBox::information(NULL, "Not Accepted", "This loop was not accepted.");
     }
