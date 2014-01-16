@@ -51,9 +51,24 @@ public:
      *
      * @brief i Index of the nucleotide
      *
-     * @return 0 if loop, X if stem
+     * @return 0 if loop, X if stem, ? if neither
      */
     char getLoopSignAt(int i) const;
+
+    /**
+     * @brief add character in front of loop
+     *
+     * @param nucl Nucleotide type
+     */
+
+    void push_front(char nucl);
+
+    /**
+     * @brief add character in back of loop
+     *
+     * @param nucl Nucleotide type
+     */
+    void push_back(char nucl);
 
     /**
      * @brief gets the size of the string
