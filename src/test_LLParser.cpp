@@ -304,4 +304,19 @@ TEST_CASE("RNAParser", "[LLParser]") {
             CHECK(RNAParser::parse(input[i]) == stemSize[i]);
         }
     }
+
+    SECTION("find stemloop") {
+        std::vector<std::string> input ({"ACGACGU", "AAU", "GGCAUC", "GUUUUUCACGAUGAAAAAC", "HIDKKDLKEODKKD", "UAG", "ACGCUC", "UUACGACGUGG"});
+        std::vector<unsigned int> stemSize ({3, 1, 1, 8, 0, 0, 1, 3});
+        std::vector<unsigned int> begins ({0, 0, 0, 0, 0, 0, 0, 2});
+        std::vector<unsigned int> ends ({7, 3, 6, 19, 14, 3, 5, 9});
+        for (unsigned int i = 0; i != input.size(); ++i) {
+            unsigned int result=0, begin=0, end=0;
+            CHECK(RNAParser::parse(input[i], result, begin, end) == stemSize[i]);
+            if (stemSize[i] != 0) {
+                CHECK(begin == begins[i]);
+                CHECK(end == ends[i]);
+            }
+        }
+    }
 }
