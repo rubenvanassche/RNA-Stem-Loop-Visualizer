@@ -30,7 +30,9 @@ int main(int argc, char* argv[]) {
         int stemsize = std::atoi(argv[2]);
         int beginloop = std::atoi(argv[3]);
         int endloop = std::atoi(argv[4]);
-
+        //HOTFIX converting stem indices to loop indices
+        beginloop += stemsize;
+        endloop -= (stemsize - 1);
         RNAVisualizer rna_visualizer;
         std::cout << stemsize << beginloop << endloop << std::endl;
 

@@ -132,10 +132,11 @@ void MainWindow::on_AnalyzeButton_clicked(){
                         for (int j = 0; j < i; j++) {         //Add unused nucleotides to RNAString
                             RNALoopAdv.push_front(RNALoop[j]);
                         }
-                        for (int j = 0; j < unusedNucleotides - i - 1; j++) {
+                        for (int j = 0; j < unusedNucleotides - i; j++) {
                             RNALoopAdv.push_back(RNALoop[RNALoop.size() -1 -j]);
                         }
                         maxStemSize = RNALoopAdv.getStemSize();   //properly set max stem size
+                        std::cout << RNALoopAdv.getSize() << std::endl;
                     }
                 }
                 subStringSize--;

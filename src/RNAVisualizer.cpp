@@ -119,6 +119,8 @@ void RNAVisualizer::visualize(
         const unsigned int& loopstart,
         const unsigned int& loopend
         ) {
+    bool evenLoop = ((loopend - loopstart) % 2 == 0);  //Does the loop have an even number of nucleotides
+    double averageLoopIndex = (loopend + loopstart - 1) / 2.0;   //Average index of a nucleotide in the loop
     // as long as the window is open, display the view
     while( fWindow.isOpen() ) {
         // first handles events that has to do witht the window
@@ -147,7 +149,18 @@ void RNAVisualizer::visualize(
 
                 y += 2 * fRadius;
             } else if (index < loopend) {
-                if ( (loopend - loopstart) / 2 == (index - loopstart) ) {
+                //Last nucleotide of first half of even loop: draw just left of center, DON'T change height
+                if ( evenLoop && ((averageLoopIndex - (double) index) < 1.0) && ((averageLoopIndex - (double) index) > 0.0)) {
+                    this->draw(sequence.at(index), 2.33 * fRadius, y);
+                }
+                //First nucleotide of second half of even loop: draw just right of center, change height up
+                else if ( evenLoop && ((averageLoopIndex - (double) index) > -1.0) && ((averageLoopIndex - (double) index) < 0.0)) {
+                    this->draw(sequence.at(index), 5.66 * fRadius, y);
+                    y -= 2 * fRadius;
+
+                }
+                //Middle nucleotide of uneven loop, draw in center
+                else if ( (loopend - loopstart) / 2 == (index - loopstart) && !evenLoop) {
                     this->draw(sequence.at(index), 4 * fRadius, y);
 
                     y -= 2 * fRadius;
@@ -166,7 +179,6 @@ void RNAVisualizer::visualize(
                 y -= 2 * fRadius;
             } // end if-else
         } // end for
-
         fWindow.display();
     } // end while
 
