@@ -29,7 +29,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # Documentation
-SET(BUILD_DOCS TRUE)
+SET(BUILD_DOCS FALSE)
 
 if(BUILD_DOCS)
     add_subdirectory(docs)
