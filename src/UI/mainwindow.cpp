@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "../LLParser.h"
 #include "../CNF.h"
+#include <sstream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -34,7 +35,7 @@ void MainWindow::on_AnalyzeButton_clicked(){
 
     std::string RNALoop = loop.toStdString(); // Work with this to start your algorithm
     bool accepted = true; // Change this to true if the loop is accepted
-    std::string visualizerLoop = ""; // Store the loop for visualizing here
+    std::string visualizerLoop = RNALoop; //""; // Store the loop for visualizing here
     // That's it!
     int startIndex = 0;
     int endIndex = 0;
@@ -97,8 +98,12 @@ void MainWindow::on_AnalyzeButton_clicked(){
             // display error message here
         } // end try-catch
     }else if(algoType == "LLParser"){
-        unsigned int stemsize = LLP::RNAParser::parse(RNALoop);
-        accepted = (stemsize != 0);
+        unsigned int result=0, begin=0, end=0;
+        LLP::RNAParser::parse(RNALoop, result, begin, end);
+        accepted = (result != 0);
+        startIndex = int(begin);
+        endIndex = int(end - 1);
+        stemSize = int(result);
     }else if(algoType == "Turing"){
         try {
             RNAString RNALoopAdv;  //Will contain string with longest possible loop indicated
@@ -158,6 +163,9 @@ void MainWindow::on_AnalyzeButton_clicked(){
     		this->fVisualizerLoop = visualizerLoop;
     	}*/
         this->fVisualizerLoop = visualizerLoop;
+        this->fStartIndex = startIndex;
+        this->fEndIndex = endIndex;
+        this->fStemSize = stemSize;
     }else{
     	QMessageBox::information(NULL, "Not Accepted", "This loop was not accepted.");
     }
@@ -167,7 +175,10 @@ void MainWindow::on_AnalyzeButton_clicked(){
 }
 
 void MainWindow::on_VisualizeButton_clicked(){
-	std::string command = " ./RNA-Stem-Loop-Visualizer '" + this->fVisualizerLoop + "'";
-	system(command.c_str());
+    std::stringstream command;
+    command << " ./RNA-Stem-Loop-Visualizer '" + this->fVisualizerLoop + "'";
+    command << " " << this->fStemSize << " " << this->fStartIndex << " " << this->fEndIndex;
+    std::cout << command.str() << std::endl;
+	system(command.str().c_str());
 }
 

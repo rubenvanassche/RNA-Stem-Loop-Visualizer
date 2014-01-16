@@ -331,11 +331,11 @@ public:
      * @brief Parses the given string.
      *
      * @param input RNA string
-     * @param begin indicates the possible begin of a stemloop
-     * @param end indicates the possible end of a stemloop (iterator like)
      * @param b_stemsize the size of the best founded stemloop
      * @param b_begin the begin of the best founded stemloop
      * @param b_end the end of the best founded stemloop
+     * @param begin indicates the possible begin of a stemloop
+     * @param end indicates the possible end of a stemloop (iterator like)
      *
      * @return If vallid the stemsize of the RNA-string, else 0
      */ 

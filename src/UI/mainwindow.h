@@ -28,6 +28,9 @@ private slots:
 private:
     Ui::MainWindow *ui;
     std::string fVisualizerLoop = "";
+    int fStartIndex = 0;
+    int fEndIndex = 0;
+    int fStemSize = 0;
 };
 
 #endif // MAINWINDOW_H
