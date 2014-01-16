@@ -1,0 +1,15 @@
+S : QC
+  | AR
+  ;
+Q : „a” Q „b”
+  | epsilon
+  ;
+R : „b” R „c”
+  | epsilon
+  ;
+A : A „a”
+  | epsilon
+  ;
+C : C „c”
+  | epsilon
+  ;

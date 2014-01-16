@@ -1,0 +1,9 @@
+S : QC
+  | AR
+  ;
+Q : „x” Q „y”
+  | „xy”
+  ;
+R : „xx” R „y”
+  | „xxy”
+  ;

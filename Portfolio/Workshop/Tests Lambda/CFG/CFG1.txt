@@ -1,0 +1,11 @@
+S : P
+  ;
+P : Q
+  | R
+  ;
+Q : „xcy”
+  | „x” Q „y”
+  ;
+R : „xcyy”
+  | „x” R „yy”
+  ;

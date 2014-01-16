@@ -1,0 +1,17 @@
+S : P
+  ;
+P : QS
+  ;
+Q : „zz”
+  | „z” R
+  ;
+R : „aza”
+  | „a” R „a”
+  ;
+S : „zz”
+  | T „z”
+  ;
+T : „bzb”
+  | „b” T „b”
+  ;
+
