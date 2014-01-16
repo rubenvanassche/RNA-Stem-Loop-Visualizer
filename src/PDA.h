@@ -34,6 +34,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <queue>
+#include <fstream>
 #include "CFG.h"
 #include "TinyXML/tinyxml.h"
 
@@ -179,56 +180,56 @@ public:
 	 */
     friend std::ostream& operator<<(std::ostream& out, PDATransition transition);
 
-    /*
+    /**
 	* @brief get the from state of the transition
 	*
 	* @return PDAState pointer
 	*/
     PDAState* getFrom(){ return this->fFrom;};
 
-    /*
+    /**
 	* @brief get the to state of the transition
 	*
 	* @return PDAState pointer
 	*/
 	PDAState* getTo(){ return this->fTo;};
 
-	/*
+	/**
 	* @brief get the input symbol of the transition
 	*
 	* @return char
 	*/
 	char getInputSymbol(){ return this->fInputSymbol;};
 
-	/*
+	/**
 	* @brief get the symbol on the top of the stack in this transition
 	*
 	* @return char
 	*/
 	char getTopStack(){ return this->fTopStack;};
 
-	/*
+	/**
 	* @brief get the stack operation of the transition
 	*
 	* @return PDAStackOperation
 	*/
 	PDAStackOperation getStackOperation(){ return this->fStackOperation;};
 
-	/*
+	/**
 	* @brief get the characters which are popped on the stack during a push operation
 	*
 	* @return vector with chars
 	*/
 	std::vector<char> getPushStack(){ return this->fPushStack;};
 
-	/*
+	/**
 	* @brief change the from state in the transition
 	*
 	* @param from PDAState pointer to the state
 	*/
 	void setFrom(PDAState* from){ this->fFrom = from;};
 
-	/*
+	/**
 	* @brief change the to state in the transition
 	*
 	* @param from PDAState pointer to the state
@@ -287,21 +288,21 @@ public:
 	 */
     friend std::ostream& operator<<(std::ostream& out, PDAID id);
 
-    /*
+    /**
      * @brief get the input of the ID
      *
      * @return string
      */
     std::string getInput(){ return this->fInput;};
 
-    /*
+    /**
 	 * @brief get the state of the ID
 	 *
 	 * @return PDAState pointer
 	 */
     PDAState* getState(){ return this->fState;};
 
-    /*
+    /**
 	 * @brief get the stack of the ID
 	 *
 	 * @return stack with chars
@@ -383,6 +384,15 @@ public:
      * @return A bool telling if the PDA ended in a final state or empty stack
      */
     bool process(std::string input);
+
+    /**
+     * @brief Store an PDA in a dot file
+     *
+     * @param fileName The file to write to
+     *
+     * @bool A bool telling if creating and writing the file was succesfull
+     */
+    bool toDotFile(std::string fileName);
 
     /**
 	 * @brief << overloading

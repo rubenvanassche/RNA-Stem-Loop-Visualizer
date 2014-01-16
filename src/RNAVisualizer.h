@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 13 January 2014.
+ * Last modified: 16 January 2014.
  * By: Stijn Wouters.
  */
 
@@ -30,7 +30,12 @@ class RNAVisualizer {
 public:
     RNAVisualizer();
 
-    void visualize(const std::string& sequence, const unsigned int& stemsize);
+    void visualize(
+            const std::string& sequence,
+            const unsigned int& stemsize,
+            const unsigned int& loopstart,
+            const unsigned int& loopend
+            );
 
 private:
     unsigned int fRadius;

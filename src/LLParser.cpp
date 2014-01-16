@@ -437,4 +437,4 @@ std::string LLTable::toString(const std::set<char>& CFGTerminals, const std::set
 SymbolString LLTable::get_transition(const char& variable, const SymbolString& lookahead) const {
     return (table.at(variable)).at(lookahead);
 }
-};
+}

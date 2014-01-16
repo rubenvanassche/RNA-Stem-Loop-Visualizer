@@ -22,6 +22,8 @@ install_manifest.txt
 # Binary & build directory
 bin/
 build/
+debug/
+Debug/
 
 # VIm backup files
 *.swp
@@ -33,7 +35,7 @@ build/
 LLP*out.txt
 
 #ignoring doxygen generated docs
-docs/
+docs/html
 
 #Ignore Binaries
 src/Tests

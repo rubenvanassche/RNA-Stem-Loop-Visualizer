@@ -355,6 +355,6 @@ private:
     static LLParser createParser();
     static const LLParser parser;
 };
-};
+}
 
 #endif /*LLPARSER_H*/
