@@ -46,38 +46,36 @@ void MainWindow::on_AnalyzeButton_clicked(){
         accepted = (stemsize != 0);
     }else if(algoType == "Turing"){
         try {
-            RNAString RNALoopAdv;
+            RNAString RNALoopAdv;  //Will contain string with longest possible loop indicated
             TuringPtr tm = generateTM("TMRNA1.xml");
-            std::tuple<bool, Tape> booltape = tm->processAndGetTape(RNALoop);
-            accepted = std::get<0>(booltape);
-            if (accepted) {
-                RNALoopAdv = RNAString(std::get<1>(booltape));
-                std::cout << RNALoopAdv << std::endl;
-
-            }
-            if (!accepted) { //Check if substrings are stem loops
-                int subStringSize = RNALoop.size();
-                int unusedNucleotides = 0;     //number of nucleotides not in tested substring
-                while (subStringSize > 4) {  //Min size of stem loop is 4
-                    if (accepted)
-                        break;
-                    subStringSize--;
-                    unusedNucleotides++;
-                    for (int i = 0; i <= (unusedNucleotides + 1); i++) {
-                        std::tuple<bool, Tape> booltape = tm->processAndGetTape(RNALoop.substr(i, subStringSize));
-                        accepted = std::get<0>(booltape);
-                        if (accepted) {
-                            RNALoopAdv = RNAString(std::get<1>(booltape));
-                            for (int j = 0; j < i; j++) {
-                                RNALoopAdv.push_front(RNALoop[j]);
-                            }
-                            for (int j = 0; j < unusedNucleotides - i - 1; j++) {
-                                RNALoopAdv.push_back(RNALoop[RNALoop.size() -1 -j]);
-                            }
+            int subStringSize = RNALoop.size();
+            int unusedNucleotides = 0;     //number of nucleotides not in tested substring
+            int maxStemSize = 0;
+            while (subStringSize >= 4) {  //Min size of stem loop is 4
+                if (subStringSize / 2.0 < maxStemSize)  //Impossible to get bigger stem
+                    break;
+                for (int i = 0; i <= unusedNucleotides; i++) { //n unused nucleotides -> n+1 possible substrings
+                    std::tuple<bool, Tape> booltape = tm->processAndGetTape(RNALoop.substr(i, subStringSize));
+                    bool newAccepted = std::get<0>(booltape);  //Indicates whether this substring is a stem loop
+                    if (newAccepted) {
+                        accepted = true;  //Something accepted == whole thing accepted
+                        newAccepted = false;   //reset
+                        RNAString newRNALoopAdv = RNAString(std::get<1>(booltape));  //generate new RNAString for current substr
+                        if (newRNALoopAdv.getStemSize() <= maxStemSize)    //Largest stem so far?
                             break;
+                        RNALoopAdv = newRNALoopAdv;   //If largest stem loop, use as result (so far)
+                        for (int j = 0; j < i; j++) {         //Add unused nucleotides to RNAString
+                            RNALoopAdv.push_front(RNALoop[j]);
                         }
+                        for (int j = 0; j < unusedNucleotides - i - 1; j++) {
+                            RNALoopAdv.push_back(RNALoop[RNALoop.size() -1 -j]);
+                        }
+                        maxStemSize = RNALoopAdv.getStemSize();   //properly set max stem size
                     }
                 }
+                subStringSize--;
+                unusedNucleotides++;
+
             }
             if (accepted) {
                 startIndex = RNALoopAdv.getLoopStartIndex();
