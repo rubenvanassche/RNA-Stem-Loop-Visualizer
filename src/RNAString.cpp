@@ -57,6 +57,15 @@ int RNAString::getSize() const {
     return fString.size();
 }
 
+std::string RNAString::getString() const {
+	std::string out;
+	out = this->fString;
+	out += "\n";
+	out + this->fLoops;
+
+	return out;
+}
+
 std::ostream& operator<<(std::ostream& os, RNAString str) {
     os << str.fString << std::endl;
     os << str.fLoops;

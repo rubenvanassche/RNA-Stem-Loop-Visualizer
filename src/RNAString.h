@@ -62,6 +62,13 @@ public:
      */
     int getSize() const;
 
+    /**
+     * @brief get the RNAString as a std::string;
+     *
+     * @return A std::string
+     */
+    std::string getString() const;
+
     friend std::ostream& operator<<(std::ostream& os, RNAString);
 private:
     std::string fString;
