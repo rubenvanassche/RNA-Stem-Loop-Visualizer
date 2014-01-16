@@ -16,19 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 13 January 2014.
+ * Last modified: 16 January 2014.
  * By: Stijn Wouters.
  */
 #include "RNAVisualizer.h"
-#include "LLParser.h"
+#include <iostream>
 
-int main() {
-    /* SAMPLE */
-    std::string rnaseq = "agucccccacu"; // le RNA string
-    RNAVisualizer rna_visualizer;           // le visualizer
+int main(int argc, char* argv[]) {
+    if (argc != 5) {
+        std::cout << "Usage: " << argv[0] << " <rnastring> <stemsize> <beginloop> <endloop>" << std::endl;
+    } else {
+        std::string rnaseq = argv[1];
+        int stemsize = std::atoi(argv[2]);
+        int beginloop = std::atoi(argv[3]);
+        int endloop = std::atoi(argv[4]);
+        RNAVisualizer rna_visualizer;
+        std::cout << stemsize << beginloop << endloop << std::endl;
 
-    rna_visualizer.visualize( rnaseq, LLP::RNAParser::parse(rnaseq) );
-
-    // that's it
+        rna_visualizer.visualize(rnaseq, stemsize, beginloop, endloop);
+    } // end if-else
     return 0;
 }

@@ -25,6 +25,7 @@
 #include <iostream>
 #include <algorithm> 
 #include <stack>
+#include <stdexcept>
 #include "stackOutput.h"
 
 
@@ -34,24 +35,57 @@ namespace LLP {
  ***********************/
 const LLParser RNAParser::parser = createParser();
 
-bool RNAParser::parse(std::string input, unsigned int stemSize) {
-    if (stemSize > input.length() / 2) return false;
+bool RNAParser::parse(std::string input, unsigned int stemsize) {
+    if (stemsize > input.length() / 2) return false;
 
     // change all elements of the loop to 'X'
-    for (unsigned int i = stemSize; i < input.length() - stemSize; i++) {
+    for (unsigned int i = stemsize; i < input.length() - stemsize; i++) {
         if (not isElement(input[i])) return false;
         input[i] = 'X';
     }
     return parser.process(input);
 }
 
-unsigned int RNAParser::parse(const std::string& input) {
-    unsigned int stemSize = 0;
+unsigned int RNAParser::parse(const std::string input) {
+    unsigned int stemsize = 0;
     for (unsigned int i = 1; i <= input.length() / 2; i++) {
-        if (parse(input, i)) stemSize = i;
+        if (parse(input, i)) stemsize = i;
     }
 
-    return stemSize;
+    return stemsize;
+}
+
+unsigned int RNAParser::parse(const std::string& input, unsigned int& b_stemsize, unsigned int& b_begin, 
+        unsigned int& b_end, unsigned int begin, unsigned int end) {
+    if (end == 0) end = input.length();
+    if (begin >= input.size()) {
+        std::stringstream ss;
+        ss << "invalid begin: begin=" << begin << " stringlength=" << input.length();
+        throw std::runtime_error(ss.str());
+    }
+    if (end > input.size()) {
+        std::stringstream ss;
+        ss << "invalid begin: end=" << end << " stringlength=" << input.length();
+        throw std::runtime_error(ss.str());
+    }
+    if (end - begin < 3) return 0;
+
+    unsigned int result = parse(input.substr(begin, end - begin)); //std::cout << "\t" << begin << "-" << end << std::endl;
+    if (result > 0 and result == b_stemsize and (end - begin) > (b_end - b_begin)) {
+        b_stemsize = result;
+        b_begin = begin;
+        b_end = end;
+    }
+    if (result > b_stemsize) {
+        b_stemsize = result;
+        b_begin = begin;
+        b_end = end;
+    }
+    
+    result = parse(input, b_stemsize, b_begin, b_end, begin, end - 1); //std::cout << "\t" << begin << "-" << end << std::endl;
+    result = parse(input, b_stemsize, b_begin, b_end, begin + 1, end); //std::cout << "\t" << begin << "-" << end << std::endl;
+
+    return b_stemsize;
 }
 
 bool RNAParser::isElement(char c) {
@@ -97,12 +131,6 @@ LLParser::LLParser(
             CFGVariables(CFGVariables) {     
 
 }
-
-/*
-LLParser::LLParser(const CFG& grammar, unsigned int lookahead) {
-
-}
-*/
 
 bool LLParser::process(const std::string& input) const {
     std::stack<char> stack;
@@ -169,12 +197,6 @@ LLTable::LLTable(
         ) : dimension(dimension), table(generateTable(CFGTerminals, CFGVariables, CFGProductions, dimension)){
 
 }
-
-/*
-LLTable::LLTable(const CFG& grammar, unsigned int dimension) {          
-
-}
-*/
 
 SymbolString LLTable::process(const char& topStack, const SymbolString& remainingInput) const {
     // calculate the length of the lookahead = min(k, remainingInput.length())

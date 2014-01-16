@@ -1,0 +1,21 @@
+<cfg>
+    <terminals>a</terminals>
+    <terminals>b</terminals>
+    <variables>AB</variables>
+    <variables>CS</variables>
+    <productions>
+        <rule head='S'>a</rule>
+        <rule head='S'>aAa</rule>
+        <rule head='S'>b</rule>
+        <rule head='S'>bBb</rule>
+    </productions>
+    <productions>
+        <rule head='A'>aAa</rule>
+        <rule head='A'>a</rule>
+    </productions>
+    <productions>
+        <rule head='B'>bBb</rule>
+        <rule head='B'>b</rule>
+    </productions>
+    <start>S</start>
+</cfg>

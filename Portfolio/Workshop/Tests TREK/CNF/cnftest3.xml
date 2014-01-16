@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<CFG>
+	<variables>
+		<var>E</var>
+		<var>F</var>
+		<var>T</var>
+		<var>I</var>
+		<var>V0</var>
+		<var>V1</var>
+		<var>V2</var>
+		<var>V3</var>
+		<var>V4</var>
+		<var>V5</var>
+		<var>V6</var>
+		<var>V7</var>
+		<var>V8</var>
+		<var>V9</var>
+		<var>V10</var>
+	</variables>
+	<terminals>
+		<t>a</t>
+		<t>b</t>
+		<t>0</t>
+		<t>1</t>
+		<t>(</t>
+		<t>)</t>
+		<t>+</t>
+		<t>*</t>
+	</terminals>
+	<rules>
+		<r var="E" body="EV8"/>
+		<r var="E" body="TV9"/>
+		<r var="E" body="V6V10"/>
+		<r var="E" body="a"/>
+		<r var="E" body="b"/>
+		<r var="E" body="IV0"/>
+		<r var="E" body="IV1"/>
+		<r var="E" body="IV2"/>
+		<r var="E" body="IV3"/>
+		<r var="T" body="TV9"/>
+		<r var="T" body="V6V10"/>
+		<r var="T" body="a"/>
+		<r var="T" body="b"/>
+		<r var="T" body="IV0"/>
+		<r var="T" body="IV1"/>
+		<r var="T" body="IV2"/>
+		<r var="T" body="IV3"/>
+		<r var="F" body="V6V10"/>
+		<r var="F" body="a"/>
+		<r var="F" body="b"/>
+		<r var="F" body="IV0"/>
+		<r var="F" body="IV1"/>
+		<r var="F" body="IV2"/>
+		<r var="F" body="IV3"/>
+		<r var="I" body="a"/>
+		<r var="I" body="b"/>
+		<r var="I" body="IV0"/>
+		<r var="I" body="IV1"/>
+		<r var="I" body="IV2"/>
+		<r var="I" body="IV3"/>
+		<r var="V0" body="a"/>
+		<r var="V1" body="b"/>
+		<r var="V2" body="0"/>
+		<r var="V3" body="1"/>
+		<r var="V4" body="+"/>
+		<r var="V5" body="*"/>
+		<r var="V6" body="("/>
+		<r var="V7" body=")"/>
+		<r var="V8" body="V4T"/>
+		<r var="V9" body="V5F"/>
+		<r var="V10" body="EV7"/>
+
+	</rules>
+	<start>E</start>
+</CFG>

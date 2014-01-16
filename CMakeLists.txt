@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Last modified: 13 January 2014.
+# Last modified: 16 January 2014.
 # By: Stijn Wouters.
 cmake_minimum_required(VERSION 2.6)
 project("RNA Stem Loop Visualizer")
@@ -93,7 +93,7 @@ FIND_PACKAGE(Qt4 REQUIRED)
 QT4_WRAP_CPP(UI_HEADERS_MOC ${UI_HEADERS})
 INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
-ADD_EXECUTABLE(RNAStemLoop ${UI_SOURCES} ${UI_HEADERS_MOC} ${UI_FORMS_HEADERS} ${LLPARSERSRC} ${TURINGSRC} ${RNASTRINGSRC} ${TINYXMLSRC})
+ADD_EXECUTABLE(RNAStemLoop ${UI_SOURCES} ${UI_HEADERS_MOC} ${UI_FORMS_HEADERS} ${LLPARSERSRC} ${TURINGSRC} ${RNASTRINGSRC} ${TINYXMLSRC} ${CNFSRC})
 TARGET_LINK_LIBRARIES(RNAStemLoop ${QT_LIBRARIES})
 
 # Extend the CMake module path to find the FindSFML.cmake file in
@@ -108,7 +108,7 @@ find_package(SFML 2 COMPONENTS system window graphics)
 include_directories(${SFML_INCLUDE_DIR})
 
 # build the main program
-add_executable(RNA-Stem-Loop-Visualizer src/RNAslv.cpp src/RNAVisualizer.cpp src/LLParser.cpp)
+add_executable(RNA-Stem-Loop-Visualizer src/RNAslv.cpp src/RNAVisualizer.cpp)
 
 # build all the tests
 add_executable(Tests src/Tests.cpp ${TINYXMLSRC} ${TURINGSRC} ${CNFSRC} ${PDASRC} ${LLPARSERSRC} ${TESTSRC})

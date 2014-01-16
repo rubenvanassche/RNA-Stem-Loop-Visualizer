@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<TuringMachines>
+    <CommonAttributes NumTapes="1" MainMachine="main"/>
+    <Machine Name="main" Start="Q0">
+        <States>
+            <State Name="Q0" Accept="false"/>
+            <State Name="Q1" Accept="false"/>
+            <State Name="Q2" Accept="false"/>
+            <State Name="Q3" Accept="false"/>
+            <State Name="Q4" Accept="true"/>
+        </States>
+        <Transitions>
+            <Transition From="Q0" To="Q1" Read="0" Write="X" Move="R"/>
+            <Transition From="Q0" To="Q3" Read="Y" Write="Y" Move="R"/>
+            <Transition From="Q1" To="Q1" Read="0" Write="0" Move="R"/>
+            <Transition From="Q1" To="Q2" Read="1" Write="Y" Move="L"/>
+            <Transition From="Q1" To="Q1" Read="Y" Write="Y" Move="R"/>
+            <Transition From="Q2" To="Q2" Read="0" Write="0" Move="L"/>
+            <Transition From="Q2" To="Q0" Read="X" Write="X" Move="R"/>
+            <Transition From="Q2" To="Q2" Read="Y" Write="Y" Move="L"/>
+            <Transition From="Q3" To="Q3" Read="Y" Write="Y" Move="R"/>
+            <Transition From="Q3" To="Q4" Read="B" Write="B" Move="R"/>
+        </Transitions>
+    </Machine>
+</TuringMachines>

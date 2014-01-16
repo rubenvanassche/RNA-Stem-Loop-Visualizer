@@ -1,0 +1,15 @@
+ CFG1
+————
+x^ncy^m met n = m of m = 2n
+
+CFG2
+————
+za^(n)za^(n)b^(m)zb^(m)z
+
+CFG3
+————
+Aanvaardt reguliere expressies over 1 en 0 met e als epsilon
+
+CFG4
+————
+a^ib^jc^k met i = j of j = k
