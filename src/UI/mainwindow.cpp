@@ -32,7 +32,7 @@ void MainWindow::on_AnalyzeButton_clicked(){
     const QString algoType =  ui->AnalyzeTypeSelect->currentText();
 
     std::string RNALoop = loop.toStdString(); // Work with this to start your algorithm
-    bool accepted = true; // Change this to true if the loop is accepted
+    bool accepted = false; // Change this to true if the loop is accepted
     std::string visualizerLoop = ""; // Store the loop for visualizing here
     // That's it!
     int startIndex = 0;
