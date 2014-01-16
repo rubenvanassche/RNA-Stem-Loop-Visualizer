@@ -35,7 +35,7 @@ Debug/
 LLP*out.txt
 
 #ignoring doxygen generated docs
-docs/
+docs/html
 
 #Ignore Binaries
 src/Tests
