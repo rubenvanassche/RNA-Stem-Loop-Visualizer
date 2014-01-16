@@ -86,7 +86,11 @@ FIND_PACKAGE(Qt4 REQUIRED)
 QT4_WRAP_CPP(UI_HEADERS_MOC ${UI_HEADERS})
 INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
-ADD_EXECUTABLE(RNAStemLoop ${UI_SOURCES} ${UI_HEADERS_MOC} ${UI_FORMS_HEADERS} ${TURINGSRC} ${RNASTRINGSRC} ${TINYXMLSRC})
+<<<<<<< HEAD
+ADD_EXECUTABLE(RNAStemLoop ${UI_SOURCES} ${UI_HEADERS_MOC} ${UI_FORMS_HEADERS} ${LLPARSERSRC} ${TURINGSRC} ${RNASTRINGSRC} ${TINYXMLSRC})
+=======
+ADD_EXECUTABLE(RNAStemLoop ${UI_SOURCES} ${UI_HEADERS_MOC} ${UI_FORMS_HEADERS} ${LLPARSERSRC})
+>>>>>>> master
 TARGET_LINK_LIBRARIES(RNAStemLoop ${QT_LIBRARIES})
 
 # Extend the CMake module path to find the FindSFML.cmake file in
@@ -125,6 +129,7 @@ target_link_libraries(RNA-Stem-Loop-Visualizer ${SFML_LIBRARIES})
 # Install all executables into the bin directory.
 install(TARGETS 
     RNA-Stem-Loop-Visualizer 
+    RNAStemLoop
     Tests 
     RunTuring 
     RunCYK 

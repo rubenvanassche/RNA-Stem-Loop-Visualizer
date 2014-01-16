@@ -37,10 +37,10 @@ const LLParser RNAParser::parser = createParser();
 bool RNAParser::parse(std::string input, unsigned int stemSize) {
     if (stemSize > input.length() / 2) return false;
 
-    // change all elements of the loop to 'x'
+    // change all elements of the loop to 'X'
     for (unsigned int i = stemSize; i < input.length() - stemSize; i++) {
         if (not isElement(input[i])) return false;
-        input[i] = 'x';
+        input[i] = 'X';
     }
     return parser.process(input);
 }
@@ -55,22 +55,22 @@ unsigned int RNAParser::parse(const std::string& input) {
 }
 
 bool RNAParser::isElement(char c) {
-    std::set<char> elements ({'g', 'u', 'a', 'c'});
+    std::set<char> elements ({'G', 'U', 'A', 'C'});
     return elements.find(c) != elements.end();
 }
 
 LLParser RNAParser::createParser() {
-    std::set<char> CFGTerminals ({'g', 'u', 'a', 'c', 'x'});
+    std::set<char> CFGTerminals ({'G', 'U', 'A', 'C', 'X'});
 
     std::set<char> CFGVariables ({'S', 'T'});
 
     std::multimap<char, SymbolString> CFGProductions;
-    CFGProductions.insert(std::pair<char, SymbolString>('S', "cSg"));
-    CFGProductions.insert(std::pair<char, SymbolString>('S', "gSc"));
-    CFGProductions.insert(std::pair<char, SymbolString>('S', "uSa"));
-    CFGProductions.insert(std::pair<char, SymbolString>('S', "aSu"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "CSG"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "GSC"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "USA"));
+    CFGProductions.insert(std::pair<char, SymbolString>('S', "ASU"));
     CFGProductions.insert(std::pair<char, SymbolString>('S', "T"));
-    CFGProductions.insert(std::pair<char, SymbolString>('T', "xT"));
+    CFGProductions.insert(std::pair<char, SymbolString>('T', "XT"));
     CFGProductions.insert(std::pair<char, SymbolString>('T', EPSILON));
 
     char CFGStartsymbol = 'S'; 
