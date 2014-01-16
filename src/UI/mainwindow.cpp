@@ -106,9 +106,9 @@ void MainWindow::on_AnalyzeButton_clicked(){
         unsigned int result=0, begin=0, end=0;
         LLP::RNAParser::parse(RNALoop, result, begin, end);
         accepted = (result != 0);
-        startIndex = int(begin);
-        endIndex = int(end - 1);
         stemSize = int(result);
+        startIndex = int(begin) + stemSize;
+        endIndex = int(end - 1) - stemSize;
     }else if(algoType == "Turing"){
         try {
             RNAString RNALoopAdv;  //Will contain string with longest possible loop indicated
@@ -143,9 +143,9 @@ void MainWindow::on_AnalyzeButton_clicked(){
 
             }
             if (accepted) {
-                startIndex = RNALoopAdv.getLoopStartIndex();
-                endIndex = RNALoopAdv.getLoopEndIndex();
                 stemSize = RNALoopAdv.getStemSize();
+                startIndex = RNALoopAdv.getLoopStartIndex() + stemSize;
+                endIndex = RNALoopAdv.getLoopEndIndex() - stemSize;
                 std::cout << RNALoopAdv << std::endl;
             }
         }

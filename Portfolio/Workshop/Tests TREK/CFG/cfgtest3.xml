@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<CFG>
+	<variables>
+		<var>I</var>
+		<var>F</var>
+		<var>T</var>
+		<var>E</var>
+	</variables>
+	<terminals>
+		<t>a</t>
+		<t>b</t>
+		<t>0</t>
+		<t>1</t>
+		<t>(</t>
+		<t>)</t>
+		<t>+</t>
+		<t>*</t>
+	</terminals>
+	<rules>
+		<r var="I" body="a"/>
+		<r var="I" body="b"/>
+		<r var="I" body="Ia"/>
+		<r var="I" body="Ib"/>
+		<r var="I" body="I0"/>
+		<r var="I" body="I1"/>
+		<r var="F" body="I"/>
+		<r var="F" body="(E)"/>
+		<r var="T" body="F"/>
+		<r var="T" body="T*F"/>
+		<r var="E" body="T"/>
+		<r var="E" body="E+T"/>
+	</rules>
+	<start>E</start>
+</CFG>
