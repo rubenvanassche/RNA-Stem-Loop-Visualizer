@@ -3,6 +3,8 @@
 #include "../LLParser.h"
 #include "../CNF.h"
 #include <sstream>
+#include <chrono>
+#include <ctime>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,6 +19,9 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::on_AnalyzeButton_clicked(){
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+    start = std::chrono::system_clock::now();
+
     ui->VisualizeButton->setDisabled(true);
     ui->AnalyzeButton->setDisabled(true);
     ui->AnalyzeButton->setText("Working ...");
@@ -154,9 +159,15 @@ void MainWindow::on_AnalyzeButton_clicked(){
         QMessageBox::information(NULL, "Problem", "This algorithm for processing the RSL is not (yet avaible).");
     }
 
+    end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end-start;
+
     if(accepted == true){
     	ui->VisualizeButton->setDisabled(false);
-    	QMessageBox::information(NULL, "Accepted", "This loop was accepted.");
+        std::stringstream message;
+        message << "This loop was accepted." << std::endl;
+        message << "elapsed time: " << elapsed_seconds.count() << "s";
+    	QMessageBox::information(NULL, "Accepted", message.str().c_str());
     	/*if(algoType == "Turing"){  I commented this out as distinguishing is no longer necessary, delete if sure it's fine this way
     		this->fVisualizerLoop = RNALoopAdv.getString();
     	}else{
