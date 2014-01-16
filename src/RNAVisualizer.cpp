@@ -133,20 +133,25 @@ void RNAVisualizer::visualize(
         fWindow.setView(fStandard);
 
         int y = 0;
+        //Indicates how many nucleotides "higher" the top right of the string is than the top left
+        int rightSideTopPart = (sequence.size() - loopend) - (loopstart);
+        //If top right higher, will be drawn out of window, so move down
+        if (rightSideTopPart > 0)
+            y += rightSideTopPart * 2 * fRadius;
         for (unsigned int index = 0; index < sequence.size(); ++index) {
             if (index < loopstart) {
                 this->draw(sequence.at(index), 2 * fRadius, y);
+                if (index >= (loopstart - stemsize)) {
+                    // add a binding
+                    sf::Vertex binding[4] = {
+                        sf::Vertex( sf::Vector2f(4 * fRadius, y + (2 * fRadius / 3) ) ),
+                        sf::Vertex( sf::Vector2f(6 * fRadius, y + (2 * fRadius / 3) ) ),
+                        sf::Vertex( sf::Vector2f(4 * fRadius, y + (4 * fRadius / 3) ) ),
+                        sf::Vertex( sf::Vector2f(6 * fRadius, y + (4 * fRadius / 3) ) ),
+                    };
 
-                // add a binding
-                sf::Vertex binding[4] = {
-                    sf::Vertex( sf::Vector2f(4 * fRadius, y + (2 * fRadius / 3) ) ),
-                    sf::Vertex( sf::Vector2f(6 * fRadius, y + (2 * fRadius / 3) ) ),
-                    sf::Vertex( sf::Vector2f(4 * fRadius, y + (4 * fRadius / 3) ) ),
-                    sf::Vertex( sf::Vector2f(6 * fRadius, y + (4 * fRadius / 3) ) ),
-                };
-
-                fWindow.draw(binding, 4, sf::Lines);
-
+                    fWindow.draw(binding, 4, sf::Lines);
+                }
                 y += 2 * fRadius;
             } else if (index < loopend) {
                 //Last nucleotide of first half of even loop: draw just left of center, DON'T change height

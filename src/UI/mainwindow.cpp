@@ -108,7 +108,7 @@ void MainWindow::on_AnalyzeButton_clicked(){
         accepted = (result != 0);
         stemSize = int(result);
         startIndex = int(begin) + stemSize;
-        endIndex = int(end - 1) - stemSize;
+        endIndex = int(end) - stemSize;
     }else if(algoType == "Turing"){
         try {
             RNAString RNALoopAdv;  //Will contain string with longest possible loop indicated
@@ -146,7 +146,7 @@ void MainWindow::on_AnalyzeButton_clicked(){
             if (accepted) {
                 stemSize = RNALoopAdv.getStemSize();
                 startIndex = RNALoopAdv.getLoopStartIndex() + stemSize;
-                endIndex = RNALoopAdv.getLoopEndIndex() - stemSize;
+                endIndex = RNALoopAdv.getLoopEndIndex() - stemSize + 1;
                 std::cout << RNALoopAdv << std::endl;
             }
         }
