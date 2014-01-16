@@ -46,8 +46,37 @@ void MainWindow::on_AnalyzeButton_clicked(){
         try {
             TuringPtr tm = generateTM("TMRNA1.xml");
             std::tuple<bool, Tape> booltape = tm->processAndGetTape(RNALoop);
-            RNALoopAdv = RNAString(std::get<1>(booltape));
             accepted = std::get<0>(booltape);
+            if (accepted) {
+                RNALoopAdv = RNAString(std::get<1>(booltape));
+                std::cout << RNALoopAdv << std::endl;
+
+            }
+            if (!accepted) { //Check if substrings are stem loops
+                int subStringSize = RNALoop.size();
+                int unusedNucleotides = 0;     //number of nucleotides not in tested substring
+                while (subStringSize > 4) {  //Min size of stem loop is 4
+                    if (accepted)
+                        break;
+                    subStringSize--;
+                    unusedNucleotides++;
+                    for (int i = 0; i <= (unusedNucleotides + 1); i++) {
+                        std::tuple<bool, Tape> booltape = tm->processAndGetTape(RNALoop.substr(i, subStringSize));
+                        accepted = std::get<0>(booltape);
+                        if (accepted) {
+                            RNALoopAdv = RNAString(std::get<1>(booltape));
+                            for (int j = 0; j < i; j++) {
+                                RNALoopAdv.push_front(RNALoop[j]);
+                            }
+                            for (int j = 0; j < unusedNucleotides - i - 1; j++) {
+                                RNALoopAdv.push_back(RNALoop[RNALoop.size() -1 -j]);
+                            }
+                            std::cout << RNALoopAdv << std::endl;
+                            break;
+                        }
+                    }
+                }
+            }
         }
         catch (std::runtime_error& e) {
             //invalid string input
