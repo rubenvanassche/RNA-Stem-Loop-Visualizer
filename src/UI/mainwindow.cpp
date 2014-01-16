@@ -41,10 +41,17 @@ void MainWindow::on_AnalyzeButton_clicked(){
     }else if(algoType == "LLParser"){
 
     }else if(algoType == "Turing"){
-        TuringPtr tm = generateTM("TMRNA1.xml");
-        std::tuple<bool, Tape> booltape = tm->processAndGetTape(RNALoop);
-        RNALoopAdv = RNAString(std::get<1>(booltape));
-        accepted = std::get<0>(booltape);
+        try {
+            TuringPtr tm = generateTM("TMRNA1.xml");
+            std::tuple<bool, Tape> booltape = tm->processAndGetTape(RNALoop);
+            RNALoopAdv = RNAString(std::get<1>(booltape));
+            accepted = std::get<0>(booltape);
+        }
+        catch (std::runtime_error& e) {
+            //invalid string input
+            RNALoopAdv = RNAString();
+            accepted = false;
+        }
 
     }else{
         QMessageBox::information(NULL, "Problem", "This algorithm for processing the RSL is not (yet avaible).");
