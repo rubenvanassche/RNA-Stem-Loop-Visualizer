@@ -74,8 +74,8 @@ set(TESTSRC
     )
     
 # Lists All the files for the GUI
-SET(UI_SOURCES src/UI/main.cpp src/UI/mainwindow.cpp src/UI/algotest.cpp)
-SET(UI_HEADERS src/UI/mainwindow.h src/UI/algotest.h)
+SET(UI_SOURCES src/UI/main.cpp src/UI/mainwindow.cpp)
+SET(UI_HEADERS src/UI/mainwindow.h)
 
 # Some QT stuff
 FIND_PACKAGE(Qt4 REQUIRED)
