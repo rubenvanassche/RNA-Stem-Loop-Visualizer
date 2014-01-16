@@ -34,12 +34,17 @@ void MainWindow::on_AnalyzeButton_clicked(){
     bool accepted = true; // Change this to true if the loop is accepted
     std::string visualizerLoop = ""; // Store the loop for visualizing here
     // That's it!
+    RNAString RNALoopAdv;
     if(algoType == "CFG"){
 
 
     }else if(algoType == "LLParser"){
 
     }else if(algoType == "Turing"){
+        TuringPtr tm = generateTM("TMRNA1.xml");
+        std::tuple<bool, Tape> booltape = tm->processAndGetTape(RNALoop);
+        RNALoopAdv = RNAString(std::get<1>(booltape));
+        accepted = std::get<0>(booltape);
 
     }else{
         QMessageBox::information(NULL, "Problem", "This algorithm for processing the RSL is not (yet avaible).");

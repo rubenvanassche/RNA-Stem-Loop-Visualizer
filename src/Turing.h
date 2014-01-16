@@ -36,6 +36,8 @@
 #include <memory>
 #include "TinyXML/tinyxml.h"
 
+#define DATADIR "/home/jakob/Dropbox/UA/RNA-Stem-Loop-Visualizer/data/"
+
 /**
  * Please note that the TuringState, TuringTransition, TMID and Tape classes were designed specifically for use with the TuringMachine class.
  * Correct behaviour with invalid arguments is not guaranteed, though the TuringMachine class is guaranteed not to provide invalid arguments to the aforementioned classes.
@@ -230,6 +232,10 @@ public:
     void moveHead(Direction dir);
 
     /**
+     * @brief Moves the head to the very first nonblank character
+     */
+    void resetHead();
+    /**
      * @brief output overload
      */
 
@@ -277,6 +283,14 @@ public:
      * @param dir Direction to move head in
      */
     void step(StatePtr to, const std::vector<char>& write, Direction dir);
+
+    /**
+     * @brief Gets the full Tape
+     *
+     * @return the full Tape
+     */
+
+    const Tape& getTape() const;
 
     /**
      * @brief output overload
@@ -404,6 +418,16 @@ public:
      * @return True if the input string is part of the language described by the TM
      */
     bool process(const std::string& input) const;
+
+
+    /**
+     * @brief Processes an input string through the Turing Machine and return accepting Tape
+     *
+     * @param input The string to be processed by the Turing Machine
+     *
+     * @return tuple of bool if the string was accepted and the Tape
+     */
+    std::tuple<bool, Tape> processAndGetTape(const std::string& input) const;
 
     /**
      * @brief Destructor
