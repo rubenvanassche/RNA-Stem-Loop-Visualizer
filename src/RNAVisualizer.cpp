@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Last modified: 13 January 2014.
+ * Last modified: 16 January 2014.
  * By: Stijn Wouters.
  */
 #include "RNAVisualizer.h"
@@ -92,19 +92,19 @@ void RNAVisualizer::event() {
 
 void RNAVisualizer::draw(const char& type, const int& x, const int& y) {
     switch(type) {
-    case 'a':
+    case 'A':
         fAdenine.setPosition(x, y);
         fWindow.draw(fAdenine);
         break;
-    case 'u':
+    case 'U':
         fUracil.setPosition(x, y);
         fWindow.draw(fUracil);
         break;
-    case 'g':
+    case 'G':
         fGuanine.setPosition(x, y);
         fWindow.draw(fGuanine);
         break;
-    case 'c':
+    case 'C':
         fCytosine.setPosition(x, y);
         fWindow.draw(fCytosine);
         break;
@@ -113,7 +113,12 @@ void RNAVisualizer::draw(const char& type, const int& x, const int& y) {
     return;
 }
 
-void RNAVisualizer::visualize(const std::string& original, const unsigned int& stemsize) {
+void RNAVisualizer::visualize(
+        const std::string& sequence,
+        const unsigned int& stemsize,
+        const unsigned int& loopstart,
+        const unsigned int& loopend
+        ) {
     // as long as the window is open, display the view
     while( fWindow.isOpen() ) {
         // first handles events that has to do witht the window
@@ -125,49 +130,42 @@ void RNAVisualizer::visualize(const std::string& original, const unsigned int& s
         // use the standard view to display the RNA
         fWindow.setView(fStandard);
 
-        if (stemsize == 0) {
-            int x = 0;
+        int y = 0;
+        for (unsigned int index = 0; index < sequence.size(); ++index) {
+            if (index < loopstart) {
+                this->draw(sequence.at(index), 2 * fRadius, y);
 
-            for (const auto& c : original) {
-                this->draw(c, x, 0);
+                // add a binding
+                sf::Vertex binding[4] = {
+                    sf::Vertex( sf::Vector2f(4 * fRadius, y + (2 * fRadius / 3) ) ),
+                    sf::Vertex( sf::Vector2f(6 * fRadius, y + (2 * fRadius / 3) ) ),
+                    sf::Vertex( sf::Vector2f(4 * fRadius, y + (4 * fRadius / 3) ) ),
+                    sf::Vertex( sf::Vector2f(6 * fRadius, y + (4 * fRadius / 3) ) ),
+                };
 
-                x += 2 * fRadius;
-            } // end for
-        } else {
-            std::string sequence = original;
-            int outleft = 0;
-            int left = outleft + (2 * fRadius);
-            int middle = left + (2 * fRadius);
-            int right = middle + (2 * fRadius);
-            int outright = right + (2 * fRadius);
-            int y = 0;
-
-            while (sequence.size() > 1) {
-                bool small = (sequence.size() >= (stemsize * 2)) || (sequence.size() <= 3);
-
-                this->draw(sequence.front(), small ? left : outleft, y);
-                this->draw(sequence.back(), small ? right : outright, y);
-
-                if (sequence.size() >= (2 *  stemsize)) {
-                    // also add a binding
-                    sf::Vertex binding[4] = {
-                        sf::Vertex( sf::Vector2f(middle, y + (2 * fRadius / 3) ) ),
-                        sf::Vertex( sf::Vector2f(right, y + (2 * fRadius / 3) ) ),
-                        sf::Vertex( sf::Vector2f(middle, y + (4 * fRadius / 3) ) ),
-                        sf::Vertex( sf::Vector2f(right, y + (4 * fRadius / 3) ) ),
-                    };
-
-                    fWindow.draw(binding, 4, sf::Lines);
-                } else {
-                    // no binding
-                } // end if-else
+                fWindow.draw(binding, 4, sf::Lines);
 
                 y += 2 * fRadius;
-                sequence = std::string(sequence.begin() + 1, sequence.end() - 1);
-            } // end while
+            } else if (index < loopend) {
+                if ( (loopend - loopstart) / 2 == (index - loopstart) ) {
+                    this->draw(sequence.at(index), 4 * fRadius, y);
 
-            if ( !sequence.empty() ) this->draw(sequence.front(), middle, y);
-        } // end if-else
+                    y -= 2 * fRadius;
+                } else if ( (index - loopstart) < ( (loopend - loopstart) / 2) ) {
+                    this->draw(sequence.at(index), 0, y);
+
+                    y += 2 * fRadius;
+                } else {
+                    this->draw(sequence.at(index), 8 * fRadius, y);
+
+                    y -= 2 * fRadius;
+                } // end if-else
+            } else {
+                this->draw(sequence.at(index), 6 * fRadius, y);
+
+                y -= 2 * fRadius;
+            } // end if-else
+        } // end for
 
         fWindow.display();
     } // end while
