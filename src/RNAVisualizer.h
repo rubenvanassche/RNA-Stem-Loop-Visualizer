@@ -1,5 +1,5 @@
-/* RNA Stem Loop Visualizer
- * The main program.
+/* RNAVisualizer
+ * Visualize the stem loop.
  *
  * Copyright (C) 2013 Stijn Wouters
  *
@@ -19,16 +19,31 @@
  * Last modified: 13 January 2014.
  * By: Stijn Wouters.
  */
-#include "RNAVisualizer.h"
-#include "LLParser.h"
 
-int main() {
-    /* SAMPLE */
-    std::string rnaseq = "agucccccacu"; // le RNA string
-    RNAVisualizer rna_visualizer;           // le visualizer
+#ifndef RNAVisualizer_H_
+#define RNAVisualizer_H_
 
-    rna_visualizer.visualize( rnaseq, LLP::RNAParser::parse(rnaseq) );
+#include <string>
+#include "SFML/Graphics.hpp"
 
-    // that's it
-    return 0;
-}
+class RNAVisualizer {
+public:
+    RNAVisualizer();
+
+    void visualize(const std::string& sequence, const unsigned int& stemsize);
+
+private:
+    unsigned int fRadius;
+    sf::CircleShape fAdenine;
+    sf::CircleShape fCytosine;
+    sf::CircleShape fGuanine;
+    sf::CircleShape fUracil;
+
+    sf::RenderWindow fWindow;
+    sf::View fStandard;
+
+    void event();
+    void draw(const char& type, const int& x, const int& y);
+};
+
+#endif /* RNAVisualizer_H_ */
