@@ -901,6 +901,88 @@ bool PDA::process(std::string input){
 	return false;
 }
 
+bool PDA::toDotFile(std::string fileName){
+	std::ofstream myfile;
+	try{
+		myfile.open(fileName);
+	}catch(std::exception &e){
+		std::cout << "There went something wrong when creating/opening the file" << e.what() << std::endl;
+		return false;
+	}
+	// Base settings
+	myfile << "digraph PDA {\n";
+	myfile << "node [shape = circle];\n";
+	myfile << "\"\" [shape=none];\n";
+
+	// Finals
+	myfile << "node [shape = doublecircle];";
+	for(auto i : this->fStates){
+		if(i.isFinal()){
+			myfile << " " << i.getName();
+		}
+	}
+	myfile << ";\n";
+
+	// Transitions
+	for(auto i : this->fTransitions){
+		std::string from = i.getFrom()->getName();
+		std::string to = i.getTo()->getName();
+		std::string label;
+		std::string topstack;
+
+		if(i.getInputSymbol() == 0){
+			label = "ε";
+		}else if(i.getInputSymbol() == 5){
+			label = "ε";
+		}else{
+			label = i.getInputSymbol();
+		}
+
+		if(i.getTopStack() == 9){
+			topstack = "Z0";
+		}else{
+			topstack = i.getTopStack();
+		}
+
+		myfile << "	" << from << " -> " << to << " [label=\"";
+
+		if(i.getStackOperation() == POP){
+			myfile << label << ", " << topstack << "/";
+		}else if(i.getStackOperation() == POPPUSH){
+			myfile << label << ", " << topstack << "/";
+			for(auto pushStackIt = i.getPushStack().begin(); pushStackIt != i.getPushStack().end();pushStackIt++){
+				myfile << *pushStackIt;
+			}
+		}else if(i.getStackOperation() == STAY){
+			myfile << label << ", " << topstack << "/" << topstack;
+		}else if(i.getStackOperation() == PUSH){
+			myfile << label << ", " << topstack << "/" << topstack;
+			for(auto pushStackIt = i.getPushStack().begin(); pushStackIt != i.getPushStack().end();pushStackIt++){
+				myfile << *pushStackIt;
+			}
+		}else if(i.getStackOperation() == EMPTY){
+			myfile <<label << ", "  << topstack << "/";
+		}else{
+			//throw std::runtime_error("No stack operation specified");
+		}
+
+		myfile << "\"];" << std::endl;
+	}
+
+	// Start state
+	try{
+		myfile << "	\"\" -> " << this->fStartState->getName() << ";" << std::endl;
+	}catch(std::exception &e){
+		std::cout << "No start state" << std::endl;
+	}
+
+	myfile << "}";
+
+	myfile.close();
+
+	return true;
+}
+
 std::ostream& operator<<(std::ostream& out, PDA pda){
 	out << "PDA" << std::endl << "---" <<std::endl;
 
