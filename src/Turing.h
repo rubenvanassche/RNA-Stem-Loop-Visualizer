@@ -36,7 +36,6 @@
 #include <memory>
 #include "TinyXML/tinyxml.h"
 
-#define DATADIR "/home/jakob/Dropbox/UA/RNA-Stem-Loop-Visualizer/data/"
 
 /**
  * Please note that the TuringState, TuringTransition, TMID and Tape classes were designed specifically for use with the TuringMachine class.
