@@ -51,9 +51,24 @@ public:
      *
      * @brief i Index of the nucleotide
      *
-     * @return 0 if loop, X if stem
+     * @return 0 if loop, X if stem, ? if neither
      */
     char getLoopSignAt(int i) const;
+
+    /**
+     * @brief add character in front of loop
+     *
+     * @param nucl Nucleotide type
+     */
+
+    void push_front(char nucl);
+
+    /**
+     * @brief add character in back of loop
+     *
+     * @param nucl Nucleotide type
+     */
+    void push_back(char nucl);
 
     /**
      * @brief gets the size of the string
@@ -61,6 +76,28 @@ public:
      * @return size of the string
      */
     int getSize() const;
+
+    /**
+     * @brief Gets the index of the first nucleotide in the loop
+     *
+     * @return the index
+     */
+    int getLoopStartIndex() const;
+
+    /**
+     * @brief Gets the index of the first nucleotide in the loop
+     *
+     * @return the index
+     */
+    int getLoopEndIndex() const;
+
+    /**
+     * @brief Gets the size of the stem of the stemloop
+     *
+     * @return the size
+     */
+
+    int getStemSize() const;
 
     /**
      * @brief get the RNAString as a std::string;

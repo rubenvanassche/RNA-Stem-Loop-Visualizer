@@ -150,4 +150,4 @@ void processInput(std::string inputFile, std::string outputFile, bool output) {
         std::cerr << err << std::endl;
     }
 }
-}; 
+}

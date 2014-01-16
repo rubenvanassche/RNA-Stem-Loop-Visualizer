@@ -151,7 +151,7 @@ void Tape::resetHead() {
     fHead = 0;
     while (fTape[fHead][0] == fBlank) {
         fHead++;
-        if (fHead == fTape.size())
+        if (fHead == (int) fTape.size())
             break;
     }
 }

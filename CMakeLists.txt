@@ -28,6 +28,13 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    SET (CMAKE_CXX_COMPILER "/usr/bin/clang++")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
+# Documentation
+SET(BUILD_DOCS TRUZ)
+
+if(BUILD_DOCS)
+    add_subdirectory(docs)
+endif()
+
 # define DATADIR for tests that need input files
 add_definitions(-DDATADIR="${CMAKE_SOURCE_DIR}/data/")
 

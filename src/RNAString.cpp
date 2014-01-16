@@ -53,6 +53,19 @@ char RNAString::getLoopSignAt(int i) const {
     return fLoops[i];
 }
 
+void RNAString::push_front(char nucl) {
+    fString.insert(fString.begin(), nucl);
+    fLoops.insert(fLoops.begin(), '?');
+}
+
+
+void RNAString::push_back(char nucl) {
+    fString.insert(fString.end(), nucl);
+    fLoops.insert(fLoops.end(), '?');
+}
+
+
+
 int RNAString::getSize() const {
     return fString.size();
 }
@@ -65,6 +78,32 @@ std::string RNAString::getString() const {
 
 	return out;
 }
+
+
+int RNAString::getLoopStartIndex() const {
+    int index = 0;
+    while (fLoops[index] != '0')
+        index++;
+    return index;
+}
+
+
+int RNAString::getLoopEndIndex() const {
+    int index = fLoops.size() - 1;
+    while (fLoops[index] != '0')
+        index--;
+    return index;
+}
+
+
+int RNAString::getStemSize() const {
+    int startIndex = getLoopStartIndex();
+    int index = startIndex;
+    while (fLoops[index] != 'X')
+        index++;
+    return index - startIndex;
+}
+
 
 std::ostream& operator<<(std::ostream& os, RNAString str) {
     os << str.fString << std::endl;
