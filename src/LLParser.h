@@ -309,23 +309,38 @@ private:
 class RNAParser {
 public:
     /**
-     * @brief Parses the given string.
+     * @brief Parses the given string. Checks if the given RNA string is a vallid stemloop of the given size.
      *
      * @param input RNA string
      * @param stemSize The size of the stem 
      *
      * @return True if 'input' is a vallid RNA string with stem of size 'stemSize'
      */ 
-    static bool parse(std::string input, unsigned int stemSize);
+    static bool parse(std::string input, unsigned int stemsize);
 
     /**
-     * @brief Parses the given string.
+     * @brief Parses the given string. Checks if the given RNA string is a vallid stemloop.
      *
      * @param input RNA string
      *
      * @return If vallid the stemsize of the RNA-string, else 0
      */ 
-    static unsigned int parse(const std::string& input);
+    static unsigned int parse(const std::string input);
+
+    /**
+     * @brief Parses the given string.
+     *
+     * @param input RNA string
+     * @param begin indicates the possible begin of a stemloop
+     * @param end indicates the possible end of a stemloop (iterator like)
+     * @param b_stemsize the size of the best founded stemloop
+     * @param b_begin the begin of the best founded stemloop
+     * @param b_end the end of the best founded stemloop
+     *
+     * @return If vallid the stemsize of the RNA-string, else 0
+     */ 
+    static unsigned int parse(const std::string& input, unsigned int& b_stemsize, unsigned int& b_begin, 
+        unsigned int& b_end, unsigned int begin=0, unsigned int end=0);
 
     /**
      * @brief Indicates whether the given character is a vallid RNA-element.
