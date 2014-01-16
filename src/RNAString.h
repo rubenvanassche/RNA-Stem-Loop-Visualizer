@@ -78,6 +78,28 @@ public:
     int getSize() const;
 
     /**
+     * @brief Gets the index of the first nucleotide in the loop
+     *
+     * @return the index
+     */
+    int getLoopStartIndex() const;
+
+    /**
+     * @brief Gets the index of the first nucleotide in the loop
+     *
+     * @return the index
+     */
+    int getLoopEndIndex() const;
+
+    /**
+     * @brief Gets the size of the stem of the stemloop
+     *
+     * @return the size
+     */
+
+    int getStemSize() const;
+
+    /**
      * @brief get the RNAString as a std::string;
      *
      * @return A std::string

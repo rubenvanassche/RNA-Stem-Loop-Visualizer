@@ -36,6 +36,9 @@ void MainWindow::on_AnalyzeButton_clicked(){
     std::string visualizerLoop = ""; // Store the loop for visualizing here
     // That's it!
     RNAString RNALoopAdv;
+    int startIndex = 0;
+    int endIndex = 0;
+    int stemSize = 0;
     if(algoType == "CFG"){
 
 
@@ -71,11 +74,16 @@ void MainWindow::on_AnalyzeButton_clicked(){
                             for (int j = 0; j < unusedNucleotides - i - 1; j++) {
                                 RNALoopAdv.push_back(RNALoop[RNALoop.size() -1 -j]);
                             }
-                            std::cout << RNALoopAdv << std::endl;
                             break;
                         }
                     }
                 }
+            }
+            if (accepted) {
+                startIndex = RNALoopAdv.getLoopStartIndex();
+                endIndex = RNALoopAdv.getLoopEndIndex();
+                stemSize = RNALoopAdv.getStemSize();
+                std::cout << RNALoopAdv << std::endl;
             }
         }
         catch (std::runtime_error& e) {

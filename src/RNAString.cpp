@@ -79,6 +79,32 @@ std::string RNAString::getString() const {
 	return out;
 }
 
+
+int RNAString::getLoopStartIndex() const {
+    int index = 0;
+    while (fLoops[index] != '0')
+        index++;
+    return index;
+}
+
+
+int RNAString::getLoopEndIndex() const {
+    int index = fLoops.size() - 1;
+    while (fLoops[index] != '0')
+        index--;
+    return index;
+}
+
+
+int RNAString::getStemSize() const {
+    int startIndex = getLoopStartIndex();
+    int index = startIndex;
+    while (fLoops[index] != 'X')
+        index++;
+    return index - startIndex;
+}
+
+
 std::ostream& operator<<(std::ostream& os, RNAString str) {
     os << str.fString << std::endl;
     os << str.fLoops;
