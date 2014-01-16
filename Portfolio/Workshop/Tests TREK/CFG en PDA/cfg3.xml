@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<CFG>
+	<variables>
+		<var>P</var>
+	</variables>
+	<terminals>
+		<t>0</t>
+		<t>1</t>
+        <t>(</t>
+        <t>)</t>
+        <t>+</t>
+        <t>*</t>
+	</terminals>
+	<rules>
+		<r var="P" body="empty"/>
+		<r var="P" body="1"/>
+        <r var="P" body="0"/>
+        <r var="P" body="(P)"/>
+        <r var="P" body="P+P"/>
+        <r var="P" body="PP"/>
+        <r var="P" body="P*"/>
+	</rules>
+	<start>P</start>
+</CFG>

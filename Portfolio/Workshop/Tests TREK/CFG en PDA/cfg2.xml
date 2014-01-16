@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<CFG>
+	<variables>
+		<var>P</var>
+		<var>Q</var>
+        <var>R</var>
+        <var>S</var>
+        <var>T</var>
+	</variables>
+	<terminals>
+		<t>a</t>
+		<t>b</t>
+        <t>z</t>
+	</terminals>
+	<rules>
+		<r var="P" body="QS"/>
+		<r var="Q" body="zz"/>
+        <r var="Q" body="zR"/>
+        <r var="R" body="aza"/>
+        <r var="R" body="aRa"/>
+        <r var="S" body="zz"/>
+        <r var="S" body="Tz"/>
+        <r var="T" body="bzb"/>
+        <r var="Q" body="bTb"/>
+	</rules>
+	<start>P</start>
+</CFG>

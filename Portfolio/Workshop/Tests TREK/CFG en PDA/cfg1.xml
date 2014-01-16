@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<CFG>
+	<variables>
+		<var>P</var>
+		<var>Q</var>
+        <var>R</var>
+	</variables>
+	<terminals>
+		<t>x</t>
+		<t>y</t>
+        <t>c</t>
+	</terminals>
+	<rules>
+		<r var="P" body="Q"/>
+        <r var="P" body="R"/>
+		<r var="Q" body="xcyy"/>
+        <r var="Q" body="xQyy"/>
+        <r var="R" body="xcy"/>
+        <r var="R" body="xRy"/>
+	</rules>
+	<start>P</start>
+</CFG>

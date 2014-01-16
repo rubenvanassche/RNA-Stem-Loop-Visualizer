@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<CFG>
+	<variables>
+		<var>S</var>
+        <var>Q</var>
+        <var>R</var>
+        <var>A</var>
+        <var>C</var>
+	</variables>
+	<terminals>
+		<t>a</t>
+		<t>b</t>
+        <t>c</t>
+        <t>e</t>
+	</terminals>
+	<rules>
+		<r var="S" body="QC"/>
+		<r var="S" body="AR"/>
+        <r var="Q" body="aQc"/>
+        <r var="Q" body="e"/>
+        <r var="R" body="bRc"/>
+        <r var="R" body="e"/>
+        <r var="A" body="Aa"/>
+        <r var="A" body="e"/>
+        <r var="C" body="Cc"/>
+        <r var="C" body="e"/>
+	</rules>
+	<start>S</start>
+</CFG>
