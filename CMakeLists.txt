@@ -16,8 +16,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# Last modified: 24 December 2013.
-# By: Pieter Lauwers.
+# Last modified: 13 January 2014.
+# By: Stijn Wouters.
 cmake_minimum_required(VERSION 2.6)
 project("RNA Stem Loop Visualizer")
 
@@ -72,9 +72,32 @@ set(TESTSRC
     src/test_PDA.cpp
     src/test_LLParser.cpp   
     )
+    
+# Lists All the files for the GUI
+SET(UI_SOURCES src/UI/main.cpp src/UI/mainwindow.cpp)
+SET(UI_HEADERS src/UI/mainwindow.h)
+
+# Some QT stuff
+FIND_PACKAGE(Qt4 REQUIRED)
+QT4_WRAP_CPP(UI_HEADERS_MOC ${UI_HEADERS})
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+ADD_EXECUTABLE(RNAStemLoop ${UI_SOURCES} ${UI_HEADERS_MOC} ${UI_FORMS_HEADERS})
+TARGET_LINK_LIBRARIES(RNAStemLoop ${QT_LIBRARIES})
+
+# Extend the CMake module path to find the FindSFML.cmake file in
+# {project root}/cmake/Modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
+
+# Look for SFML >= 2.0, with the specific subcomponents listed below
+find_package(SFML 2 COMPONENTS system window graphics)
+
+# Add include dirs for SFML (The SFML_INCLUDE_DIR variable is defined by
+# FindSFML.cmake, if SFML was found).
+include_directories(${SFML_INCLUDE_DIR})
 
 # build the main program
-add_executable(RNA-Stem-Loop-Visualizer src/RNAslv.cpp)
+add_executable(RNA-Stem-Loop-Visualizer src/RNAslv.cpp src/RNAVisualizer.cpp src/LLParser.cpp)
 
 # build all the tests
 add_executable(Tests src/Tests.cpp ${TINYXMLSRC} ${TURINGSRC} ${CNFSRC} ${PDASRC} ${LLPARSERSRC} ${TESTSRC})
@@ -90,6 +113,10 @@ add_executable(RunPDA src/runPDAInput.cpp ${TINYXMLSRC} ${PDASRC})
 
 # build the LLParser workshop
 add_executable(RunLLParser src/runLLParserInput.cpp ${LLPARSERSRC})
+
+# Link target to SFML libs (The SFML_LIBRARIES is defined by FindSFML.cmake,
+# if SFML was found)
+target_link_libraries(RNA-Stem-Loop-Visualizer ${SFML_LIBRARIES})
 
 # Install all executables into the bin directory.
 install(TARGETS 
