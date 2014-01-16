@@ -121,6 +121,7 @@ target_link_libraries(RNA-Stem-Loop-Visualizer ${SFML_LIBRARIES})
 # Install all executables into the bin directory.
 install(TARGETS 
     RNA-Stem-Loop-Visualizer 
+    RNAStemLoop
     Tests 
     RunTuring 
     RunCYK 
