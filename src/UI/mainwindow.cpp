@@ -63,7 +63,11 @@ void MainWindow::on_AnalyzeButton_clicked(){
     if(accepted == true){
     	ui->VisualizeButton->setDisabled(false);
     	QMessageBox::information(NULL, "Accepted", "This loop was accepted.");
-    	this->fVisualizerLoop = visualizerLoop;
+    	if(algoType == "Turing"){
+    		this->fVisualizerLoop = RNALoopAdv.getString();
+    	}else{
+    		this->fVisualizerLoop = visualizerLoop;
+    	}
     }else{
     	QMessageBox::information(NULL, "Not Accepted", "This loop was not accepted.");
     }
