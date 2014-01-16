@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "../LLParser.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -34,12 +35,26 @@ void MainWindow::on_AnalyzeButton_clicked(){
     bool accepted = true; // Change this to true if the loop is accepted
     std::string visualizerLoop = ""; // Store the loop for visualizing here
     // That's it!
+    RNAString RNALoopAdv;
     if(algoType == "CFG"){
 
 
     }else if(algoType == "LLParser"){
-
+        unsigned int stemsize = LLP::RNAParser::parse(RNALoop);
+        accepted = (stemsize != 0);
     }else if(algoType == "Turing"){
+        try {
+            TuringPtr tm = generateTM("TMRNA1.xml");
+            std::tuple<bool, Tape> booltape = tm->processAndGetTape(RNALoop);
+            RNALoopAdv = RNAString(std::get<1>(booltape));
+            accepted = std::get<0>(booltape);
+        }
+        catch (std::runtime_error& e) {
+            //invalid string input
+            std::cout << e.what() << std::endl;
+            RNALoopAdv = RNAString();
+            accepted = false;
+        }
 
     }else{
         QMessageBox::information(NULL, "Problem", "This algorithm for processing the RSL is not (yet avaible).");

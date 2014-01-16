@@ -147,6 +147,16 @@ void Tape::moveHead(Direction dir) {
 }
 
 
+void Tape::resetHead() {
+    fHead = 0;
+    while (fTape[fHead][0] == fBlank) {
+        fHead++;
+        if (fHead == fTape.size())
+            break;
+    }
+}
+
+
 std::ostream& operator<<(std::ostream& output, const Tape& T) {
     output << "Tape: ";
     for (int j=0; j < T.fTrackCount; j++) {
@@ -175,6 +185,11 @@ void TMID::step(StatePtr to, const std::vector<char>& write, Direction dir) {
     fState = to;
     fTape.replaceSymbolsAtHead(write);
     fTape.moveHead(dir);
+}
+
+const Tape& TMID::getTape() const {
+    const Tape& tapeRef = fTape;
+    return  tapeRef;
 }
 
 
@@ -359,6 +374,37 @@ bool TuringMachine::process(const std::string& input) const {
         fIDs.pop();
     }
     return 0;
+}
+
+std::tuple<bool, Tape> TuringMachine::processAndGetTape(const std::string& input) const {
+    if (fStartState == nullptr)
+        throw std::runtime_error("No start state specified!");
+    for (auto i : input) {
+        if (fAlphabet.find(i) == fAlphabet.end()) {
+            throw std::runtime_error("Error while processing input string: Character in input but not in input alphabet!");
+        }
+    }
+
+    std::queue<TMID> fIDs;   //Queue ensures all IDs for i-th character in input are processed before moving on to IDs for (i+1)th character
+    fIDs.push(TMID(input, fStartState, fBlank, fTrackCount));  //Generate first ID
+    while (fIDs.size()) {               //continue processing until no IDs left or accept state reached
+        TMID& currentID = fIDs.front();
+        for(auto i : fTransitions) {                //Multiple valid transitions possible!
+            std::pair<StatePtr, std::vector<char>> IDpair = currentID.getStateAndSymbols();    //Current state and read symbol on tape
+            if (i.match(IDpair.first, IDpair.second)) {                                    //Transition for current state and symbol found
+                std::tuple<StatePtr, std::vector<char>, Direction> trans = i.getTransition();    //Fetch next state, symbol to write and direction to move tape head
+                if (fAccepting.find(std::get<0>(trans)) != fAccepting.end()) {             //Next state accepting --> immediately accept input
+                    //std::cout << currentID << std::endl; //delete
+                    return std::make_tuple(true, currentID.getTape());
+                }
+                TMID newID = currentID;                                                   //copy current ID (through default copy constructor, which does the job in this case)
+                newID.step(std::get<0>(trans), std::get<1>(trans), std::get<2>(trans));   //Apply transition to copied ID
+                fIDs.push(newID);                                                         //And finally add to the queue
+            }
+        }
+        fIDs.pop();
+    }
+    return std::make_tuple(false, Tape("", 'B', 0));
 }
 
 

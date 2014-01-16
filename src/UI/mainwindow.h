@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <QMessageBox>
 #include <iostream>
+#include "../Turing.h"
+#include "../RNAString.h"
 
 namespace Ui {
 class MainWindow;
