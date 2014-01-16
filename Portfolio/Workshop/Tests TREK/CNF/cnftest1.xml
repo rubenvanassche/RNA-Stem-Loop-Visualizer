@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<CFG>
+	<variables>
+		<var>S</var>
+		<var>X</var>
+		<var>Y</var>
+		<var>0</var>
+		<var>1</var>
+		<var>2</var>
+		<var>3</var>
+		<var>4</var>
+	</variables>
+	<terminals>
+		<t>a</t>
+		<t>b</t>
+		<t>c</t>
+	</terminals>
+	<rules>
+		<r var="S" body="01"/>
+		<r var="S" body="21"/>
+		<r var="S" body="03"/>
+		<r var="S" body="23"/>
+		<r var="X" body="AY"/>
+		<r var="X" body="BY"/>
+		<r var="X" body="a"/>
+		<r var="X" body="b"/>
+		<r var="Y" body="AY"/>
+		<r var="Y" body="BY"/>
+		<r var="Y" body="a"/>
+		<r var="Y" body="b"/>
+		<r var="Y" body="c"/>
+		<r var="0" body="2X"/>
+		<r var="1" body="3X"/>
+		<r var="2" body="a"/>
+		<r var="3" body="b"/>
+		<r var="4" body="c"/>
+	</rules>
+	<start>S</start>
+</CFG>

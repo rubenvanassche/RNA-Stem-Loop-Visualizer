@@ -1,0 +1,3 @@
+correct:    1s0
+correct:    1m1m1m1m1m1
+error:      1ss0

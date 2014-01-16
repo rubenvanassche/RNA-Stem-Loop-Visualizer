@@ -132,12 +132,6 @@ LLParser::LLParser(
 
 }
 
-/*
-LLParser::LLParser(const CFG& grammar, unsigned int lookahead) {
-
-}
-*/
-
 bool LLParser::process(const std::string& input) const {
     std::stack<char> stack;
     stack.emplace(startsymbol);
@@ -203,12 +197,6 @@ LLTable::LLTable(
         ) : dimension(dimension), table(generateTable(CFGTerminals, CFGVariables, CFGProductions, dimension)){
 
 }
-
-/*
-LLTable::LLTable(const CFG& grammar, unsigned int dimension) {          
-
-}
-*/
 
 SymbolString LLTable::process(const char& topStack, const SymbolString& remainingInput) const {
     // calculate the length of the lookahead = min(k, remainingInput.length())
