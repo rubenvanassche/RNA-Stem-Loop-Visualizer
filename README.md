@@ -146,6 +146,10 @@ LLParserInput.txt results in LLParserOutput.txt
 ## Usage
 Open RNAStemLoopVisualizer and start visualizing!
 
+## Documentation
+The API Documentation can be made by changing the BUILD_DOCS bool in the CMakeLists.txt file.
+We also provide an online version of the documentation which can be found here: http://rubenvanassche.github.io/RNA-Stem-Loop-Visualizer/docs/html/
+
 ## Made By
 ```
 Pieter Lauwers
