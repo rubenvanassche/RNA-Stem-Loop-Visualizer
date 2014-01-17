@@ -144,22 +144,26 @@ void MainWindow::on_AnalyzeButton_clicked(){
 
     				if(*it == 'A' and *rIt == 'U'){
     					// do nothing
+    					stemSize++;
     				}else if(*it == 'U' and *rIt == 'A'){
-    					// do nothing
+    					stemSize++;
     				}else if(*it == 'C' and *rIt == 'G'){
-    					// do nothing
+    					stemSize++;
     				}else if(*it == 'G' and *rIt == 'C'){
-    					// do nothing
+    					stemSize++;
     				}else{
     					startIndex = x - begin;
     					endIndex = RNALoop.size()  - x;
-    					stemSize = endIndex - startIndex + 1;
     					break;
     				}
 
     				x++;
     				it++;
     				rIt++;
+    			}
+
+    			if(startIndex == endIndex){
+    				stemSize /= 2;
     			}
     		}
 
