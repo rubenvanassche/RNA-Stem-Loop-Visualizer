@@ -109,6 +109,68 @@ void MainWindow::on_AnalyzeButton_clicked(){
         stemSize = int(result);
         startIndex = int(begin) + stemSize;
         endIndex = int(end) - stemSize;
+    }else if(algoType == "PDA"){
+    	try{
+    		PDA pda("../data/PDARNA1.xml");
+    		const std::string originalLoop = RNALoop;
+
+    		int begin = 0;
+    		while(true){
+    			accepted = pda.process(RNALoop);
+    			if(accepted == true){
+    				// Stem found so go to next step
+    				break;
+    			}else{
+    				// Stem not found, remove from each side two blocks
+    				RNALoop.erase(0,1);
+    				RNALoop.erase(RNALoop.size() - 1,1);
+    				begin++;
+    			}
+    		}
+
+    		// The code below is for the visualizer so it can work with the loop, it's off course better then using the PDA but using the PDA is the point of this course
+    		// So above the loop is checked with full functionality by the PDA
+    		// Beneth this block we just use "normal" code because the pda hasn't the functionality built in to do this
+
+    		int x = 0;
+
+    		if(accepted == true){
+    			std::string::iterator it = RNALoop.begin();
+    			std::string::reverse_iterator rIt = RNALoop.rbegin();
+    			while(true){
+    				if(it == RNALoop.end()){
+    					break;
+    				}
+
+    				if(*it == 'A' and *rIt == 'U'){
+    					// do nothing
+    				}else if(*it == 'U' and *rIt == 'A'){
+    					// do nothing
+    				}else if(*it == 'C' and *rIt == 'G'){
+    					// do nothing
+    				}else if(*it == 'G' and *rIt == 'C'){
+    					// do nothing
+    				}else{
+    					startIndex = x - begin;
+    					endIndex = RNALoop.size()  - x;
+    					stemSize = endIndex - startIndex + 1;
+    					break;
+    				}
+
+    				x++;
+    				it++;
+    				rIt++;
+    			}
+    		}
+
+    		// Give the original string back
+    		RNALoop = originalLoop;
+    	}catch(std::exception &e){
+    		std::cout << "There went something wrong: " << e.what() << std::endl;
+    	    ui->AnalyzeButton->setEnabled(true);
+    	    ui->AnalyzeButton->setText("Analyze");
+    		return;
+    	}
     }else if(algoType == "Turing"){
         try {
             RNAString RNALoopAdv;  //Will contain string with longest possible loop indicated
