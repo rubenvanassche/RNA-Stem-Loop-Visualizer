@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <iostream>
 #include "../Turing.h"
+#include "../PDA.h"
 #include "../RNAString.h"
 
 namespace Ui {
