@@ -94,7 +94,7 @@ void MainWindow::on_AnalyzeButton_clicked(){
 
                         sequence = std::string(sequence.begin() + 1, sequence.end() - 1);
                     } else {
-                        endIndex = sequence.size() - 1;
+                        endIndex = startIndex + sequence.size();
                         break;
                     } // end if-else
                 } // end while
