@@ -1,0 +1,11 @@
+
+RNA sequence		Accepted	Stemsize	StartLoop	EndLoop
+—————————————————————————————————————————————————————————————————————————————————
+ACGACGU			YES		3		3		4
+AAU			YES		1		1		2
+GGCAUC			YES		1		1		5
+GUUUUUCACGAUGAAAAAC	YES		8		8		11
+HIDKKDLKEODKKD		NO		0		-		-
+UAG			NO		0		-		-
+ACGCUC			YES		1		1		4
+UUACGACGUGG		YES		3		5		6		
