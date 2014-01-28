@@ -5,14 +5,13 @@ Software for finding and visualizing RNA Stem Loops from a RNA sequence.
 
 ## Introduction
 RNA (**R**ibo **N**ucleine **Acid**) is actually a chain of nucleotides,
-abbreviated as G, A, U and C and where G is a complement of C and U of A and
-vice versa. The RNA will form a stem loop if there are two parts in the RNA
+abbreviated as G, A, U and C and where G is a complement of C and U of A.
+The RNA will form a stem loop if there are two parts in the RNA
 sequence consisting of complements of each other (the stem) while there are
 other non-complementing nucleotides in between (the loop).
 
-### Basic Version
 Assume a RNA sequence like `CCUGCXXXXXGCAGG`, then this software will parse
-this sequence and testify whether this is a stem loop. If so, then it will
+this sequence and test whether this is a stem loop. If so, then it will
 visualize something like below:
 ```
  C === G
@@ -26,34 +25,34 @@ X       X
 ```
 Where the upperpart is a stem and the lower one is a loop.
 
-We'll use a PDA (Push-Down Automaton for parsing the sequence and maybe
-we'll extend it to using a LL or LR parser or Turing Machine instead).
+Either a CFG, an LL Parser or a Turing Machine (up to the user)
+is used to analyze the string.
 
-> We'll assume that the loop starts where X does **not** match with a
-> complementary X anymore (e.g. G cannot match with an A, so then the loop
-> starts from there).
+Note that not all algorithms will give the same result. They all look for
+something slightly different.
 
-### Extensions
-```
-[ ] Input RNA sequence where the initial nucleotide is not necessarily the
-    beginning of the stem loop.
+CFG: A stem loop across the entire input string
 
-[ ] Support sequences with multiple stem loops.
+LL Parser: A stem loop that does not necessarily use the entire input string.
+If there are multiple stem loops, the one with the longest stem is chosen.
+If there are multiple stem loops with the maximum size, the leftmost one is chosen.
 
-[ ] Use something fancier than ASCII to visualize the stem loop.
+Turing Machine: Looks for the same stem loops as the LL Parser, 
+however only stem loops with loops of at least 2 nucleotides will be considered.
 
-[ ] Use LL parser or Turing Machine instead of PDA.
-
-[ ] GUI
-
-```
+A GUI is provided in the RNAStemLoop executable. Enter an input string, 
+choose an algorithm, press "Analyze" to analyze a string and press "Visual RSL"
+to generate a visualization of the stem loop. Remember to re-analyze after
+changing any input!
 
 ## Installing
 ```sh
 # assuming you are now in the project root directory
-$ mkdir build/ && cd build/
-$ cmake ../
-$ make && make install
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make 
+$ make install
 ```
 
 Now you'll get the following executables in the `bin/` directory:
@@ -65,6 +64,34 @@ Now you'll get the following executables in the `bin/` directory:
 - `Tests` Runs all the tests using the [Catch](https://github.com/philsquared/Catch) 
   testing environment.
 
+
+## Usage
+Open RNAStemLoopVisualizer and start visualizing!
+
+## Documentation
+The API Documentation can be made by changing the BUILD_DOCS bool in the CMakeLists.txt file.
+We also provide an online version of the documentation which can be found here: http://rubenvanassche.github.io/RNA-Stem-Loop-Visualizer/docs/html/
+A PDF version can also be found in the /docs/ folder
+
+## Made By
+```
+Pieter Lauwers
+Jakob Struye
+Ruben Van Assche
+Stijn Wouters
+```
+
+## Contributing
+You are welcome! Just send a pull request.
+
+Bugs, questions and/or ideas are welcome too, just put them on the [issues page](https://github.com/rubenvanassche/RNA-Stem-Loop-Visualizer/issues).
+(Also: it's really cool if you've fixed that bug by yourself and send a PR
+instead)
+
+
+
+Note that the following sections are not about the RNA Stem Loop Visualizer!
+They only concern testing of some algorithms used by the Visualizer.
 ### Workshop
 There are also some executables and sample files that was provided during the 
 workshop sessions in University of Antwerp:
@@ -142,25 +169,3 @@ The parse table for the provided grammar.
     EXAMPLES
 LLParserInput.txt results in LLParserOutput.txt
 ```
-
-## Usage
-Open RNAStemLoopVisualizer and start visualizing!
-
-## Documentation
-The API Documentation can be made by changing the BUILD_DOCS bool in the CMakeLists.txt file.
-We also provide an online version of the documentation which can be found here: http://rubenvanassche.github.io/RNA-Stem-Loop-Visualizer/docs/html/
-
-## Made By
-```
-Pieter Lauwers
-Jakob Struye
-Ruben Van Assche
-Stijn Wouters
-```
-
-## Contributing
-You are welcome! Just send a pull request.
-
-Bugs, questions and/or ideas are welcome too, just put them on the [issues page](https://github.com/rubenvanassche/RNA-Stem-Loop-Visualizer/issues).
-(Also: it's really cool if you've fixed that bug by yourself and send a PR
-instead)
