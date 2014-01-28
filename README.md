@@ -55,6 +55,8 @@ $ make
 $ make install
 ```
 
+Note that Qt4 and SFML2.0 are required!
+
 Now you'll get the following executables in the `bin/` directory:
 
 ### Executables
