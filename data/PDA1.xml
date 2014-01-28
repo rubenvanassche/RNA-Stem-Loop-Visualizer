@@ -64,7 +64,6 @@
                 <operation>PUSH</operation>
                 <push>X</push>
             </transition>
-
             <transition>
                 <from>p</from>
                 <to>p</to>
