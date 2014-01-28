@@ -23,7 +23,7 @@ X       X
  X     X
     X
 ```
-Where the upperpart is a stem and the lower one is a loop.
+Where the upper part is a stem and the lower one is a loop.
 
 Either a CFG, an LL Parser or a Turing Machine (up to the user)
 is used to analyze the string.
@@ -155,7 +155,7 @@ suffix) as a command line argument. When prompted, enter an input string
     EXAMPLES
 One ODA in .xml format is provided as example:
 
-    - PDAInput1.xml is a PDA accpeting all the palindromes of the form : [0+1]*c[0+1]*
+    - PDAInput1.xml is a PDA accepting all the palindromes of the form : [0+1]*c[0+1]*
 ```
 
 #### LLParser (Pieter Lauwers)
