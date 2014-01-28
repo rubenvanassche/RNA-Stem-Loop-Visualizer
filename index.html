@@ -37,16 +37,13 @@
 <a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h2>
 
 <p>RNA (<strong>R</strong>ibo <strong>N</strong>ucleine <strong>Acid</strong>) is actually a chain of nucleotides,
-abbreviated as G, A, U and C and where G is a complement of C and U of A and
-vice versa. The RNA will form a stem loop if there are two parts in the RNA
+abbreviated as G, A, U and C and where G is a complement of C and U of A.
+The RNA will form a stem loop if there are two parts in the RNA
 sequence consisting of complements of each other (the stem) while there are
 other non-complementing nucleotides in between (the loop).</p>
 
-<h3>
-<a name="basic-version" class="anchor" href="#basic-version"><span class="octicon octicon-link"></span></a>Basic Version</h3>
-
 <p>Assume a RNA sequence like <code>CCUGCXXXXXGCAGG</code>, then this software will parse
-this sequence and testify whether this is a stem loop. If so, then it will
+this sequence and test whether this is a stem loop. If so, then it will
 visualize something like below:</p>
 
 <pre><code> C === G
@@ -59,41 +56,40 @@ X       X
     X
 </code></pre>
 
-<p>Where the upperpart is a stem and the lower one is a loop.</p>
+<p>Where the upper part is a stem and the lower one is a loop.</p>
 
-<p>We'll use a PDA (Push-Down Automaton for parsing the sequence and maybe
-we'll extend it to using a LL or LR parser or Turing Machine instead).</p>
+<p>Either a CFG, an LL Parser or a Turing Machine (up to the user)
+is used to analyze the string.</p>
 
-<blockquote>
-<p>We'll assume that the loop starts where X does <strong>not</strong> match with a
-complementary X anymore (e.g. G cannot match with an A, so then the loop
-starts from there).</p>
-</blockquote>
+<p>Note that not all algorithms will give the same result. They all look for
+something slightly different.</p>
 
-<h3>
-<a name="extensions" class="anchor" href="#extensions"><span class="octicon octicon-link"></span></a>Extensions</h3>
+<p>CFG: A stem loop across the entire input string</p>
 
-<pre><code>[ ] Input RNA sequence where the initial nucleotide is not necessarily the
-    beginning of the stem loop.
+<p>LL Parser: A stem loop that does not necessarily use the entire input string.
+If there are multiple stem loops, the one with the longest stem is chosen.
+If there are multiple stem loops with the maximum size, the leftmost one is chosen.</p>
 
-[ ] Support sequences with multiple stem loops.
+<p>Turing Machine: Looks for the same stem loops as the LL Parser, 
+however only stem loops with loops of at least 2 nucleotides will be considered.</p>
 
-[ ] Use something fancier than ASCII to visualize the stem loop.
-
-[ ] Use LL parser or Turing Machine instead of PDA.
-
-[ ] GUI
-
-</code></pre>
+<p>A GUI is provided in the RNAStemLoop executable. Enter an input string, 
+choose an algorithm, press "Analyze" to analyze a string and press "Visual RSL"
+to generate a visualization of the stem loop. Remember to re-analyze after
+changing any input!</p>
 
 <h2>
 <a name="installing" class="anchor" href="#installing"><span class="octicon octicon-link"></span></a>Installing</h2>
 
 <div class="highlight highlight-sh"><pre><span class="c"># assuming you are now in the project root directory</span>
-<span class="nv">$ </span>mkdir build/ <span class="o">&amp;&amp;</span> <span class="nb">cd </span>build/
-<span class="nv">$ </span>cmake ../
-<span class="nv">$ </span>make <span class="o">&amp;&amp;</span> make install
+<span class="nv">$ </span>mkdir build
+<span class="nv">$ </span><span class="nb">cd </span>build
+<span class="nv">$ </span>cmake ..
+<span class="nv">$ </span>make 
+<span class="nv">$ </span>make install
 </pre></div>
+
+<p>Note that Qt4 and SFML2.0 are required!</p>
 
 <p>Now you'll get the following executables in the <code>bin/</code> directory:</p>
 
@@ -108,7 +104,40 @@ starts from there).</p>
 <li>
 <code>Tests</code> Runs all the tests using the <a href="https://github.com/philsquared/Catch">Catch</a> 
 testing environment.</li>
-</ul><h3>
+</ul><h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Open RNAStemLoopVisualizer and start visualizing!</p>
+
+<h2>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p>The API Documentation can be made by changing the BUILD_DOCS bool in the CMakeLists.txt file.
+We also provide an online version of the documentation which can be found here: <a href="http://rubenvanassche.github.io/RNA-Stem-Loop-Visualizer/docs/html/">http://rubenvanassche.github.io/RNA-Stem-Loop-Visualizer/docs/html/</a>
+A PDF version can also be found in the /docs/ folder</p>
+
+<h2>
+<a name="made-by" class="anchor" href="#made-by"><span class="octicon octicon-link"></span></a>Made By</h2>
+
+<pre><code>Pieter Lauwers
+Jakob Struye
+Ruben Van Assche
+Stijn Wouters
+</code></pre>
+
+<h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>You are welcome! Just send a pull request.</p>
+
+<p>Bugs, questions and/or ideas are welcome too, just put them on the <a href="https://github.com/rubenvanassche/RNA-Stem-Loop-Visualizer/issues">issues page</a>.
+(Also: it's really cool if you've fixed that bug by yourself and send a PR
+instead)</p>
+
+<p>Note that the following sections are not about the RNA Stem Loop Visualizer!
+They only concern testing of some algorithms used by the Visualizer.</p>
+
+<h3>
 <a name="workshop" class="anchor" href="#workshop"><span class="octicon octicon-link"></span></a>Workshop</h3>
 
 <p>There are also some executables and sample files that was provided during the 
@@ -176,7 +205,7 @@ suffix) as a command line argument. When prompted, enter an input string
     EXAMPLES
 One ODA in .xml format is provided as example:
 
-    - PDAInput1.xml is a PDA accpeting all the palindromes of the form : [0+1]*c[0+1]*
+    - PDAInput1.xml is a PDA accepting all the palindromes of the form : [0+1]*c[0+1]*
 </code></pre>
 
 <h4>
@@ -191,35 +220,6 @@ The parse table for the provided grammar.
     EXAMPLES
 LLParserInput.txt results in LLParserOutput.txt
 </code></pre>
-
-<h2>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
-
-<p>Open RNAStemLoopVisualizer and start visualizing!</p>
-
-<h2>
-<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
-
-<p>The API Documentation can be made by changing the BUILD_DOCS bool in the CMakeLists.txt file.
-We also provide an online version of the documentation which can be found here: <a href="http://rubenvanassche.github.io/RNA-Stem-Loop-Visualizer/docs/html/">http://rubenvanassche.github.io/RNA-Stem-Loop-Visualizer/docs/html/</a></p>
-
-<h2>
-<a name="made-by" class="anchor" href="#made-by"><span class="octicon octicon-link"></span></a>Made By</h2>
-
-<pre><code>Pieter Lauwers
-Jakob Struye
-Ruben Van Assche
-Stijn Wouters
-</code></pre>
-
-<h2>
-<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
-
-<p>You are welcome! Just send a pull request.</p>
-
-<p>Bugs, questions and/or ideas are welcome too, just put them on the <a href="https://github.com/rubenvanassche/RNA-Stem-Loop-Visualizer/issues">issues page</a>.
-(Also: it's really cool if you've fixed that bug by yourself and send a PR
-instead)</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/rubenvanassche">rubenvanassche</a></p>
