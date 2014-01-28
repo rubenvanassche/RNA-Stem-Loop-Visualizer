@@ -58,7 +58,7 @@ public:
          << QString::fromUtf8("CFG")
          << QString::fromUtf8("LLParser")
          << QString::fromUtf8("Turing")
-         << QString::fromUtf8("PDA")
+         //<< QString::fromUtf8("PDA")
         );
         AnalyzeTypeSelect->setObjectName(QString::fromUtf8("AnalyzeTypeSelect"));
         AnalyzeTypeSelect->setGeometry(QRect(280, 210, 108, 26));

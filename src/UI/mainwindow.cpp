@@ -202,7 +202,6 @@ void MainWindow::on_AnalyzeButton_clicked(){
                             RNALoopAdv.push_back(RNALoop[RNALoop.size() -1 -j]);
                         }
                         maxStemSize = RNALoopAdv.getStemSize();   //properly set max stem size
-                        std::cout << RNALoopAdv.getSize() << std::endl;
                     }
                 }
                 subStringSize--;
