@@ -40,16 +40,12 @@ we'll extend it to using a LL or LR parser or Turing Machine instead).
 
 [ ] Support sequences with multiple stem loops.
 
-[ ] Input which elements should be in the loop, so you can track down
-    specific stem loops.
-
 [ ] Use something fancier than ASCII to visualize the stem loop.
 
-[ ] Use LL or RL parser or Turing Machine instead of PDA.
+[ ] Use LL parser or Turing Machine instead of PDA.
 
 [ ] GUI
 
-[ ] ...
 ```
 
 ## Installing
@@ -64,7 +60,8 @@ Now you'll get the following executables in the `bin/` directory:
 
 ### Executables
 
-- `RNAslv` [Placeholder executable for phase II, does currently nothing]
+- `RNAStemLoop` [The GUI for the RNA Stem Loop Visualizer]
+- `RNA-Stem-Loop-Visualizer` [The visualizer, shouldn't be called by the user]
 - `Tests` Runs all the tests using the [Catch](https://github.com/philsquared/Catch) 
   testing environment.
 
@@ -147,7 +144,19 @@ LLParserInput.txt results in LLParserOutput.txt
 ```
 
 ## Usage
-Hey, we haven't implemented this yet!
+Open RNAStemLoopVisualizer and start visualizing!
+
+## Documentation
+The API Documentation can be made by changing the BUILD_DOCS bool in the CMakeLists.txt file.
+We also provide an online version of the documentation which can be found here: http://rubenvanassche.github.io/RNA-Stem-Loop-Visualizer/docs/html/
+
+## Made By
+```
+Pieter Lauwers
+Jakob Struye
+Ruben Van Assche
+Stijn Wouters
+```
 
 ## Contributing
 You are welcome! Just send a pull request.

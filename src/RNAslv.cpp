@@ -31,7 +31,6 @@ int main(int argc, char* argv[]) {
         int beginloop = std::atoi(argv[3]);
         int endloop = std::atoi(argv[4]);
         RNAVisualizer rna_visualizer;
-        std::cout << stemsize << beginloop << endloop << std::endl;
 
         rna_visualizer.visualize(rnaseq, stemsize, beginloop, endloop);
     } // end if-else

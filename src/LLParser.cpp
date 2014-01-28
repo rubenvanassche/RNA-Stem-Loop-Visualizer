@@ -70,7 +70,7 @@ unsigned int RNAParser::parse(const std::string& input, unsigned int& b_stemsize
     }
     if (end - begin < 3) return 0;
 
-    unsigned int result = parse(input.substr(begin, end - begin)); //std::cout << "\t" << begin << "-" << end << std::endl;
+    unsigned int result = parse(input.substr(begin, end - begin));
     if (result > 0 and result == b_stemsize and (end - begin) > (b_end - b_begin)) {
         b_stemsize = result;
         b_begin = begin;
@@ -81,9 +81,10 @@ unsigned int RNAParser::parse(const std::string& input, unsigned int& b_stemsize
         b_begin = begin;
         b_end = end;
     }
+    if (b_stemsize == (input.length() - 1) / 2) return b_stemsize; // maximal stemsize 
     
-    result = parse(input, b_stemsize, b_begin, b_end, begin, end - 1); //std::cout << "\t" << begin << "-" << end << std::endl;
-    result = parse(input, b_stemsize, b_begin, b_end, begin + 1, end); //std::cout << "\t" << begin << "-" << end << std::endl;
+    result = parse(input, b_stemsize, b_begin, b_end, begin, end - 1); 
+    result = parse(input, b_stemsize, b_begin, b_end, begin + 1, end); 
 
     return b_stemsize;
 }
